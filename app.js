@@ -1,6 +1,14 @@
 var express = require('express');
 var app = express();
 
+// Global controller. Currently used to add HTTP headers to all responses.
+app.get('/*', function(req, res, next) {
+    // HTTP headers to protect against general clickjacking
+    res.header('X-Frame-Options', 'DENY');
+    res.header('Content-Security-Policy', 'frame-ancestors: \'none\'');
+    next();
+});
+
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
