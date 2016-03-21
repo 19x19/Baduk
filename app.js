@@ -28,23 +28,13 @@ app.get('/go', function (req, res) {
     res.sendFile(__dirname + '/src/views/go.html');
 });
 
-app.get('/chat', function (req, res) {
-    res.sendFile(__dirname + '/chat.html')
-});
-
 io.on('connection', function (socket) {
-    console.log('a user connected');
-
-    socket.on('userSentMessage', function (msg) {
-        io.emit('messageBroadcast', msg);
+    socket.on('postNewMessage', function (message) {
+        io.emit('getNewMessage', message);
     });
-    socket.on('register', function (msg) {
-        console.log('register', msg);
-    });
-
 });
 
-http.listen(3001, function () {
+http.listen(3000, function () {
     console.log('listening on *:3000');
 });
 
