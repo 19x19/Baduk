@@ -1,10 +1,11 @@
 {
   "name": "fischr",
   "version": "0.0.1",
-  "description": "Play games",
+  "description": "An easy-to-use online gaming platform.",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "socket.io": "^1.4.5"
   },
   "devDependencies": {},
   "scripts": {
