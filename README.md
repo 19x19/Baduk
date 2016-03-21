@@ -3,20 +3,10 @@ Play games
 
 # Installation
 
-Install nodenv:
-
-
-```
-brew update
-brew install nodenv
-```
-
-Install and use node 5.9.0:
+Install Node.js using the following:
 
 ```
-nodenv install v5.9.0
-nodenv local v5.9.0
-node --version # make sure this shows 5.9.0
+curl "https://nodejs.org/dist/latest/node-${VERSION:-$(wget -qO- https://nodejs.org/dist/latest/ | sed -nE 's|.*>node-(.*)\.pkg</a>.*|\1|p')}.pkg" > "$HOME/Downloads/node-latest.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-latest.pkg" -target "/"
 ```
 
 Install dependencies:
@@ -31,4 +21,4 @@ Run app:
 node ./app.js
 ```
 
-Visit http://localhost:3000/ in chrome
+Visit http://localhost:3000/ in Chrome
