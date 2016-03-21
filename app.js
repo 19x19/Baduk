@@ -20,7 +20,7 @@ app.use(express.static('public'));
 app.use(express.static('source/views'));
 
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/src/index.html');
+  res.sendFile(__dirname + '/src/views/index.html');
 });
 
 io.on('connection', function (socket) {
