@@ -30,13 +30,18 @@ app.get('/go', function (req, res) {
 
 app.get('/chat', function (req, res) {
     res.sendFile(__dirname + '/chat.html')
-})
+});
 
 io.on('connection', function (socket) {
     console.log('a user connected');
-    socket.on('chat message', function (msg) {
-        console.log('message: ' + msg);
+
+    socket.on('userSentMessage', function (msg) {
+        io.emit('messageBroadcast', msg);
     });
+    socket.on('register', function (msg) {
+        console.log('register', msg);
+    });
+
 });
 
 http.listen(3000, function () {
