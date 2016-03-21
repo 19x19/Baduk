@@ -6,21 +6,51 @@
 </head>
 
 <body>
-Type stuff
-
+Your name is <span id="userId"></span>
 <br />
 
+
 <input id="m"></input>
+
+<div id="log">
+</div>
 
 <div id="sendButton">send</div>
 
 <script>
+
+function uuid() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
+}
+
+var userId = uuid();
+
+$("#userId").text(userId);
+
 var socket = io();
+socket.emit('register', userId);
+
 $("#sendButton").on('click', function () {
-	var message = $("#m").val();
-	console.log(message);
-	socket.emit('chat message', message);
+
+    var message = $("#m").val();
+    socket.emit('userSentMessage', {
+        'message': message,
+        'userId': userId,
+    });
+
 });
+
+socket.on('messageBroadcast', function (msg) {
+
+    $("#log").append($("<pre>", {
+        'text': msg.userId + ': ' + msg.message
+    }));
+
+});
+
+
 </script>
 
 
