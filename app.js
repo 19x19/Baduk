@@ -6,6 +6,8 @@ app.get('/*', function(req, res, next) {
     // HTTP headers to protect against general clickjacking
     res.header('X-Frame-Options', 'DENY');
     res.header('Content-Security-Policy', 'frame-ancestors: \'none\'');
+    // No crawlers on this website, thanks
+    res.header('X-Robots-Tag', 'noindex');
     next();
 });
 
