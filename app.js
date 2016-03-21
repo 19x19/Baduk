@@ -17,6 +17,7 @@ app.get('/*', function(req, res, next) {
 });
 
 app.use(express.static('public'));
+app.use('/bower_components', express.static('bower_components'));
 app.use(express.static('source/views'));
 
 app.get('/', function (req, res) {
