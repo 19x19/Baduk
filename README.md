@@ -30,3 +30,5 @@ Run app:
 ```
 node ./app.js
 ```
+
+Visit http://localhost:3000/ in chrome
