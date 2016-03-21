@@ -1,0 +1,29 @@
+<html>
+
+<head>
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script> 
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+</head>
+
+<body>
+Type stuff
+
+<br />
+
+<input id="m"></input>
+
+<div id="sendButton">send</div>
+
+<script>
+var socket = io();
+$("#sendButton").on('click', function () {
+	var message = $("#m").val();
+	console.log(message);
+	socket.emit('chat message', message);
+});
+</script>
+
+
+</body>
+
+</html>
