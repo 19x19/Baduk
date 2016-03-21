@@ -4,6 +4,7 @@
   "description": "An easy-to-use online gaming platform.",
   "main": "app.js",
   "dependencies": {
+    "bower": "^1.7.7",
     "express": "^4.13.4",
     "socket.io": "^1.4.5"
   },

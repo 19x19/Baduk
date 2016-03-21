@@ -3,6 +3,10 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+app.use(express.static('public'));
+app.use('/bower_components', express.static('bower_components'));
+app.use(express.static('source/views'));
+
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
     // General headers for security, ranging from clickjacking protection to
@@ -15,10 +19,6 @@ app.get('/*', function(req, res, next) {
 
     next();
 });
-
-app.use(express.static('public'));
-app.use('/bower_components', express.static('bower_components'));
-app.use(express.static('source/views'));
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
