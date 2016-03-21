@@ -74,6 +74,7 @@
     var socket = io();
     $("#send").on('click', function() {
         var message = $("#message").val();
+        $("#message").val('');
         socket.emit('postNewMessage', {
             'message' : 'User: ' + message,
         });
