@@ -9,6 +9,8 @@ app.get('/*', function(req, res, next) {
     res.header('Content-Security-Policy', 'frame-ancestors: \'none\'');
     // No crawlers on this website, thanks
     res.header('X-Robots-Tag', 'noindex');
+    // Anti-XSS protection (only works on Chrome and IE8+, so sanitize anyways)
+    res.header('X-XSS-Protection', '1; mode=block');
 
     next();
 });
