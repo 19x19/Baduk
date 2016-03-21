@@ -24,6 +24,10 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
 });
 
+app.get('/chat', function (req, res) {
+    res.sendFile(__dirname + '/chat.html')
+})
+
 io.on('connection', function (socket) {
     console.log('a user connected');
     socket.on('chat message', function (msg) {
