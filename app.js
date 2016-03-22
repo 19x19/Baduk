@@ -1,8 +1,11 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
+var port = 3000;
+
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
+var sha1 = require('sha1');
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
@@ -26,8 +29,34 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
 });
 
+// Generates a hash for a new game, and increments the
+// internal count to prepare for the next call
+// TODO Figure out if this is the right place for this function
+function game_hash() {
+    var count = 0;
+    return function() {
+        count++;
+        return sha1(count);
+    }
+}
+var current_hash = game_hash();
+var current_games = [];
+
 app.get('/go', function (req, res) {
-    res.sendFile(__dirname + '/src/views/go.html');
+    // Generate a new game of Go and store the hash
+    var new_hash = current_hash();
+    current_games.push(new_hash);
+    res.redirect('/go/' + new_hash);
+});
+
+app.get('/go/:id', function(req, res) {
+    // Check if the game currently exists. If not, send them back
+    // to the homepage.
+    if(current_games.indexOf(req.params.id) >= 0) {
+        res.sendFile(__dirname + '/src/views/go.html');
+    } else {
+        res.redirect('/');
+    }
 });
 
 io.on('connection', function (socket) {
@@ -36,7 +65,7 @@ io.on('connection', function (socket) {
     });
 });
 
-http.listen(3000, function () {
-    console.log('listening on *:3000');
+http.listen(port, function () {
+    console.log('listening on *:' + port);
 });
 

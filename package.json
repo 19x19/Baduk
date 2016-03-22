@@ -7,6 +7,7 @@
     "bower": "^1.7.7",
     "express": "^4.13.4",
     "serve-favicon": "^2.3.0",
+    "sha1": "^1.1.1",
     "socket.io": "^1.4.5"
   },
   "devDependencies": {},
