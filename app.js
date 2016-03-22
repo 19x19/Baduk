@@ -9,7 +9,7 @@ var sha1 = require('sha1');
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
-app.use(express.static('source/views'));
+app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
 // Global controller. Basically being used as middleware.
