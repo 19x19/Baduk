@@ -71,21 +71,29 @@
 
 </body>
     <script>
+
+    var uuid = function () {
+        var array = new Uint32Array(10);
+        window.crypto.getRandomValues(array);
+        return window.sha1(JSON.stringify(array));
+    }
+
     var socket = io();
 
-    console.log(sha1);
-    console.log(moniker);
-
     var roomId = /[^/]*$/.exec(window.location.pathname)[0];
+
+    var clientId = uuid();
+
     socket.emit('joinRoom', {
-        'roomId' : roomId,
+        'roomId': roomId,
+        'clientId': clientId,
     });
     $("#send").on('click', function() {
         var message = $("#message").val();
         $("#message").val('');
         socket.emit('postNewMessage', {
-            'message' :  message,
-            'roomId'    : roomId,
+            'message': message,
+            'roomId': roomId,
         });
     });
     socket.on('getNewMessage', function(new_message) {

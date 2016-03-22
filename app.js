@@ -66,13 +66,13 @@ io.on('connection', function (socket) {
     socket.on('postNewMessage', function (new_message) {
         io.emit('getNewMessage', {
             message: 'Anonymous: ' + new_message.message,
-            roomId   : new_message.roomId,
+            roomId: new_message.roomId,
         });
     });
     socket.on('joinRoom', function (new_user) {
         io.emit('getNewMessage', {
-            message: "Anonymous joined the chat.",
-            roomId   : new_user.roomId,
+            message: new_user.clientId + " joined the chat.",
+            roomId: new_user.roomId,
         });
     });
 });
