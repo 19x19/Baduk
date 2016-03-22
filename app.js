@@ -43,7 +43,9 @@ var current_hash = game_hash();
 var current_games = [];
 
 app.get('/go', function (req, res) {
-    // Generate a new game of Go and store the hash
+    // If someone just goes to /go without a game ID, we generate a new one.
+    // IDs are generated with SHA-1, which git uses too so I think its
+    // a safe assumption that no collisions will occur
     // TODO Rate limit so that people can't DDoS our server so easily
     var new_hash = current_hash();
     current_games.push(new_hash);
