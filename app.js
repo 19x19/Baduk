@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = 3000;
+var port = 3002;
 
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
@@ -28,7 +28,24 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
 });
 
+// Generates a hash for a new game, and increments the
+// internal count to prepare for the next call
+function game_hash() {
+    var count = 100000000000;
+    var hash_length = 36;
+    return function() {
+        count++;
+        // TODO Global variables are bad, right?
+        return ((count).toString(hash_length));
+    }
+}
+var current_hash = game_hash();
+
 app.get('/go', function (req, res) {
+    res.redirect('/go/' + current_hash());
+});
+
+app.get('/go/:id', function(req, res) {
     res.sendFile(__dirname + '/src/views/go.html');
 });
 
