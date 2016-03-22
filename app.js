@@ -79,6 +79,10 @@ io.on('connection', function (socket) {
             roomId: new_user.roomId,
         });
     });
+    
+    socket.on('leaveRoom', function (msg) {
+        io.emit('leftRoom', msg);
+    });
 });
 
 http.listen(port, function () {

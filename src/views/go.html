@@ -109,6 +109,21 @@
             }));
         }
     });
+
+
+    jQuery(window).bind('beforeunload', function (e) {
+        socket.emit('leaveRoom', {
+            'roomId': roomId,
+            'clientId': clientId
+        });
+    });
+
+    socket.on('leftRoom', function (msg) {
+        $("#history").append($("<pre>", {
+            'text': fakeName(msg.clientId) + ': ' + 'left the chat.',
+        }));
+    });
+
     </script>
 
 </body>
