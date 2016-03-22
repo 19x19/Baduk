@@ -12,7 +12,7 @@ curl "https://nodejs.org/dist/latest/node-${VERSION:-$(wget -qO- https://nodejs.
 npm install && bower install
 ```
 
-Run Fischr at localhost:3000:
+Run Fischr at localhost:3001:
 
 ```
 node ./app.js
