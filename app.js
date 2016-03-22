@@ -5,6 +5,7 @@ var port = 3002;
 
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
+var sha1 = require('sha1');
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
@@ -30,13 +31,12 @@ app.get('/', function (req, res) {
 
 // Generates a hash for a new game, and increments the
 // internal count to prepare for the next call
+// TODO Figure out if this is the right place for this function
 function game_hash() {
-    var count = 100000000000;
-    var hash_length = 36;
+    var count = 0;
     return function() {
         count++;
-        // TODO Global variables are bad, right?
-        return ((count).toString(hash_length));
+        return sha1(count);
     }
 }
 var current_hash = game_hash();
