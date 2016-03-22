@@ -6,11 +6,14 @@ var port = 3001;
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var sha1 = require('sha1');
+var Ddos = require('ddos')
+var ddos = new Ddos;
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
+app.use(ddos.express)
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
@@ -31,7 +34,6 @@ app.get('/', function (req, res) {
 
 // Generates a hash for a new game, and increments the
 // internal count to prepare for the next call
-// TODO Figure out if this is the right place for this function
 function game_hash() {
     var count = 0;
     return function() {
