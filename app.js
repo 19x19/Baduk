@@ -44,6 +44,7 @@ var current_games = [];
 
 app.get('/go', function (req, res) {
     // Generate a new game of Go and store the hash
+    // TODO Rate limit so that people can't DDoS our server so easily
     var new_hash = current_hash();
     current_games.push(new_hash);
     res.redirect('/go/' + new_hash);
