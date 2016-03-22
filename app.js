@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = 3000;
+var port = 3001;
 
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
