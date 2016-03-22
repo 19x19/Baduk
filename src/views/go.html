@@ -81,9 +81,7 @@
     }
 
     var socket = io();
-
     var roomId = /[^/]*$/.exec(window.location.pathname)[0];
-
     var clientId = uuid();
 
     $("#yourName").text(fakeName(clientId));
@@ -102,6 +100,7 @@
             'clientId': clientId,
         });
     });
+
     socket.on('getNewMessage', function (new_message) {
         console.log(new_message);
         if (new_message.roomId == roomId) {
