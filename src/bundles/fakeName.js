@@ -2124,5 +2124,5 @@ var randomInteger = function (digest) {
 }
 
 window.fakeName = function (digest) {
-	return adjectives[randomInteger(digest) % adjectives.length] + ' ' + nouns[randomInteger(digest) % adjectives.length];
+	return adjectives[randomInteger(digest) % adjectives.length] + ' ' + nouns[randomInteger(digest) % nouns.length];
 }
