@@ -74,20 +74,20 @@
     console.log(sha1);
     console.log(moniker);
 
-    var game = /[^/]*$/.exec(window.location.pathname)[0];
-    socket.emit('newUser', {
-        'game' : game,
+    var roomId = /[^/]*$/.exec(window.location.pathname)[0];
+    socket.emit('joinRoom', {
+        'roomId' : roomId,
     });
     $("#send").on('click', function() {
         var message = $("#message").val();
         $("#message").val('');
         socket.emit('postNewMessage', {
             'message' :  message,
-            'game'    : game,
+            'roomId'    : roomId,
         });
     });
     socket.on('getNewMessage', function(new_message) {
-        if(new_message.game == game) {
+        if(new_message.roomId == roomId) {
             $("#history").append($("<pre>", {
                 'text': new_message.message
             }));

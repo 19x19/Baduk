@@ -43,7 +43,7 @@ var current_hash = game_hash();
 var current_games = [];
 
 app.get('/go', function (req, res) {
-    // If someone just goes to /go without a game ID, we generate a new one.
+    // If someone just goes to /go without a room ID, we generate a new one.
     // IDs are generated with SHA-1, which git uses too so I think its
     // a safe assumption that no collisions will occur
     // TODO Rate limit so that people can't DDoS our server so easily
@@ -52,8 +52,8 @@ app.get('/go', function (req, res) {
     res.redirect('/go/' + new_hash);
 });
 
-app.get('/go/:id', function(req, res) {
-    // Check if the game currently exists. If not, send them back
+app.get('/go/:id', function (req, res) {
+    // Check if the room id currently exists. If not, send them back
     // to the homepage.
     if(current_games.indexOf(req.params.id) >= 0) {
         res.sendFile(__dirname + '/src/views/go.html');
@@ -66,13 +66,13 @@ io.on('connection', function (socket) {
     socket.on('postNewMessage', function (new_message) {
         io.emit('getNewMessage', {
             message: 'Anonymous: ' + new_message.message,
-            game   : new_message.game,
+            roomId   : new_message.roomId,
         });
     });
-    socket.on('newUser', function(new_user) {
+    socket.on('joinRoom', function (new_user) {
         io.emit('getNewMessage', {
             message: "Anonymous joined the chat.",
-            game   : new_user.game,
+            roomId   : new_user.roomId,
         });
     });
 });
