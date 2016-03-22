@@ -1,3 +1,13 @@
 .wood-color {
 	background-color: #966F33;	
 }
+
+.outer-board {
+	width: 562.5px;
+	height: 562.5px;
+	border: 1px solid black;
+}
+
+.inner-board {
+	margin: 31.25px;
+}
