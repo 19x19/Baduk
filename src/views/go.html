@@ -61,21 +61,19 @@
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="../bower_components/jquery/dist/jquery.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <!-- Bundles -->
-    <script src="/src/bundles/go.b.js"></script>
+<script src="../bower_components/jquery/dist/jquery.js"></script>
+<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../bower_components/socket.io-client/socket.io.js"></script>
+<script src="/src/bundles/go.b.js"></script>
 
 </body>
-    <!-- Socket.io -->
-    <!-- TODO Download a local script, we're not plebs -->
-    <script src="../bower_components/socket.io-client/socket.io.js"></script>
     <script>
     var socket = io();
+
+    console.log(sha1);
+    console.log(moniker);
+
     var game = /[^/]*$/.exec(window.location.pathname)[0];
     socket.emit('newUser', {
         'game' : game,
