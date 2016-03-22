@@ -74,11 +74,12 @@
     <script src="../bower_components/socket.io-client/socket.io.js"></script>
     <script>
     var socket = io();
+    socket.emit('newUser', {});
     $("#send").on('click', function() {
         var message = $("#message").val();
         $("#message").val('');
         socket.emit('postNewMessage', {
-            'message' : 'Anonymous: ' + message,
+            'message' :  message,
         });
     });
     socket.on('getNewMessage', function(message) {

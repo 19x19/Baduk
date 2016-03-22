@@ -64,7 +64,12 @@ app.get('/go/:id', function(req, res) {
 
 io.on('connection', function (socket) {
     socket.on('postNewMessage', function (message) {
-        io.emit('getNewMessage', message);
+        io.emit('getNewMessage', 'Anonymous: ' + message);
+    });
+    socket.on('newUser', function() {
+        io.emit('getNewMessage', {
+            message: "'Anonymous' joined the chat.",
+        });
     });
 });
 
