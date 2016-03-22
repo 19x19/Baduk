@@ -37,3 +37,6 @@ bower_components
 
 # DS_Stores are annoying
 .DS_Store
+
+# Temporary files
+*.swp

@@ -2,10 +2,12 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var favicon = require('serve-favicon');
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use(express.static('source/views'));
+app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
@@ -28,20 +30,10 @@ app.get('/go', function (req, res) {
     res.sendFile(__dirname + '/src/views/go.html');
 });
 
-app.get('/chat', function (req, res) {
-    res.sendFile(__dirname + '/chat.html')
-});
-
 io.on('connection', function (socket) {
-    console.log('a user connected');
-
-    socket.on('userSentMessage', function (msg) {
-        io.emit('messageBroadcast', msg);
+    socket.on('postNewMessage', function (message) {
+        io.emit('getNewMessage', message);
     });
-    socket.on('register', function (msg) {
-        console.log('register', msg);
-    });
-
 });
 
 http.listen(3000, function () {
