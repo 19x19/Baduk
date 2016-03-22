@@ -63,12 +63,16 @@ app.get('/go/:id', function(req, res) {
 });
 
 io.on('connection', function (socket) {
-    socket.on('postNewMessage', function (message) {
-        io.emit('getNewMessage', 'Anonymous: ' + message);
-    });
-    socket.on('newUser', function() {
+    socket.on('postNewMessage', function (new_message) {
         io.emit('getNewMessage', {
-            message: "'Anonymous' joined the chat.",
+            message: 'Anonymous: ' + new_message.message,
+            game   : new_message.game,
+        });
+    });
+    socket.on('newUser', function(new_user) {
+        io.emit('getNewMessage', {
+            message: "Anonymous joined the chat.",
+            game   : new_user.game,
         });
     });
 });
