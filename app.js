@@ -43,14 +43,20 @@ var current_hash = game_hash();
 var current_games = [];
 
 app.get('/go', function (req, res) {
+    // Generate a new game of Go and store the hash
     var new_hash = current_hash();
     current_games.push(new_hash);
     res.redirect('/go/' + new_hash);
 });
 
 app.get('/go/:id', function(req, res) {
-    // TODO Make sure the SHA1 corresponds to an actual game
-    res.sendFile(__dirname + '/src/views/go.html');
+    // Check if the game currently exists. If not, send them back
+    // to the homepage.
+    if(current_games.indexOf(req.params.id) >= 0) {
+        res.sendFile(__dirname + '/src/views/go.html');
+    } else {
+        res.redirect('/');
+    }
 });
 
 io.on('connection', function (socket) {
