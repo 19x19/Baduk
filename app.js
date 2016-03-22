@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = 3000;
+var port = 3001;
 
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
@@ -9,7 +9,7 @@ var sha1 = require('sha1');
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
-app.use(express.static('source/views'));
+app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
 // Global controller. Basically being used as middleware.
@@ -43,14 +43,17 @@ var current_hash = game_hash();
 var current_games = [];
 
 app.get('/go', function (req, res) {
-    // Generate a new game of Go and store the hash
+    // If someone just goes to /go without a room ID, we generate a new one.
+    // IDs are generated with SHA-1, which git uses too so I think its
+    // a safe assumption that no collisions will occur
+    // TODO Rate limit so that people can't DDoS our server so easily
     var new_hash = current_hash();
     current_games.push(new_hash);
     res.redirect('/go/' + new_hash);
 });
 
-app.get('/go/:id', function(req, res) {
-    // Check if the game currently exists. If not, send them back
+app.get('/go/:id', function (req, res) {
+    // Check if the room id currently exists. If not, send them back
     // to the homepage.
     if(current_games.indexOf(req.params.id) >= 0) {
         res.sendFile(__dirname + '/src/views/go.html');
@@ -60,12 +63,21 @@ app.get('/go/:id', function(req, res) {
 });
 
 io.on('connection', function (socket) {
-    socket.on('postNewMessage', function (message) {
-        io.emit('getNewMessage', message);
+    socket.on('postNewMessage', function (new_message) {
+        io.emit('getNewMessage', {
+            message: 'Anonymous: ' + new_message.message,
+            roomId   : new_message.roomId,
+        });
+    });
+    socket.on('joinRoom', function (new_user) {
+        io.emit('getNewMessage', {
+            message: "Anonymous joined the chat.",
+            roomId   : new_user.roomId,
+        });
     });
 });
 
 http.listen(port, function () {
-    console.log('listening on *:' + port);
+    console.log('Listening on *:' + port);
 });
 
