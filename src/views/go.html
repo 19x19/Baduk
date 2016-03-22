@@ -74,6 +74,7 @@
     <script src="../bower_components/socket.io-client/socket.io.js"></script>
     <script>
     var socket = io();
+    var game = /[^/]*$/.exec(window.location.pathname)[0];
     socket.emit('newUser', {});
     $("#send").on('click', function() {
         var message = $("#message").val();
