@@ -54,6 +54,7 @@
                 <!-- Chat Well -->
                 <div class="well">
                     <h4>Chat</h4>
+                    Your name is <span id="yourName"></span>
                     <div id="history"></div>
                     <div class=" col-xs-7">
                         <input id="message" class="form-control" />
@@ -67,6 +68,7 @@
 <script src="../bower_components/jquery/dist/jquery.js"></script>
 <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="../bower_components/socket.io-client/socket.io.js"></script>
+<script src="/src/bundles/fakeName.js"></script>
 <script src="/src/bundles/go.b.js"></script>
 
 </body>
@@ -84,22 +86,32 @@
 
     var clientId = uuid();
 
+    $("#yourName").text(fakeName(clientId));
+
     socket.emit('joinRoom', {
         'roomId': roomId,
         'clientId': clientId,
     });
-    $("#send").on('click', function() {
+    $("#send").on('click', function () {
         var message = $("#message").val();
         $("#message").val('');
         socket.emit('postNewMessage', {
             'message': message,
             'roomId': roomId,
+            'clientId': clientId,
         });
     });
-    socket.on('getNewMessage', function(new_message) {
-        if(new_message.roomId == roomId) {
+    socket.on('getNewMessage', function (new_message) {
+        console.log(new_message);
+        if (new_message.roomId == roomId) {
+            console.log(new_message.authorId);
+            if (new_message.authorId) {
+                console.log(fakeName(new_message.authorId));               
+            } else {
+                new_message.authorId = '12';
+            }
             $("#history").append($("<pre>", {
-                'text': new_message.message
+                'text': fakeName(new_message.authorId) + ': ' + new_message.message
             }));
         }
     });

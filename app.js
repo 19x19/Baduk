@@ -67,13 +67,15 @@ app.get('/go/:id', function (req, res) {
 io.on('connection', function (socket) {
     socket.on('postNewMessage', function (new_message) {
         io.emit('getNewMessage', {
-            message: 'Anonymous: ' + new_message.message,
+            message: new_message.message,
+            authorId: new_message.clientId,
             roomId: new_message.roomId,
         });
     });
     socket.on('joinRoom', function (new_user) {
         io.emit('getNewMessage', {
-            message: new_user.clientId + " joined the chat.",
+            message: "joined the chat.",
+            authorId: new_user.clientId,
             roomId: new_user.roomId,
         });
     });
