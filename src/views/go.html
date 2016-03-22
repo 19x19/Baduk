@@ -76,7 +76,7 @@
         var message = $("#message").val();
         $("#message").val('');
         socket.emit('postNewMessage', {
-            'message' : 'User: ' + message,
+            'message' : 'Anonymous: ' + message,
         });
     });
     socket.on('getNewMessage', function(message) {
