@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = 3002;
+var port = 3000;
 
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
@@ -40,12 +40,16 @@ function game_hash() {
     }
 }
 var current_hash = game_hash();
+var current_games = [];
 
 app.get('/go', function (req, res) {
-    res.redirect('/go/' + current_hash());
+    var new_hash = current_hash();
+    current_games.push(new_hash);
+    res.redirect('/go/' + new_hash);
 });
 
 app.get('/go/:id', function(req, res) {
+    // TODO Make sure the SHA1 corresponds to an actual game
     res.sendFile(__dirname + '/src/views/go.html');
 });
 
