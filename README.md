@@ -25,5 +25,5 @@ node ./app.js
 If you add a new browserify bundle, update the loaded javascript as follows:
 
 ```
-browserify src/bundles/go.js -o src/bundles/go.b.js
+browserify src/bundles/go.js -o src/bundles/go_bundle.js
 ```

@@ -69,7 +69,7 @@
 <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="../bower_components/socket.io-client/socket.io.js"></script>
 <script src="/src/bundles/fakeName.js"></script>
-<script src="/src/bundles/go.b.js"></script>
+<script src="/src/bundles/go_bundle.js"></script>
 
 </body>
     <script>
@@ -92,6 +92,7 @@
         'roomId': roomId,
         'clientId': clientId,
     });
+
     $("#send").on('click', function () {
         var message = $("#message").val();
         $("#message").val('');
@@ -104,14 +105,8 @@
     socket.on('getNewMessage', function (new_message) {
         console.log(new_message);
         if (new_message.roomId == roomId) {
-            console.log(new_message.authorId);
-            if (new_message.authorId) {
-                console.log(fakeName(new_message.authorId));               
-            } else {
-                new_message.authorId = '12';
-            }
             $("#history").append($("<pre>", {
-                'text': fakeName(new_message.authorId) + ': ' + new_message.message
+                'text': fakeName(new_message.authorId) + ': ' + new_message.message,
             }));
         }
     });
