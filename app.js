@@ -1,8 +1,11 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
+var port = 3002;
+
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
+var sha1 = require('sha1');
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
@@ -26,7 +29,23 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
 });
 
+// Generates a hash for a new game, and increments the
+// internal count to prepare for the next call
+// TODO Figure out if this is the right place for this function
+function game_hash() {
+    var count = 0;
+    return function() {
+        count++;
+        return sha1(count);
+    }
+}
+var current_hash = game_hash();
+
 app.get('/go', function (req, res) {
+    res.redirect('/go/' + current_hash());
+});
+
+app.get('/go/:id', function(req, res) {
     res.sendFile(__dirname + '/src/views/go.html');
 });
 
@@ -36,7 +55,7 @@ io.on('connection', function (socket) {
     });
 });
 
-http.listen(3000, function () {
-    console.log('listening on *:3000');
+http.listen(port, function () {
+    console.log('listening on *:' + port);
 });
 
