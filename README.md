@@ -18,6 +18,12 @@ npm install
 bower install
 ```
 
+Browserify:
+
+```
+browserify src/bundles/go.js -o src/bundles/go.b.js
+```
+
 Run Fischr:
 
 ```
