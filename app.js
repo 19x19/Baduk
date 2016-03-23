@@ -45,6 +45,7 @@ function game_hash() {
 var current_hash = game_hash();
 var current_games = [];
 var current_users = {};
+var USERNAME = 0;
 
 // TODO A function that maps a socket.id to a unique name
 
@@ -70,10 +71,11 @@ app.get('/go/:id', function (req, res) {
 io.on('connection', function (socket) {
     // Recieves some information when a new user joins
     socket.on('post_new_connect', function(info) {
+        current_users[socket.id] = [moniker.choose()];
         socket.room = info.room;
         socket.join(info.room);
         io.to(info.room).emit('get_new_connect', {
-            'socket_id' : socket.id,
+            'username' : current_users[socket.id][USERNAME],
         });
     });
 
@@ -81,15 +83,15 @@ io.on('connection', function (socket) {
     socket.on('post_new_disconnect', function(info) {
         socket.leave(info.room);
         io.to(info.room).emit('get_new_disconnect', {
-            'socket_id' : socket.id,
+            'username' : current_users[socket.id][USERNAME],
         });
     });
 
     // Posts a new message to the room
     socket.on('post_new_message', function(info) {
         io.to(info.room).emit('get_new_message', {
-            message : info.message,
-            author : socket.id,
+            'message' : info.message,
+            'username' : current_users[socket.id][USERNAME],
         });
     });
 });

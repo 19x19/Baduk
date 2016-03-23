@@ -9,7 +9,7 @@ socket.emit('post_new_connect', {
 // Get a message when a new user connects                                   
 socket.on('get_new_connect', function(info) {                               
     $("#history").append($("<pre>", {                                       
-        'text': (info.socket_id + ' has connected.'),                       
+        'text': (info.username + ' has connected.'),                       
     }));                                                                    
 });                                                                         
                                                                             
@@ -26,7 +26,7 @@ $("#send").on('click', function () {
 // Gets a new message from the server                                       
 socket.on('get_new_message', function (info) {                              
     $("#history").append($("<pre>", {                                       
-        'text': info.author + ': ' + info.message,                          
+        'text': info.username + ': ' + info.message,                          
     }));                                                                    
 });                                                                         
                                                                             
@@ -40,6 +40,6 @@ jQuery(window).bind('beforeunload', function (e) {
 // Get any disconnects from the server                                      
 socket.on('get_new_disconnect', function(info) {                            
     $("#history").append($("<pre>", {                                       
-        'text' : info.socket_id + ' has left the chat.',                    
+        'text' : info.username + ' has left the chat.',                    
     }));                                                                    
 });   
