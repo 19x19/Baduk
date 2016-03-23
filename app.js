@@ -66,6 +66,8 @@ io.on('connection', function (socket) {
             'username' : games.current_users[socket.id]['username'],
         });
         socket.leave(info.room);
+        // TODO Actually remove the new user from the current_users
+        // TODO Abstract into src/modules/games
     });
 
     // Posts a new message to the room
