@@ -44,6 +44,8 @@ function game_hash() {
 var current_hash = game_hash();
 var current_games = [];
 
+// TODO A function that maps a socket.id to a unique name
+
 app.get('/go', function (req, res) {
     // If someone just goes to /go without a room ID, we generate a new one.
     // IDs are generated with SHA-1, which git uses too so I think its
