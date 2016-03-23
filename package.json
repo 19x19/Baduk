@@ -6,6 +6,7 @@
   "dependencies": {
     "bower": "^1.7.7",
     "browserify": "^13.0.0",
+    "ddos": "^0.1.11",
     "express": "^4.13.4",
     "moniker": "^0.1.2",
     "serve-favicon": "^2.3.0",

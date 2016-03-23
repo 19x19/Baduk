@@ -6,11 +6,14 @@ var port = 3001;
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var sha1 = require('sha1');
+var Ddos = require('ddos')
+var ddos = new Ddos;
 
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
+app.use(ddos.express)
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
@@ -31,7 +34,6 @@ app.get('/', function (req, res) {
 
 // Generates a hash for a new game, and increments the
 // internal count to prepare for the next call
-// TODO Figure out if this is the right place for this function
 function game_hash() {
     var count = 0;
     return function() {
@@ -42,11 +44,12 @@ function game_hash() {
 var current_hash = game_hash();
 var current_games = [];
 
+// TODO A function that maps a socket.id to a unique name
+
 app.get('/go', function (req, res) {
     // If someone just goes to /go without a room ID, we generate a new one.
     // IDs are generated with SHA-1, which git uses too so I think its
     // a safe assumption that no collisions will occur
-    // TODO Rate limit so that people can't DDoS our server so easily
     var new_hash = current_hash();
     current_games.push(new_hash);
     res.redirect('/go/' + new_hash);
@@ -63,16 +66,28 @@ app.get('/go/:id', function (req, res) {
 });
 
 io.on('connection', function (socket) {
-    socket.on('postNewMessage', function (new_message) {
-        io.emit('getNewMessage', {
-            message: 'Anonymous: ' + new_message.message,
-            roomId   : new_message.roomId,
+    // Recieves some information when a new user joins
+    socket.on('post_new_connect', function(info) {
+        socket.room = info.room;
+        socket.join(info.room);
+        io.to(info.room).emit('get_new_connect', {
+            'socket_id' : socket.id,
         });
     });
-    socket.on('joinRoom', function (new_user) {
-        io.emit('getNewMessage', {
-            message: "Anonymous joined the chat.",
-            roomId   : new_user.roomId,
+
+    // Removes a user from the room
+    socket.on('post_new_disconnect', function(info) {
+        socket.leave(info.room);
+        io.to(info.room).emit('get_new_disconnect', {
+            'socket_id' : socket.id,
+        });
+    });
+
+    // Posts a new message to the room
+    socket.on('post_new_message', function(info) {
+        io.to(info.room).emit('get_new_message', {
+            message : info.message,
+            author : socket.id,
         });
     });
 });
