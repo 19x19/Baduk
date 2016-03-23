@@ -6,7 +6,6 @@ var port = 3001;
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
-var moniker = require('moniker');
 
 var games = require('./src/modules/games.js');
 
