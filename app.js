@@ -44,7 +44,7 @@ app.get('/go', function (req, res) {
 app.get('/go/:id', function (req, res) {
     // Check if the room id games.currently exists. If not, send them back
     // to the homepage.
-    if(games.current_games.indexOf(req.params.id) >= 0) {
+    if(games.game_exists(req.params.id)) {
         res.sendFile(__dirname + '/src/views/go.html');
     } else {
         res.redirect('/');

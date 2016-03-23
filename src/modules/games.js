@@ -18,6 +18,12 @@ var game_hash = function() {
 };
 var current_hash = game_hash();
 
+var game_exists = function(hash) {
+    return current_games.indexOf(hash) >= 0;
+};
+
 exports.current_hash = current_hash;
+exports.game_exists = game_exists;
+
 exports.current_games = current_games;
 exports.current_users = current_users;
