@@ -5,9 +5,10 @@ var port = 3001;
 
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
-var sha1 = require('sha1');
 var Ddos = require('ddos');
 var moniker = require('moniker');
+
+var games = require('./src/modules/games.js');
 
 var ddos = new Ddos;
 app.use(express.static('public'));
@@ -33,32 +34,19 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
 });
 
-// Generates a hash for a new game, and increments the
-// internal count to prepare for the next call
-function game_hash() {
-    var count = 0;
-    return function() {
-        count++;
-        return sha1(count);
-    }
-}
-var current_hash = game_hash();
-var current_games = [];
-var current_users = {};
-
 app.get('/go', function (req, res) {
     // If someone just goes to /go without a room ID, we generate a new one.
     // IDs are generated with SHA-1, which git uses too so I think its
     // a safe assumption that no collisions will occur
-    var new_hash = current_hash();
-    current_games.push(new_hash);
+    var new_hash = games.current_hash();
+    games.current_games.push(new_hash);
     res.redirect('/go/' + new_hash);
 });
 
 app.get('/go/:id', function (req, res) {
-    // Check if the room id currently exists. If not, send them back
+    // Check if the room id games.currently exists. If not, send them back
     // to the homepage.
-    if(current_games.indexOf(req.params.id) >= 0) {
+    if(games.current_games.indexOf(req.params.id) >= 0) {
         res.sendFile(__dirname + '/src/views/go.html');
     } else {
         res.redirect('/');
@@ -68,19 +56,19 @@ app.get('/go/:id', function (req, res) {
 io.on('connection', function (socket) {
     // Recieves some information when a new user joins
     socket.on('post_new_connect', function(info) {
-        current_users[socket.id] = {};
-        current_users[socket.id]['username'] = moniker.choose();
+        games.current_users[socket.id] = {};
+        games.current_users[socket.id]['username'] = moniker.choose();
         socket.room = info.room;
         socket.join(info.room);
         io.to(info.room).emit('get_new_connect', {
-            'username' : current_users[socket.id]['username'],
+            'username' : games.current_users[socket.id]['username'],
         });
     });
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
         io.to(info.room).emit('get_new_disconnect', {
-            'username' : current_users[socket.id]['username'],
+            'username' : games.current_users[socket.id]['username'],
         });
         socket.leave(info.room);
     });
@@ -89,7 +77,7 @@ io.on('connection', function (socket) {
     socket.on('post_new_message', function(info) {
         io.to(info.room).emit('get_new_message', {
             'message' : info.message,
-            'username' : current_users[socket.id]['username'],
+            'username' : games.current_users[socket.id]['username'],
         });
     });
 });

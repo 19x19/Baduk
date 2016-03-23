@@ -27,7 +27,3 @@ If you add a new browserify bundle, update the loaded javascript as follows:
 ```
 browserify src/bundles/go.js -o src/bundles/go_bundle.js
 ```
-
-## To-Do
-
-- Move model code to a new file, don't mix it with controller
