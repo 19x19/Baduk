@@ -1,15 +1,23 @@
 var sha1 = require('sha1');
 
-// Generates a hash for a new game, and increments the
-// internal count to prepare for the next call
+/*
+    Javascript module for general games (NOT GO SPECIFIC!)
+*/
+
+var current_games = [];
+var current_users = {};
+
 var game_hash = function() {
     var count = 0;
     return function() {
         count++;
-        return sha1(count);
+        var new_hash = sha1(count);
+        current_games.push(new_hash);        
+        return new_hash;
     }
 };
+var current_hash = game_hash();
 
-exports.current_hash = game_hash();
-exports.current_games = [];
-exports.current_users = {};
+exports.current_hash = current_hash;
+exports.current_games = current_games;
+exports.current_users = current_users;
