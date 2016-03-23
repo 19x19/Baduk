@@ -80,47 +80,52 @@
         return window.sha1(JSON.stringify(array));
     }
 
+    var room = /[^/]*$/.exec(window.location.pathname)[0];
     var socket = io();
-    var roomId = /[^/]*$/.exec(window.location.pathname)[0];
     var clientId = uuid();
 
     $("#yourName").text(fakeName(clientId));
 
-    socket.emit('joinRoom', {
-        'roomId': roomId,
-        'clientId': clientId,
+    // Tell the server that we've connected to a new room
+    socket.emit('post_new_connect', {
+        'room' : room,
     });
 
+    // Get a message when a new user connects
+    socket.on('get_new_connect', function(info) {
+        $("#history").append($("<pre>", {
+            'text': (info.socket_id + ' has connected.'),
+        }));
+    });
+
+    // Send a new message to the room
     $("#send").on('click', function () {
         var message = $("#message").val();
         $("#message").val('');
-        socket.emit('postNewMessage', {
+        socket.emit('post_new_message', {
             'message': message,
-            'roomId': roomId,
-            'clientId': clientId,
+            'room': room,
         });
     });
 
-    socket.on('getNewMessage', function (new_message) {
-        console.log(new_message);
-        if (new_message.roomId == roomId) {
-            $("#history").append($("<pre>", {
-                'text': fakeName(new_message.authorId) + ': ' + new_message.message,
-            }));
-        }
-    });
-
-
-    jQuery(window).bind('beforeunload', function (e) {
-        socket.emit('leaveRoom', {
-            'roomId': roomId,
-            'clientId': clientId
-        });
-    });
-
-    socket.on('leftRoom', function (msg) {
+    // Gets a new message from the server
+    socket.on('get_new_message', function (info) {
         $("#history").append($("<pre>", {
-            'text': fakeName(msg.clientId) + ': ' + 'left the chat.',
+            'text': info.author + ': ' + info.message,
+        }));
+    });
+
+    // Tell the server before the user leaves
+    jQuery(window).bind('beforeunload', function (e) {
+        socket.emit('post_new_disconnect', {
+            'room': room,
+        });
+    });
+
+    // Get any disconnects from the server
+    socket.on('get_new_disconnect', function(info) {
+        $("#history").append($("<pre>", {
+            'text' : info.socket_id + ' has left the chat.',
         }));
     });
 

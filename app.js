@@ -65,18 +65,36 @@ app.get('/go/:id', function (req, res) {
 });
 
 io.on('connection', function (socket) {
+    // Recieves some information when a new user joins
+    socket.on('post_new_connect', function(info) {
+        socket.room = info.room;
+        socket.join(info.room);
+        io.to(info.room).emit('get_new_connect', {
+            'socket_id' : socket.id,
+        });
+    });
+
+    // Removes a user from the room
+    socket.on('post_new_disconnect', function(info) {
+        socket.leave(info.room);
+        io.to(info.room).emit('get_new_disconnect', {
+            'socket_id' : socket.id,
+        });
+    });
+
+    // Posts a new message to the room
+    socket.on('post_new_message', function(info) {
+        io.to(info.room).emit('get_new_message', {
+            message : info.message,
+            author : socket.id,
+        });
+    });
+
     socket.on('postNewMessage', function (new_message) {
         io.emit('getNewMessage', {
             message: new_message.message,
             authorId: new_message.clientId,
-            roomId: new_message.roomId,
-        });
-    });
-    socket.on('joinRoom', function (new_user) {
-        io.emit('getNewMessage', {
-            message: "joined the chat.",
-            authorId: new_user.clientId,
-            roomId: new_user.roomId,
+            room: new_message.room,
         });
     });
     
