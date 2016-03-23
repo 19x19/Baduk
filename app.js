@@ -5,9 +5,10 @@ var port = 3001;
 
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
-var sha1 = require('sha1');
 var Ddos = require('ddos');
 var moniker = require('moniker');
+
+var games = require('./src/modules/games.js');
 
 var ddos = new Ddos;
 app.use(express.static('public'));
@@ -33,34 +34,17 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
 });
 
-// Generates a hash for a new game, and increments the
-// internal count to prepare for the next call
-function game_hash() {
-    var count = 0;
-    return function() {
-        count++;
-        return sha1(count);
-    }
-}
-var current_hash = game_hash();
-var current_games = [];
-var current_users = {};
-
-// TODO A function that maps a socket.id to a unique name
-
 app.get('/go', function (req, res) {
     // If someone just goes to /go without a room ID, we generate a new one.
     // IDs are generated with SHA-1, which git uses too so I think its
     // a safe assumption that no collisions will occur
-    var new_hash = current_hash();
-    current_games.push(new_hash);
-    res.redirect('/go/' + new_hash);
+    res.redirect('/go/' + games.current_hash());
 });
 
 app.get('/go/:id', function (req, res) {
-    // Check if the room id currently exists. If not, send them back
+    // Check if the room id games.currently exists. If not, send them back
     // to the homepage.
-    if(current_games.indexOf(req.params.id) >= 0) {
+    if(games.game_exists(req.params.id)) {
         res.sendFile(__dirname + '/src/views/go.html');
     } else {
         res.redirect('/');
@@ -70,26 +54,27 @@ app.get('/go/:id', function (req, res) {
 io.on('connection', function (socket) {
     // Recieves some information when a new user joins
     socket.on('post_new_connect', function(info) {
-        socket.room = info.room;
-        socket.join(info.room);
-        io.to(info.room).emit('get_new_connect', {
-            'socket_id' : socket.id,
-        });
+        games.add_user(info, socket);
+        io.to(info.room).emit('get_new_connect', {                                     
+            'username' : games.current_users[socket.id]['username'],                         
+        }); 
     });
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
-        socket.leave(info.room);
         io.to(info.room).emit('get_new_disconnect', {
-            'socket_id' : socket.id,
+            'username' : games.current_users[socket.id]['username'],
         });
+        socket.leave(info.room);
+        // TODO Actually remove the new user from the current_users
+        // TODO Abstract into src/modules/games
     });
 
     // Posts a new message to the room
     socket.on('post_new_message', function(info) {
         io.to(info.room).emit('get_new_message', {
-            message : info.message,
-            author : socket.id,
+            'message' : info.message,
+            'username' : games.current_users[socket.id]['username'],
         });
     });
 });
