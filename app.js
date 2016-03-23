@@ -54,13 +54,10 @@ app.get('/go/:id', function (req, res) {
 io.on('connection', function (socket) {
     // Recieves some information when a new user joins
     socket.on('post_new_connect', function(info) {
-        games.current_users[socket.id] = {};
-        games.current_users[socket.id]['username'] = moniker.choose();
-        socket.room = info.room;
-        socket.join(info.room);
-        io.to(info.room).emit('get_new_connect', {
-            'username' : games.current_users[socket.id]['username'],
-        });
+        games.add_user(info, socket);
+        io.to(info.room).emit('get_new_connect', {                                     
+            'username' : games.current_users[socket.id]['username'],                         
+        }); 
     });
 
     // Removes a user from the room
