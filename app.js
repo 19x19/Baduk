@@ -89,18 +89,6 @@ io.on('connection', function (socket) {
             author : socket.id,
         });
     });
-
-    socket.on('postNewMessage', function (new_message) {
-        io.emit('getNewMessage', {
-            message: new_message.message,
-            authorId: new_message.clientId,
-            room: new_message.room,
-        });
-    });
-    
-    socket.on('leaveRoom', function (msg) {
-        io.emit('leftRoom', msg);
-    });
 });
 
 http.listen(port, function () {
