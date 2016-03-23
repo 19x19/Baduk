@@ -44,9 +44,7 @@
 
                 <h2>Go</h2>
                 <!-- The board should go here -->
-                <div class="outer-board">
-                    <img class="inner-board" src="/img/go_board_9*9.png" height="500" width="500" alt="error showing the image">
-                </div>
+                <img class="board" src="/img/go_board_9*9.png" height="500" width="500" alt="error showing the image">
                 <hr>
             </div>
 
@@ -68,6 +66,31 @@
 <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="../bower_components/socket.io-client/socket.io.js"></script>
 <script src="/src/bundles/go.b.js"></script>
+<script>
+    $(document).ready(function(e) {
+        var black_circles = '';
+        $('.board').click(function(e){
+            var posX = (e.pageX - $(this).position().left), posY = (e.pageY - 90 - $(this).position().top);
+            alert(posX + ' , ' + posY);
+            var row = parseInt(posX / 62.5), col = parseInt(posY / 62.5);
+            posX = row * 62.5;
+            posY = col * 62.5;
+            alert(row + ' , ' + posY);
+            black_circle ='url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
+            if(!black_circles) {
+                black_circles = black_circles + 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
+                alert(black_circles);
+                $(this).css("background", black_circles);
+                $(this).css("background-size", '60px');
+            } else {
+                black_circles = black_circles + ', ' + 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
+                $(this).css("background", black_circles);
+                $(this).css("background-size", '60px');
+            }
+        });
+    });
+</script>
+
 
 </body>
     <script>
