@@ -44,7 +44,7 @@
 
                 <h2>Go</h2>
                 <!-- The board should go here -->
-                <img class="board" src="/img/go_board_9*9.png" height="500" width="500" alt="error showing the image">
+                <img class="board" src="/img/go_board_9*9.png" height="500px" width="500px" alt="error showing the image">
                 <hr>
             </div>
 
@@ -72,13 +72,13 @@
         $(document).ready(function(e) {
             var black_circles = '';
             $('.board').click(function(e){
-                var posX = (e.pageX - $(this).position().left), posY = (e.pageY - 90 - $(this).position().top);
+                var posX = (e.pageX - 48  - $(this).position().left), posY = (e.pageY - 70 - $(this).position().top);
                 alert(posX + ' , ' + posY);
-                var row = parseInt(posX / 62.5), col = parseInt(posY / 62.5);
-                posX = row * 62.5;
-                posY = col * 62.5;
-                alert(row + ' , ' + posY);
-                black_circle ='url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
+                var row = parseInt(posX / 54), col = parseInt(posY / 54);
+                posX = row * 55;
+                posY = col * 55;
+                alert(row + ' , ' + col);
+                black_circle = 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
                 if(!black_circles) {
                     black_circles = black_circles + 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
                     alert(black_circles);
