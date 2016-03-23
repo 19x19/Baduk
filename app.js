@@ -6,9 +6,10 @@ var port = 3001;
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var sha1 = require('sha1');
-var Ddos = require('ddos')
-var ddos = new Ddos;
+var Ddos = require('ddos');
+var moniker = require('moniker');
 
+var ddos = new Ddos;
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
@@ -43,6 +44,7 @@ function game_hash() {
 }
 var current_hash = game_hash();
 var current_games = [];
+var current_users = {};
 
 // TODO A function that maps a socket.id to a unique name
 
@@ -95,4 +97,3 @@ io.on('connection', function (socket) {
 http.listen(port, function () {
     console.log('Listening on *:' + port);
 });
-
