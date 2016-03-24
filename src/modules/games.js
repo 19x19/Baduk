@@ -23,6 +23,7 @@ var game_exists = function(hash) {
     return current_games.indexOf(hash) >= 0;
 };
 
+// Adds a user to the given room
 var add_user = function(info, socket) {
     current_users[socket.id] = {};                                       
     current_users[socket.id]['username'] = moniker.choose();             
@@ -30,9 +31,16 @@ var add_user = function(info, socket) {
     socket.join(info.room);                                                    
 }
 
+// Removes the user from a given room
+var remove_user = function(info, socket) {
+    socket.leave(info.room);
+    delete current_users[socket.id];
+}
+
 exports.current_hash = current_hash;
 exports.game_exists = game_exists;
 exports.add_user = add_user;
+exports.remove_user = remove_user;;
 
 exports.current_games = current_games;
 exports.current_users = current_users;
