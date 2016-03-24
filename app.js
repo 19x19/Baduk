@@ -62,6 +62,8 @@ io.on('connection', function (socket) {
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
         io.to(info.room).emit('get_new_disconnect', {
+            // TODO for some reason sometimes the user has no username on
+            // disconnect...
             'username' : games.current_users[socket.id]['username'],
         });
         games.remove_user(info, socket);
