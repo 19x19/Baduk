@@ -8,6 +8,7 @@
     "ddos": "^0.1.11",
     "express": "^4.13.4",
     "moniker": "^0.1.2",
+    "node-sgf-parser": "0.0.1",
     "serve-favicon": "^2.3.0",
     "sha1": "^1.1.1",
     "socket.io": "^1.4.5"
