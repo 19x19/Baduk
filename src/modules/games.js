@@ -9,6 +9,7 @@ var current_games = [];
 var current_users = {};
 
 var game_hash = function() {
+    // TODO Generate the count more randomly
     var count = 0;
     return function() {
         count++;
