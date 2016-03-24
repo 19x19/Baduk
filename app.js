@@ -74,6 +74,18 @@ io.on('connection', function (socket) {
             'username' : games.current_users[socket.id]['username'],
         });
     });
+
+    // Add a piece at the given position
+    socket.on('post_new_piece', function(info) {
+        // TODO Put internal game logic here before posting. For now, we just
+        // put a piece for everyone in the room regardless. Also doesn't account
+        // for any color, etc.
+        io.to(info.room).emit('get_new_piece', {
+            'row' : info.row,
+            'col' : info.col,
+        });
+    });
+    
 });
 
 http.listen(port, function () {
