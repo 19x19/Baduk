@@ -56,6 +56,7 @@ io.on('connection', function (socket) {
         games.add_user(info, socket);
         io.to(info.room).emit('get_new_connect', {                                     
             'username' : games.current_users[socket.id]['username'],                         
+            'roommates' : games.players_in_room(info.room),
         }); 
     });
 
@@ -65,6 +66,7 @@ io.on('connection', function (socket) {
             // TODO for some reason sometimes the user has no username on
             // disconnect...
             'username' : games.current_users[socket.id]['username'],
+            'roommates' : games.players_in_room(info.room),
         });
         games.remove_user(info, socket);
     });

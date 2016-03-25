@@ -6,11 +6,24 @@ socket.emit('post_new_connect', {
     'room' : room,                                                          
 });                                                                         
                                                                             
+// Updates the list of roommates
+var updateRoommates = function(roommates, exclude) {
+    $("#roommates").empty();
+    for(var name in roommates) {
+        if(exclude !== roommates[name]) {
+            $("#roommates").append($("<pre>", {
+                'text': roommates[name],
+            }));
+        }
+    }
+}
+
 // Get a message when a new user connects                                   
 socket.on('get_new_connect', function(info) {                               
     $("#history").append($("<pre>", {                                       
         'text': (info.username + ' has connected.'),                       
     }));                                                                    
+    updateRoommates(info.roommates);
 });                                                                         
                                                                             
 // Send a new message to the room                                           
@@ -42,4 +55,5 @@ socket.on('get_new_disconnect', function(info) {
     $("#history").append($("<pre>", {                                       
         'text' : info.username + ' has left the chat.',                    
     }));                                                                    
+    updateRoommates(info.roommates, info.username);
 });   

@@ -44,7 +44,7 @@ var players_in_room = function(room) {
     players = []
     for (var id in current_users) {
         if(current_users[id]['room'] == room) {
-            players.push(id);
+            players.push(current_users[id]['username']);
         }
     }
     return players;
