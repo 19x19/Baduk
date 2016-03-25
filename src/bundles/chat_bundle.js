@@ -1,4 +1,4 @@
-var socket = io();                                                          
+//var socket = io();                                                          
 var room = /[^/]*$/.exec(window.location.pathname)[0];                      
                                                                             
 // Tell the server that we've connected to a new room                       
