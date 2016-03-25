@@ -14,7 +14,7 @@ var game_hash = function() {
     return function() {
         count++;
         var new_hash = sha1(count);
-        current_games.push(new_hash);        
+        current_games.push(new_hash);
         return new_hash;
     }
 };
@@ -26,11 +26,11 @@ var game_exists = function(hash) {
 
 // Adds a user to the given room
 var add_user = function(info, socket) {
-    current_users[socket.id] = {};                                       
-    current_users[socket.id]['username'] = moniker.choose();             
+    current_users[socket.id] = {};
+    current_users[socket.id]['username'] = moniker.choose();
     current_users[socket.id]['room'] = info.room;
-    socket.room = info.room;                                                   
-    socket.join(info.room);                                                    
+    socket.room = info.room;
+    socket.join(info.room);
 }
 
 // Removes the user from a given room
