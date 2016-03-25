@@ -28,6 +28,7 @@ var game_exists = function(hash) {
 var add_user = function(info, socket) {
     current_users[socket.id] = {};                                       
     current_users[socket.id]['username'] = moniker.choose();             
+    current_users[socket.id]['room'] = info.room;
     socket.room = info.room;                                                   
     socket.join(info.room);                                                    
 }
@@ -38,10 +39,22 @@ var remove_user = function(info, socket) {
     delete current_users[socket.id];
 }
 
+// Gets all socket ids of players in the given room
+var players_in_room = function(room) {
+    players = []
+    for (var id in current_users) {
+        if(current_users[id]['room'] == room) {
+            players.push(id);
+        }
+    }
+    return players;
+}
+
 exports.current_hash = current_hash;
 exports.game_exists = game_exists;
 exports.add_user = add_user;
-exports.remove_user = remove_user;;
+exports.remove_user = remove_user;
+exports.players_in_room = players_in_room;
 
 exports.current_games = current_games;
 exports.current_users = current_users;
