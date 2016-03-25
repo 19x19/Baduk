@@ -62,6 +62,9 @@ io.on('connection', function (socket) {
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
+        if (socket.id === undefined) {
+            console.log('debug: socket id === undefined, socket = ', socket);
+        }
         io.to(info.room).emit('get_new_disconnect', {
             // TODO for some reason sometimes the user has no username on
             // disconnect...
