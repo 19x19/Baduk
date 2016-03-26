@@ -1,5 +1,4 @@
 $(document).ready(function(e) {
-    var circles = '';
     $('.board').click(function(e){
  
         var posX = (e.pageX - 48  - $(this).position().left);
