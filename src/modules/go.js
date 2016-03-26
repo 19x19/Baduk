@@ -55,7 +55,33 @@ var makeMove = function (gameState, color, x, y) {
             'y': y
         });
     }
-    return gameState;
+    return withoutDeadGroups(gameState);
+}
+
+var withoutDeadGroups = function (gameState) {
+    
+    var blackStones = [];
+    var whiteStones = [];
+
+    console.log(JSON.stringify(gameState));
+
+    gameState.blackStones.forEach(function (stone) {
+        if (libertiesOf(gameState, stone.x, stone.y).length > 0) {
+            blackStones.push(stone);
+        }
+    });
+    gameState.whiteStones.forEach(function (stone) {
+        if (libertiesOf(gameState, stone.x, stone.y).length > 0) {
+            whiteStones.push(stone);
+        }
+    });
+
+    return {
+        'whiteStones': whiteStones,
+        'blackStones': blackStones,
+        'turn': gameState.turn
+    };
+
 }
 
 var isInBounds = function (x, y) {
@@ -68,8 +94,8 @@ var colorOf = function (gameState, x, y) {
         var s = gameState.whiteStones[i];
         if (s.x === x && s.y === y) return 'white';
     }
-    for (var i=0; i<gameState.whiteStones.length; i++) {
-        var s = gameState.whiteStones[i];
+    for (var i=0; i<gameState.blackStones.length; i++) {
+        var s = gameState.blackStones[i];
         if (s.x === x && s.y === y) return 'black';
     }
     return 'empty';
@@ -86,7 +112,7 @@ var libertiesOf = function (gameState, x, y, blacklist) {
     if (blacklist.indexOf(reprStone(x, y)) !== -1) return [];
 
     var color = colorOf(gameState, x, y);
-    if (color === 'empty') throw new 'libertiesOf called on empty square'
+    if (color === 'empty') return [];
 
     var visitedStones = [];
 
@@ -119,3 +145,4 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 }
 
 exports.applyMove = applyMove;
+
