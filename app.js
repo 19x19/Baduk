@@ -87,7 +87,7 @@ io.on('connection', function (socket) {
         // TODO Put internal game logic here before posting. For now, we just
         // put a piece for everyone in the room regardless. Also doesn't account
         // for any color, etc.
-        console.log('post new piece');
+        console.log('post new piece', info, info.room);
         io.to(info.room).emit('get_new_piece', {
             'row' : info.row,
             'col' : info.col,

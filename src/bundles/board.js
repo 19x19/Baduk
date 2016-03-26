@@ -20,14 +20,21 @@ $(document).ready(function(e) {
 
         console.log(row, col);
 
+        var room = /[^/]*$/.exec(window.location.pathname)[0];
+
         socket.emit('post_new_piece', {
             'row': row,
-            'col': col
+            'col': col,
+            'room': room
         });
 
-        //black_circle = 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
+        // black_circle = 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
     });
 
+
+socket.on('get_new_piece', function (msg) {
+    add(msg.row, msg.col);
+});
 
 //REMOVES THE PIECE FROM THE BOARD
 remove = function(row, col) {
