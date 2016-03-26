@@ -16,8 +16,6 @@ $(document).ready(function(e) {
             col = 8;
         }
 
-        row -= 1;
-
         console.log(row, col);
 
         var room = /[^/]*$/.exec(window.location.pathname)[0];
