@@ -54,10 +54,10 @@ io.on('connection', function (socket) {
     // Recieves some information when a new user joins
     socket.on('post_new_connect', function(info) {
         games.add_user(info, socket);
-        io.to(info.room).emit('get_new_connect', {                                     
-            'username' : games.current_users[socket.id]['username'],                         
+        io.to(info.room).emit('get_new_connect', {
+            'username' : games.current_users[socket.id]['username'],
             'roommates' : games.players_in_room(info.room),
-        }); 
+        });
     });
 
     // Removes a user from the room
@@ -92,7 +92,7 @@ io.on('connection', function (socket) {
             'col' : info.col,
         });
     });
-    
+
 });
 
 http.listen(port, function () {
