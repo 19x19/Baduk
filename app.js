@@ -8,6 +8,7 @@ var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 
 var games = require('./src/modules/games.js');
+var go = require('./src/modules/go.js');
 
 var ddos = new Ddos;
 app.use(express.static('public'));
@@ -89,7 +90,7 @@ io.on('connection', function (socket) {
         // put a piece for everyone in the room regardless. Also doesn't account
         // for any color, etc.
         console.log('post new piece', info, info.room);
-        if(games.valid_move(info, socket.id)) {
+        if(go.valid_move(info, socket.id)) {
             io.to(info.room).emit('get_new_piece', {
                 'row' : info.row,
                 'col' : info.col,

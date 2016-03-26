@@ -76,17 +76,11 @@ var players_in_room = function(room) {
     return players;
 }
 
-// Returns true if the move is valid
-var valid_move = function(info, socket_id) {
-    return true;
-}
-
 exports.current_hash = current_hash;
 exports.game_exists = game_exists;
 exports.add_user = add_user;
 exports.remove_user = remove_user;
 exports.players_in_room = players_in_room;
-exports.valid_move = valid_move;
 
 exports.current_games = current_games;
 exports.current_users = current_users;
