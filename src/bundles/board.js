@@ -28,31 +28,16 @@ $(document).ready(function(e) {
 
     });
 
-
-socket.on('get_new_piece', function (msg) {
-    console.log(msg.row, msg.col, msg.color);
-    add(msg.row, msg.col, msg.color);
-});
-
-//REMOVES THE PIECE FROM THE BOARD
-remove = function(row, col) {
-    var posToRemove = removePosition(row, col);
-    if(posToRemove == -1) { // The case where the element doesn't exist
-        return -1;
-    }
-    arr = circles.split(","); // array of CSS background property of all the pieces on the board 
-    arr.splice(posToRemove, 1); // removes the element from the array
+socket.on('new_game_state', function (msg) {
+    $('.board').css("background", '');
     circles = '';
-    for(var i = 0; i < arr.length; i++) {
-        if(circles) {
-            circles = circles + ',' + arr[i].toString();
-        } else {
-            circles = arr[i].toString();
-        }
-    }
-    $('.board').css("background", circles);
-    $('.board').css("background-size", '60px');
-};
+    msg.blackStones.forEach(function (stone) {
+        add(stone.x, stone.y, 'Black');
+    });
+    msg.whiteStones.forEach(function (stone) {
+        add(stone.x, stone.y, 'White');
+    });
+});
 
 
 // RETURNS WHICH PART OF THE STRING TO REMOVE
