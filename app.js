@@ -89,11 +89,13 @@ io.on('connection', function (socket) {
         // put a piece for everyone in the room regardless. Also doesn't account
         // for any color, etc.
         console.log('post new piece', info, info.room);
-        io.to(info.room).emit('get_new_piece', {
-            'row' : info.row,
-            'col' : info.col,
-            'color' : games.current_users[socket.id]['color'],
-        });
+        if(games.valid_move(info, socket.id)) {
+            io.to(info.room).emit('get_new_piece', {
+                'row' : info.row,
+                'col' : info.col,
+                'color' : games.current_users[socket.id]['color'],
+            });
+        }
     });
 
 });
