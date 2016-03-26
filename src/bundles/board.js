@@ -29,48 +29,32 @@ $(document).ready(function(e) {
     });
 
 socket.on('new_game_state', function (msg) {
-    $('.board').css("background", '');
-    circles = '';
-    msg.blackStones.forEach(function (stone) {
-        add(stone.x, stone.y, 'black');
-    });
-    msg.whiteStones.forEach(function (stone) {
-        add(stone.x, stone.y, 'white');
-    });
+    $('.board').css("background", cssOfAll(msg.blackStones, msg.whiteStones));
+    $('.board').css("background-size", '60px');
 });
 
 
-// RETURNS WHICH PART OF THE STRING TO REMOVE
-removePosition = function(row, col) {
-    arr = circles.split(","); // array of CSS background property of all the pieces on the board
-    var arr_2;
-    for(var i = 0; i < arr.length; i++) {
-        var test = arr[i].toString();
-        arr_2 = arr[i].toString().split(" ",3);
-        if((arr_2[1].toString() == ((row * 55) + "px")) && 
-            (arr_2[2].toString() == ((col * 55) + "px"))) {
-                return i;
-        }
-    }
-    return -1;
-};
+cssOfAll = function (blackStones, whiteStones) {
+    cssOfBlack = blackStones.map(function (stone) {
+        return cssOf(stone.x, stone.y, 'black');
+    });
+    cssOfWhite = whiteStones.map(function (stone) {
+        return cssOf(stone.x, stone.y, 'white');
+    });
+    return cssOfBlack.concat(cssOfWhite).join(',');
+}
 
-//ADDS THE PIECE TO THE BOARD
-add = function(row, col, type) {
-    var posX = row * 55;
-    var posY = col * 55;
 
+cssOf = function (row, col, type) {
     var filename;
     if (type === 'white') {
         filename = '../img/white_circle.png';
     } else {
         filename = '../img/black_circle.png';
     }
-
-    circles = circles + ',' + 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
-    $('.board').css("background", circles);
-    $('.board').css("background-size", '60px');
-
+    var posX = row * 55;
+    var posY = col * 55;
+    return 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
 }
 
 });
