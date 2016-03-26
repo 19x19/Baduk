@@ -30,8 +30,8 @@ $(document).ready(function(e) {
 
 
 socket.on('get_new_piece', function (msg) {
-    add(msg.row, msg.col);
-    console.log(msg.color);
+    console.log(msg.row, msg.col, msg.color);
+    add(msg.row, msg.col, msg.color);
 });
 
 //REMOVES THE PIECE FROM THE BOARD
@@ -76,7 +76,7 @@ add = function(row, col, type) {
     var posY = col * 55;
 
     var filename;
-    if (type === 'white') {
+    if (type === 'White') {
         filename = '../img/white_circle.png';
     } else {
         filename = '../img/black_circle.png';
