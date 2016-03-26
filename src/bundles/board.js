@@ -26,7 +26,6 @@ $(document).ready(function(e) {
             'room': room
         });
 
-        // black_circle = 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
     });
 
 
@@ -73,13 +72,21 @@ removePosition = function(row, col) {
 //ADDS THE PIECE TO THE BOARD
 add = function(row, col, type) {
     var posX = row * 55;
-    var posY = col * 55; 
-    if(!circles) {
-        circles = circles + 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
+    var posY = col * 55;
+
+    var filename;
+    if (type === 'white') {
+        filename = '../img/white_circle.png';
+    } else {
+        filename = '../img/black_circle.png';
+    }
+
+    if (!circles) {
+        circles = 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
         $('.board').css("background", circles);
         $('.board').css("background-size", '60px');
     } else {
-        circles = circles + ',' + 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
+        circles = circles + ',' + 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
         $('.board').css("background", circles);
         $('.board').css("background-size", '60px');
     }
