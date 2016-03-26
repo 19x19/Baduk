@@ -17,13 +17,3 @@ Run Fischr at localhost:3001:
 ```
 node ./app.js
 ```
-
-# Developers
-
-## Browserify
-
-If you add a new browserify bundle, update the loaded javascript as follows:
-
-```
-browserify src/bundles/go.js -o src/bundles/go_bundle.js
-```

@@ -6,7 +6,6 @@ var port = 3001;
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
-var moniker = require('moniker');
 
 var games = require('./src/modules/games.js');
 
@@ -57,17 +56,22 @@ io.on('connection', function (socket) {
         games.add_user(info, socket);
         io.to(info.room).emit('get_new_connect', {                                     
             'username' : games.current_users[socket.id]['username'],                         
+            'roommates' : games.players_in_room(info.room),
         }); 
     });
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
+        if (socket.id === undefined) {
+            console.log('debug: socket id === undefined, socket = ', socket);
+        }
         io.to(info.room).emit('get_new_disconnect', {
+            // TODO for some reason sometimes the user has no username on
+            // disconnect...
             'username' : games.current_users[socket.id]['username'],
+            'roommates' : games.players_in_room(info.room),
         });
-        socket.leave(info.room);
-        // TODO Actually remove the new user from the current_users
-        // TODO Abstract into src/modules/games
+        games.remove_user(info, socket);
     });
 
     // Posts a new message to the room
@@ -77,6 +81,18 @@ io.on('connection', function (socket) {
             'username' : games.current_users[socket.id]['username'],
         });
     });
+
+    // Add a piece at the given position
+    socket.on('post_new_piece', function(info) {
+        // TODO Put internal game logic here before posting. For now, we just
+        // put a piece for everyone in the room regardless. Also doesn't account
+        // for any color, etc.
+        io.to(info.room).emit('get_new_piece', {
+            'row' : info.row,
+            'col' : info.col,
+        });
+    });
+    
 });
 
 http.listen(port, function () {
