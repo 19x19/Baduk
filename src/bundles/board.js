@@ -82,15 +82,10 @@ add = function(row, col, type) {
         filename = '../img/black_circle.png';
     }
 
-    if (!circles) {
-        circles = 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
-        $('.board').css("background", circles);
-        $('.board').css("background-size", '60px');
-    } else {
-        circles = circles + ',' + 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
-        $('.board').css("background", circles);
-        $('.board').css("background-size", '60px');
-    }
+    circles = circles + ',' + 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
+    $('.board').css("background", circles);
+    $('.board').css("background-size", '60px');
+
 }
 
 });
