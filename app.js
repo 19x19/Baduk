@@ -75,7 +75,7 @@ io.on('connection', function (socket) {
     });
 
     // Posts a new message to the room
-    socket.on('post_new_message', function(info) {
+    socket.on('post_new_message', function (info) {
         io.to(info.room).emit('get_new_message', {
             'message' : info.message,
             'username' : games.current_users[socket.id]['username'],
@@ -83,10 +83,11 @@ io.on('connection', function (socket) {
     });
 
     // Add a piece at the given position
-    socket.on('post_new_piece', function(info) {
+    socket.on('post_new_piece', function (info) {
         // TODO Put internal game logic here before posting. For now, we just
         // put a piece for everyone in the room regardless. Also doesn't account
         // for any color, etc.
+        console.log('post new piece');
         io.to(info.room).emit('get_new_piece', {
             'row' : info.row,
             'col' : info.col,

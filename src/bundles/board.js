@@ -1,23 +1,31 @@
 $(document).ready(function(e) {
     var circles = '';
     $('.board').click(function(e){
+ 
         var posX = (e.pageX - 48  - $(this).position().left);
         var posY = (e.pageY - 70 - $(this).position().top);
+
         var row = parseInt(posX / 57);
         var col = parseInt(posY / 57);
-        if(row == 9) {
+ 
+        if (row == 9) {
             row = 8;
         }
-        if(col == 9) {
+ 
+        if (col == 9) {
             col = 8;
         }
 
-        socket.emit('postNewPiece',{
+        row -= 1;
+
+        console.log(row, col);
+
+        socket.emit('post_new_piece', {
             'row': row,
             'col': col
         });
+
         //black_circle = 'url("../img/black_circle.png") ' + posX + 'px ' + posY + 'px no-repeat';
-        // TODO : Send to server
     });
 
 
