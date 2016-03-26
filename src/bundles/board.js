@@ -2,7 +2,7 @@ $(document).ready(function(e) {
     var circles = '';
     $('.board').click(function(e){
         var posX = (e.pageX - 48  - $(this).position().left);
-        var    posY = (e.pageY - 70 - $(this).position().top);
+        var posY = (e.pageY - 70 - $(this).position().top);
         var row = parseInt(posX / 57);
         var col = parseInt(posY / 57);
         if(row == 9) {
