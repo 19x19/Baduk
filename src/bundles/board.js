@@ -32,6 +32,7 @@ $(document).ready(function(e) {
 
 socket.on('get_new_piece', function (msg) {
     add(msg.row, msg.col);
+    console.log(msg.color);
 });
 
 //REMOVES THE PIECE FROM THE BOARD

@@ -91,6 +91,7 @@ io.on('connection', function (socket) {
         io.to(info.room).emit('get_new_piece', {
             'row' : info.row,
             'col' : info.col,
+            'color' : games.current_users[socket.id]['is_white'],
         });
     });
 

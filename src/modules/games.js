@@ -29,6 +29,21 @@ var add_user = function(info, socket) {
     current_users[socket.id] = {};
     current_users[socket.id]['username'] = moniker.choose();
     current_users[socket.id]['room'] = info.room;
+
+    // Determine the color randomly
+    var current_sockets = sockets_in_room(info.room);
+    if(current_sockets.length == 1) {
+        // If there are no players, randomly assign a color
+        current_users[socket.id]['is_white'] = (Math.random() < 0.5);
+    } else if(current_sockets.length == 2) {
+        // If there is one player, get the opposite of his color
+        var new_color = !current_users[current_sockets[0]]['is_white'];
+        current_users[socket.id]['is_white'] = new_color;
+    } else {
+        // If there is already two players in the room, no color
+        current_users[socket.id]['is_white'] = null;
+    }
+
     socket.room = info.room;
     socket.join(info.room);
 }
@@ -39,7 +54,18 @@ var remove_user = function(info, socket) {
     delete current_users[socket.id];
 }
 
-// Gets all socket ids of players in the given room
+// Gets all usernames of players in the given room
+var sockets_in_room = function(room) {
+    players = []
+    for (var id in current_users) {
+        if(current_users[id]['room'] == room) {
+            players.push(id);
+        }
+    }
+    return players;
+}
+
+// Gets all usernames of players in the given room
 var players_in_room = function(room) {
     players = []
     for (var id in current_users) {
