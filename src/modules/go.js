@@ -4,16 +4,6 @@
 
 var current_games = {};
 
-var valid_move = function (info, color) {
-
-
-
-    // If the code reaches this point, the move is valid, so we proceed
-    // Toggle the player's turn
-
-    return true;
-}
-
 // update current_games[roomId] with action
 // return undefined if it is an illegal move
 var applyMove = function (roomId, action) {
@@ -27,14 +17,13 @@ var applyMove = function (roomId, action) {
         return false;
     }
 
-    if (current_games[roomId]['turn'] == 'Black') {
-        current_games[roomId]['turn'] = 'White';
+    if (current_games[roomId]['turn'] == 'black') {
+        current_games[roomId]['turn'] = 'white';
     } else {
-        current_games[roomId]['turn'] = 'Black';
+        current_games[roomId]['turn'] = 'black';
     }
 
-    var _color = action.player_color === 'Black' ? 'black' : 'white';
-    current_games[roomId] = makeMove(current_games[roomId], _color, action.row, action.col);
+    current_games[roomId] = makeMove(current_games[roomId], action.player_color, action.row, action.col);
 
     return current_games[roomId];
 
@@ -44,7 +33,7 @@ var initialGameState = function () {
     return {
         'whiteStones': [],
         'blackStones': [],
-        'turn': 'Black'
+        'turn': 'black'
     };
 };
 

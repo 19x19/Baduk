@@ -32,10 +32,10 @@ socket.on('new_game_state', function (msg) {
     $('.board').css("background", '');
     circles = '';
     msg.blackStones.forEach(function (stone) {
-        add(stone.x, stone.y, 'Black');
+        add(stone.x, stone.y, 'black');
     });
     msg.whiteStones.forEach(function (stone) {
-        add(stone.x, stone.y, 'White');
+        add(stone.x, stone.y, 'white');
     });
 });
 
@@ -61,7 +61,7 @@ add = function(row, col, type) {
     var posY = col * 55;
 
     var filename;
-    if (type === 'White') {
+    if (type === 'white') {
         filename = '../img/white_circle.png';
     } else {
         filename = '../img/black_circle.png';
