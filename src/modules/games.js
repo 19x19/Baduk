@@ -37,7 +37,7 @@ var add_user = function(info, socket) {
         current_users[socket.id]['color'] = (Math.random() < 0.5 ? 'White' : 'Black');
     } else if(current_sockets.length == 2) {
         // If there is one player, get the opposite of his color
-        var other_color = current_users[current_sockets[0]]['is_white'];
+        var other_color = current_users[current_sockets[0]]['color'];
         current_users[socket.id]['color'] = (other_color === 'White' ? 'Black' : 'White');
     } else {
         // If there is already two players in the room, no color

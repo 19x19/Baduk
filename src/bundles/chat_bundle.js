@@ -39,7 +39,7 @@ $("#send").on('click', function () {
 // Gets a new message from the server
 socket.on('get_new_message', function (info) {
     $("#history").append($("<pre>", {
-        'text': info.username + ': ' + info.message,
+        'text': '[' + info.color + '] ' + info.username + ': ' + info.message,
     }));
 });
 
