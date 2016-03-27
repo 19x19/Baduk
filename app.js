@@ -97,11 +97,6 @@ io.on('connection', function (socket) {
 
     // Add a piece at the given position
     socket.on('post_new_piece', function (info) {
-        // TODO Put internal game logic here before posting. For now, we just
-        // put a piece for everyone in the room regardless. Also doesn't account
-        // for any color, etc.
-        console.log('post new piece', info, info.room);
-
         var color = games.current_users[socket.id]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'new_piece',

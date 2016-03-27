@@ -28,6 +28,12 @@ $(document).ready(function(e) {
     });
 
 socket.on('new_game_state', function (msg) {
+    if (msg.turn === 'white') {
+        $("#gameState").text('White to play');
+    } else {
+        $("#gameState").text('Black to play');
+    }
+    console.log(msg);
     $('.inner').empty().append(cssOfAll(msg.blackStones, msg.whiteStones));
 });
 
