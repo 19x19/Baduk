@@ -1,5 +1,4 @@
 $(document).ready(function(e) {
-    var circles = '';
     $('.board').click(function(e){
  
         var posX = (e.pageX - 48  - $(this).position().left);
@@ -28,64 +27,33 @@ $(document).ready(function(e) {
 
     });
 
-
-socket.on('get_new_piece', function (msg) {
-    console.log(msg.row, msg.col, msg.color);
-    add(msg.row, msg.col, msg.color);
+socket.on('new_game_state', function (msg) {
+    $('.board').css("background", cssOfAll(msg.blackStones, msg.whiteStones));
+    $('.board').css("background-size", '60px');
 });
 
-//REMOVES THE PIECE FROM THE BOARD
-remove = function(row, col) {
-    var posToRemove = removePosition(row, col);
-    if(posToRemove == -1) { // The case where the element doesn't exist
-        return -1;
-    }
-    arr = circles.split(","); // array of CSS background property of all the pieces on the board 
-    arr.splice(posToRemove, 1); // removes the element from the array
-    circles = '';
-    for(var i = 0; i < arr.length; i++) {
-        if(circles) {
-            circles = circles + ',' + arr[i].toString();
-        } else {
-            circles = arr[i].toString();
-        }
-    }
-    $('.board').css("background", circles);
-    $('.board').css("background-size", '60px');
-};
+
+cssOfAll = function (blackStones, whiteStones) {
+    cssOfBlack = blackStones.map(function (stone) {
+        return cssOf(stone.x, stone.y, 'black');
+    });
+    cssOfWhite = whiteStones.map(function (stone) {
+        return cssOf(stone.x, stone.y, 'white');
+    });
+    return cssOfBlack.concat(cssOfWhite).join(',');
+}
 
 
-// RETURNS WHICH PART OF THE STRING TO REMOVE
-removePosition = function(row, col) {
-    arr = circles.split(","); // array of CSS background property of all the pieces on the board
-    var arr_2;
-    for(var i = 0; i < arr.length; i++) {
-        var test = arr[i].toString();
-        arr_2 = arr[i].toString().split(" ",3);
-        if((arr_2[1].toString() == ((row * 55) + "px")) && 
-            (arr_2[2].toString() == ((col * 55) + "px"))) {
-                return i;
-        }
-    }
-    return -1;
-};
-
-//ADDS THE PIECE TO THE BOARD
-add = function(row, col, type) {
-    var posX = row * 55;
-    var posY = col * 55;
-
+cssOf = function (row, col, type) {
     var filename;
-    if (type === 'White') {
+    if (type === 'white') {
         filename = '../img/white_circle.png';
     } else {
         filename = '../img/black_circle.png';
     }
-
-    circles = circles + ',' + 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
-    $('.board').css("background", circles);
-    $('.board').css("background-size", '60px');
-
+    var posX = row * 55;
+    var posY = col * 55;
+    return 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
 }
 
 });

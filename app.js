@@ -8,6 +8,7 @@ var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 
 var games = require('./src/modules/games.js');
+var go = require('./src/modules/go.js');
 
 var ddos = new Ddos;
 app.use(express.static('public'));
@@ -89,11 +90,22 @@ io.on('connection', function (socket) {
         // put a piece for everyone in the room regardless. Also doesn't account
         // for any color, etc.
         console.log('post new piece', info, info.room);
-        io.to(info.room).emit('get_new_piece', {
-            'row' : info.row,
-            'col' : info.col,
-            'color' : games.current_users[socket.id]['color'],
+
+        var color = games.current_users[socket.id]['color'];
+        var newState = go.applyMove(info.room, {
+            'action': 'new_piece',
+            'row': info.row,
+            'col': info.col,
+            'player_color': color
         });
+
+        if (newState !== false) {
+            console.log('emit newstate');
+            io.to(info.room).emit('new_game_state', newState);
+        } else {
+            console.log('illegal move');
+        }
+
     });
 
 });
