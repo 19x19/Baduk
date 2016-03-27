@@ -54,26 +54,18 @@ var remove_user = function(info, socket) {
     delete current_users[socket.id];
 }
 
-// Gets all usernames of players in the given room
+// Gets all ids of players in the given room
 var sockets_in_room = function(room) {
-    players = []
-    for (var id in current_users) {
-        if(current_users[id]['room'] == room) {
-            players.push(id);
-        }
-    }
-    return players;
+    return Object.keys(current_users).filter(function(id) {
+        return current_users[id].room === room;
+    });
 }
 
 // Gets all usernames of players in the given room
 var players_in_room = function(room) {
-    players = []
-    for (var id in current_users) {
-        if(current_users[id]['room'] == room) {
-            players.push(current_users[id]['username']);
-        }
-    }
-    return players;
+    return sockets_in_room(room).map(function(id) {
+        return current_users[id].username
+    });
 }
 
 exports.current_hash = current_hash;
