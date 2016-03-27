@@ -19,11 +19,20 @@ pre {
 	background-color: #966F33;	
 }
 
+
 .board {
 	padding: 28.5px;
     border: 1px solid black;
-    /*background: url('../img/black_circle.png') 61px 61px ,url('../img/black_circle.png') 0px 0px;*/
+}
+
+.board {
+    content: '';
+    position: relative;
+    /*background: url('../img/white_circle.png') 61px 61px;*/
     background-repeat: no-repeat;
     background-size: 60px;
-    background-position: relative;
+}
+
+.inner {
+    /*position: relative;*/
 }
