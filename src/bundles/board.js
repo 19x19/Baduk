@@ -28,8 +28,7 @@ $(document).ready(function(e) {
     });
 
 socket.on('new_game_state', function (msg) {
-    $('.board').css("background", cssOfAll(msg.blackStones, msg.whiteStones));
-    $('.board').css("background-size", '60px');
+    $('.inner').append(cssOfAll(msg.blackStones, msg.whiteStones));
 });
 
 
@@ -47,13 +46,13 @@ cssOfAll = function (blackStones, whiteStones) {
 cssOf = function (row, col, type) {
     var filename;
     if (type === 'white') {
-        filename = '../img/white_circle.png';
+        filename = '/img/white_circle.png';
     } else {
-        filename = '../img/black_circle.png';
+        filename = '/img/black_circle.png';
     }
-    var posX = row * 55;
-    var posY = col * 55;
-    return 'url("' + filename + '") ' + posX + 'px ' + posY + 'px no-repeat';
+    var posX = (row * 55) + 15;
+    var posY = (col * 55) + 65;
+    return "<img src = '" + filename + "' style = 'position: absolute; left:" + posX + "px; top:" + posY + "px;' width = '60px' />" ;
 }
 
 });
