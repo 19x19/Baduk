@@ -51,8 +51,19 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
+app.get('/whoami/:roomId/:socketId', function (req, res) {
+    var roomId = req.params.roomId;
+    var socketId = req.params.socketId;
+
+    console.log(roomId, socketId, games.current_users);
+
+    res.json({
+        'username': games.current_users['/#' + socketId]['username'],
+    });
+});
+
 io.on('connection', function (socket) {
-    // Recieves some information when a new user joins
+    // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
         games.add_user(info, socket);
         io.to(info.room).emit('get_new_connect', {
