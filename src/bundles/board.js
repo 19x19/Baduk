@@ -28,7 +28,7 @@ $(document).ready(function(e) {
     });
 
 socket.on('new_game_state', function (msg) {
-    $('.inner').append(cssOfAll(msg.blackStones, msg.whiteStones));
+    $('.inner').empty().append(cssOfAll(msg.blackStones, msg.whiteStones));
 });
 
 
