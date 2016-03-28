@@ -57,7 +57,7 @@ cssOf = function (row, col, type) {
         filename = '/img/black_circle.png';
     }
     var posX = (row * 55) + 15;
-    var posY = (col * 55) + 65;
+    var posY = (col * 55) + 75;
     return "<img src = '" + filename + "' style = 'position: absolute; left:" + posX + "px; top:" + posY + "px;' width = '60px' />" ;
 }
 

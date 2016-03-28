@@ -33,7 +33,8 @@ var initialGameState = function () {
     return {
         'whiteStones': [],
         'blackStones': [],
-        'turn': 'black'
+        'turn': 'black',
+        'size': 9
     };
 };
 
@@ -84,9 +85,9 @@ var withoutDeadGroups = function (gameState) {
 
 }
 
-var isInBounds = function (x, y) {
-    return 0 <= x && x < 19;
-    return 0 <= y && y < 19;
+var isInBounds = function (gameState, x, y) {
+    return 0 <= x && x < 9;
+    return 0 <= y && y < 9;
 }
 
 var colorOf = function (gameState, x, y) {
@@ -127,7 +128,7 @@ var libertiesOf = function (gameState, x, y, blacklist) {
         if (dx === 0 && dy === 0) continue;
         if (dx * dy !== 0) continue;
 
-        if (isInBounds(x+dx, y+dy)) {
+        if (isInBounds(gameState, x+dx, y+dy)) {
 
             var otherColor = colorOf(gameState, x+dx, y+dy);
 
