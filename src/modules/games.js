@@ -72,7 +72,8 @@ var sockets_in_room = function(room) {
 // Gets all usernames of players in the given room
 var players_in_room = function(room) {
     return sockets_in_room(room).map(function(id) {
-        return current_users[id].username
+        return {'name' : current_users[id].username,
+                'color' : current_users[id].color};
     });
 }
 

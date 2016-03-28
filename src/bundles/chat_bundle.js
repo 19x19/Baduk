@@ -6,14 +6,26 @@ socket.emit('post_new_connect', {
     'room' : room,
 });
 
+// Wraps a name with the appropriate image
+var wrapName = function(player, name) {
+    return "<pre><i class=\"fa fa-" + player + "\"></i> " + name  + "</pre>";
+}
+
 // Updates the list of roommates
 var updateRoommates = function(roommates, exclude) {
     $("#roommates").empty();
     for(var name in roommates) {
-        if(exclude !== roommates[name]) {
-            $("#roommates").append($("<pre>", {
-                'text': roommates[name],
-            }));
+        if(exclude !== roommates[name].name) {
+            if(roommates[name].color == "white") {
+                var player = "circle-thin";
+            } else if(roommates[name].color == "black") {
+                var player = "circle";
+            } else {
+                var player = "eye";
+            }
+            $("#roommates").append(
+                wrapName(player, roommates[name].name)
+            );
         }
     }
 }
