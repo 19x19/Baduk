@@ -39,13 +39,13 @@ socket.on('new_game_state', function (msg) {
 
 
 imgOfAll = function (blackStones, whiteStones) {
-    imgOfBlack = blackStones.map(function (stone) {
+    var imgOfBlack = blackStones.map(function (stone) {
         return imgOf(stone.x, stone.y, 'black');
     });
-    imgOfWhite = whiteStones.map(function (stone) {
+    var imgOfWhite = whiteStones.map(function (stone) {
         return imgOf(stone.x, stone.y, 'white');
     });
-    return imgOfBlack.concat(imgOfWhite).join(' ');
+    return imgOfBlack.concat(imgOfWhite);
 }
 
 
@@ -58,7 +58,15 @@ imgOf = function (row, col, type) {
     }
     var posX = (row * 55) + 15;
     var posY = (col * 55) + 80;
-    return "<img src = '" + filename + "' style = 'position: absolute; left:" + posX + "px; top:" + posY + "px;' width = '60px' />" ;
+    return $("<img>", {
+        'src': filename,
+        'css': {
+            'position': 'absolute',
+            'left': posX,
+            'top': posY,
+            'width': 60
+        }
+    });
 }
 
 });
