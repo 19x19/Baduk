@@ -60,13 +60,21 @@ app.get('/whoami/:roomId/:socketId', function (req, res) {
     });
 });
 
+var socketOfId = {};
+
 io.on('connection', function (socket) {
+
+    socketOfId[socket.id] = socket;
+
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
         games.add_user(info, socket);
         io.to(info.room).emit('get_new_connect', {
-            'username' : games.current_users[socket.id]['username'],
+            'username' : games.current_users[socket.id].username,
             'roommates' : games.players_in_room(info.room),
+        });
+        socket.emit('your_name', {
+            'username': games.current_users[socket.id].username,
         });
     });
 
