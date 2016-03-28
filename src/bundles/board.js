@@ -45,7 +45,7 @@ cssOfAll = function (blackStones, whiteStones) {
     cssOfWhite = whiteStones.map(function (stone) {
         return cssOf(stone.x, stone.y, 'white');
     });
-    return cssOfBlack.concat(cssOfWhite).join(',');
+    return cssOfBlack.concat(cssOfWhite).join(' ');
 }
 
 
@@ -57,7 +57,7 @@ cssOf = function (row, col, type) {
         filename = '/img/black_circle.png';
     }
     var posX = (row * 55) + 15;
-    var posY = (col * 55) + 75;
+    var posY = (col * 55) + 80;
     return "<img src = '" + filename + "' style = 'position: absolute; left:" + posX + "px; top:" + posY + "px;' width = '60px' />" ;
 }
 
