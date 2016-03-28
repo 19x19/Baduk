@@ -7,7 +7,10 @@ socket.emit('post_new_connect', {
 });
 
 // Wraps a name with the appropriate image
-var wrapName = function(player, name) {
+var wrapName = function(color, name) {
+    if(color == "white") var player = "circle-thin";
+    if(color == "black") var player = "circle";
+    if(color == "spectator") var player = "eye";
     return "<pre><i class=\"fa fa-" + player + "\"></i> " + name  + "</pre>";
 }
 
@@ -16,15 +19,8 @@ var updateRoommates = function(roommates, exclude) {
     $("#roommates").empty();
     for(var name in roommates) {
         if(exclude !== roommates[name].name) {
-            if(roommates[name].color == "white") {
-                var player = "circle-thin";
-            } else if(roommates[name].color == "black") {
-                var player = "circle";
-            } else {
-                var player = "eye";
-            }
             $("#roommates").append(
-                wrapName(player, roommates[name].name)
+                wrapName(roommates[name].color, roommates[name].name)
             );
         }
     }
