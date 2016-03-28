@@ -8,10 +8,10 @@ socket.emit('post_new_connect', {
 
 // Wraps a name with the appropriate image
 var wrapName = function(color, name) {
-    if(color == "white") var player = "circle-thin";
-    if(color == "black") var player = "circle";
-    if(color == "spectator") var player = "eye";
-    return "<pre><i class=\"fa fa-" + player + "\"></i> " + name  + "</pre>";
+    if(color == "white")      { var player = "circle-thin"; }
+    else if(color == "black") { var player = "circle"; }
+    else                      { var player = "eye"; }
+    return "<i class=\"fa fa-" + player + "\"></i> " + name;
 }
 
 // Updates the list of roommates
@@ -20,7 +20,7 @@ var updateRoommates = function(roommates, exclude) {
     for(var name in roommates) {
         if(exclude !== roommates[name].name) {
             $("#roommates").append(
-                wrapName(roommates[name].color, roommates[name].name)
+                "<pre>" + wrapName(roommates[name].color, roommates[name].name) + "</pre>"
             );
         }
     }
@@ -55,9 +55,9 @@ $("#send").on('click', function () {
 
 // Gets a new message from the server
 socket.on('get_new_message', function (info) {
-    $("#history").append($("<pre>", {
-        'text': '[' + info.color + '] ' + info.username + ': ' + info.message,
-    }));
+    $("#history").append(
+        "<pre>" + wrapName(info.color, info.username) + ': ' + info.message + "</pre>"
+    );
 });
 
 // Tell the server before the user leaves
