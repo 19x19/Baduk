@@ -7,11 +7,11 @@ $(document).ready(function(e) {
         var row = parseInt(posX / 57);
         var col = parseInt(posY / 57);
  
-        if (row == 9) {
+        if (row === 9) {
             row = 8;
         }
  
-        if (col == 9) {
+        if (col === 9) {
             col = 8;
         }
 
@@ -34,22 +34,22 @@ socket.on('new_game_state', function (msg) {
         $("#gameState").text('Black to play');
     }
     console.log(msg);
-    $('.inner').empty().append(cssOfAll(msg.blackStones, msg.whiteStones));
+    $('.inner').empty().append(imgOfAll(msg.blackStones, msg.whiteStones));
 });
 
 
-cssOfAll = function (blackStones, whiteStones) {
-    cssOfBlack = blackStones.map(function (stone) {
-        return cssOf(stone.x, stone.y, 'black');
+imgOfAll = function (blackStones, whiteStones) {
+    imgOfBlack = blackStones.map(function (stone) {
+        return imgOf(stone.x, stone.y, 'black');
     });
-    cssOfWhite = whiteStones.map(function (stone) {
-        return cssOf(stone.x, stone.y, 'white');
+    imgOfWhite = whiteStones.map(function (stone) {
+        return imgOf(stone.x, stone.y, 'white');
     });
-    return cssOfBlack.concat(cssOfWhite).join(' ');
+    return imgOfBlack.concat(imgOfWhite).join(' ');
 }
 
 
-cssOf = function (row, col, type) {
+imgOf = function (row, col, type) {
     var filename;
     if (type === 'white') {
         filename = '/img/white_circle.png';
