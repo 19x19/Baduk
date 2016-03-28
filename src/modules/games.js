@@ -34,7 +34,7 @@ var add_user = function(info, socket) {
     var current_sockets = sockets_in_room(info.room);
     if(current_sockets.length == 1) {
         // If there are no players, randomly assign a color
-        current_users[socket.id]['color'] = (Math.random() < 0.5 ? 'white' : 'black');
+        current_users[socket.id].color = (Math.random() < 0.5 ? 'white' : 'black');
     } else if(current_sockets.length == 2) {
         // If there is one player, get the opposite of his color
         var other_color = current_users[current_sockets[0]]['color'];
@@ -43,6 +43,10 @@ var add_user = function(info, socket) {
         // If there is already two players in the room, no color
         current_users[socket.id]['color'] = 'Spectator';
     }
+
+    socket.emit('your_color', {
+        color: current_users[socket.id].color
+    });
 
     console.log(sockets_in_room(info.room).map(function (socketId) {
         return current_users[socketId];

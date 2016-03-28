@@ -31,6 +31,10 @@ socket.on('your_name', function (msg) {
     $("#yourName").text(msg.username);
 });
 
+socket.on('your_color', function (msg) {
+    $("#yourColor").text(msg.color);
+});
+
 // Send a new message to the room
 $("#send").on('click', function () {
     var message = $("#message").val();
