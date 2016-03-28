@@ -13,9 +13,11 @@ var applyMove = function (roomId, action) {
         current_games[roomId] = initialGameState();
     }
 
+    // If its not their turn, invalid move
     if (action.player_color !== current_games[roomId].turn) {
         return false;
     }
+
 
     if (current_games[roomId]['turn'] == 'black') {
         current_games[roomId]['turn'] = 'white';
