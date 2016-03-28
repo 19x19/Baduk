@@ -55,6 +55,8 @@ $("#send").on('click', function () {
 
 // Gets a new message from the server
 socket.on('get_new_message', function (info) {
+    // TODO Find a way to store the message as text to avoid XSS attacks, but also
+    //      have the wrapname actually render... I don't know enough javascript for this
     $("#history").append(
         "<pre>" + wrapName(info.color, info.username) + ': ' + info.message + "</pre>"
     );
