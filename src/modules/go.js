@@ -64,8 +64,6 @@ var withoutDeadGroups = function (gameState) {
     var blackStones = [];
     var whiteStones = [];
 
-    console.log(JSON.stringify(gameState));
-
     gameState.blackStones.forEach(function (stone) {
         if (libertiesOf(gameState, stone.x, stone.y).length > 0) {
             blackStones.push(stone);

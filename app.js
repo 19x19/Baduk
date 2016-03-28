@@ -55,8 +55,6 @@ app.get('/whoami/:roomId/:socketId', function (req, res) {
     var roomId = req.params.roomId;
     var socketId = req.params.socketId;
 
-    console.log(roomId, socketId, games.current_users);
-
     res.json({
         'username': games.current_users['/#' + socketId]['username'],
     });
@@ -106,7 +104,6 @@ io.on('connection', function (socket) {
         });
 
         if (newState !== false) {
-            console.log('emit newstate');
             io.to(info.room).emit('new_game_state', newState);
         } else {
             console.log('illegal move');

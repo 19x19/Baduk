@@ -15,8 +15,6 @@ $(document).ready(function(e) {
             col = 8;
         }
 
-        console.log(row + ',' + col);
-
         var room = /[^/]*$/.exec(window.location.pathname)[0];
 
         socket.emit('post_new_piece', {
