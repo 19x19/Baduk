@@ -25,15 +25,14 @@ socket.on('get_new_connect', function(info) {
     }));
     updateRoommates(info.roommates);
 
-    if (!window.whoami) {
-        fetch('/whoami/' + room + '/' + socket.id).then(function (response) {
-            return response.json();
-        }).then(function (res) {
-            window.whoami = res.username;
-            $("#yourName").text(window.whoami);
-        });
-    }
+});
 
+socket.on('your_name', function (msg) {
+    $("#yourName").text(msg.username);
+});
+
+socket.on('your_color', function (msg) {
+    $("#yourColor").text(msg.color);
 });
 
 // Send a new message to the room

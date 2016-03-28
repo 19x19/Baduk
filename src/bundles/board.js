@@ -7,15 +7,13 @@ $(document).ready(function(e) {
         var row = parseInt(posX / 57);
         var col = parseInt(posY / 57);
  
-        if (row == 9) {
+        if (row === 9) {
             row = 8;
         }
  
-        if (col == 9) {
+        if (col === 9) {
             col = 8;
         }
-
-        console.log(row + ',' + col);
 
         var room = /[^/]*$/.exec(window.location.pathname)[0];
 
@@ -34,22 +32,22 @@ socket.on('new_game_state', function (msg) {
         $("#gameState").text('Black to play');
     }
     console.log(msg);
-    $('.inner').empty().append(cssOfAll(msg.blackStones, msg.whiteStones));
+    $('.inner').empty().append(imgOfAll(msg.blackStones, msg.whiteStones));
 });
 
 
-cssOfAll = function (blackStones, whiteStones) {
-    cssOfBlack = blackStones.map(function (stone) {
-        return cssOf(stone.x, stone.y, 'black');
+imgOfAll = function (blackStones, whiteStones) {
+    var imgOfBlack = blackStones.map(function (stone) {
+        return imgOf(stone.x, stone.y, 'black');
     });
-    cssOfWhite = whiteStones.map(function (stone) {
-        return cssOf(stone.x, stone.y, 'white');
+    var imgOfWhite = whiteStones.map(function (stone) {
+        return imgOf(stone.x, stone.y, 'white');
     });
-    return cssOfBlack.concat(cssOfWhite).join(',');
+    return imgOfBlack.concat(imgOfWhite);
 }
 
 
-cssOf = function (row, col, type) {
+imgOf = function (row, col, type) {
     var filename;
     if (type === 'white') {
         filename = '/img/white_circle.png';
@@ -57,8 +55,16 @@ cssOf = function (row, col, type) {
         filename = '/img/black_circle.png';
     }
     var posX = (row * 55) + 15;
-    var posY = (col * 55) + 65;
-    return "<img src = '" + filename + "' style = 'position: absolute; left:" + posX + "px; top:" + posY + "px;' width = '60px' />" ;
+    var posY = (col * 55) + 80;
+    return $("<img>", {
+        'src': filename,
+        'css': {
+            'position': 'absolute',
+            'left': posX,
+            'top': posY,
+            'width': 60
+        }
+    });
 }
 
 });

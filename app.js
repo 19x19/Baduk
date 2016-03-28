@@ -51,24 +51,21 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
-app.get('/whoami/:roomId/:socketId', function (req, res) {
-    var roomId = req.params.roomId;
-    var socketId = req.params.socketId;
-
-    console.log(roomId, socketId, games.current_users);
-
-    res.json({
-        'username': games.current_users['/#' + socketId]['username'],
-    });
-});
+var socketOfId = {};
 
 io.on('connection', function (socket) {
+
+    socketOfId[socket.id] = socket;
+
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
         games.add_user(info, socket);
         io.to(info.room).emit('get_new_connect', {
-            'username' : games.current_users[socket.id]['username'],
+            'username' : games.current_users[socket.id].username,
             'roommates' : games.players_in_room(info.room),
+        });
+        socket.emit('your_name', {
+            'username': games.current_users[socket.id].username,
         });
     });
 
@@ -106,7 +103,6 @@ io.on('connection', function (socket) {
         });
 
         if (newState !== false) {
-            console.log('emit newstate');
             io.to(info.room).emit('new_game_state', newState);
         } else {
             console.log('illegal move');
