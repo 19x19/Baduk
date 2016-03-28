@@ -6,6 +6,7 @@ var port = 3001;
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
+var xss = require('node-xss').clean;
 
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
@@ -85,11 +86,11 @@ io.on('connection', function (socket) {
 
     // Posts a new message to the room
     socket.on('post_new_message', function (info) {
-        io.to(info.room).emit('get_new_message', {
+        io.to(info.room).emit('get_new_message', xss({
             'message' : info.message,
             'username' : games.current_users[socket.id]['username'],
             'color' : games.current_users[socket.id]['color'],
-        });
+        }));
     });
 
     // Add a piece at the given position
