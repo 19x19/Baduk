@@ -51,15 +51,6 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
-app.get('/whoami/:roomId/:socketId', function (req, res) {
-    var roomId = req.params.roomId;
-    var socketId = req.params.socketId;
-
-    res.json({
-        'username': games.current_users['/#' + socketId]['username'],
-    });
-});
-
 var socketOfId = {};
 
 io.on('connection', function (socket) {
