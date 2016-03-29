@@ -1,0 +1,9 @@
+- Don't start the game before two users have joined
+- Finish game logic
+- Clean up board, chat and roommates UI
+- A "send this link to your friend" button
+- End-game (resign, draw, etc.)
+- Switch to redis for game processing
+- Use an actual Node.js web server
+- Finish setting up baduk.ca (currently 159.203.33.30/)
+- Randomize game roomID
