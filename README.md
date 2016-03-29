@@ -1,6 +1,6 @@
-# Fischr
+# Baduk
 
-An easy-to-use online gaming platform.
+An easy-to-use online Go gaming platform.
 
 # Installation
 
@@ -12,7 +12,7 @@ curl "https://nodejs.org/dist/latest/node-${VERSION:-$(wget -qO- https://nodejs.
 npm install && bower install
 ```
 
-Run Fischr at localhost:3001:
+Run Baduk at localhost:3001:
 
 ```
 node ./app.js
