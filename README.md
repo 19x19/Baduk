@@ -1,6 +1,6 @@
 # Baduk
 
-An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.com.
+An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.ca.
 
 # Installation
 
