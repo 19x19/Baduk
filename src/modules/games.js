@@ -9,11 +9,10 @@ var current_games = [];
 var current_users = {};
 
 var game_hash = function() {
-    // TODO Generate the count more randomly
-    var count = 0;
     return function() {
-        count++;
-        var new_hash = sha1(count);
+        do {
+            var new_hash = sha1(Math.random());
+        } while(current_games.indexOf(new_hash) > -1);
         current_games.push(new_hash);
         return new_hash;
     }
