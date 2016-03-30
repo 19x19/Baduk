@@ -2,7 +2,7 @@
 
 An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.ca.
 
-# Installation
+## Installation
 
 Install Node.js and dependencies using the following:
 
@@ -17,3 +17,7 @@ Run Baduk at localhost:3001:
 ```
 node ./app.js
 ```
+
+## Infrastructure
+
+Baduk updates to origin/master every midnight.
