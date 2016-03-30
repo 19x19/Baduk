@@ -4,8 +4,9 @@
 
 var current_games = {};
 
+/* exported */
 // update current_games[roomId] with action
-// return undefined if it is an illegal move
+// return false if it is an illegal move
 var applyMove = function (roomId, action) {
 
     // If its the first move, initialize the game
@@ -18,16 +19,12 @@ var applyMove = function (roomId, action) {
         return false;
     }
 
+    var newState = makeMove(current_games[roomId], action.player_color, action.row, action.col);
 
-    if (current_games[roomId]['turn'] == 'black') {
-        current_games[roomId]['turn'] = 'white';
-    } else {
-        current_games[roomId]['turn'] = 'black';
-    }
+    if (newState === false) return false;
 
-    current_games[roomId] = makeMove(current_games[roomId], action.player_color, action.row, action.col);
-
-    return current_games[roomId];
+    current_games[roomId] = newState;
+    return newState;
 
 }
 
@@ -46,7 +43,12 @@ var copy = function (obj) {
 
 var makeMove = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
+
+    var oldNumBlackStones = gameState.blackStones.length;
+    var oldNumWhiteStones = gameState.whiteStones.length;
+
     gameState = copy(gameState);
+
     if (color === 'white') {
         gameState.whiteStones.push({
             'x': x,
@@ -58,11 +60,23 @@ var makeMove = function (gameState, color, x, y) {
             'y': y
         });
     }
-    return withoutDeadGroups(gameState);
+
+    gameState = withoutDeadGroups(gameState);
+
+    if (gameState.turn === 'black' && oldNumBlackStones + 1 !== gameState.blackStones.length) return false;
+    if (gameState.turn === 'white' && oldNumWhiteStones + 1 !== gameState.whiteStones.length) return false;
+
+    if (gameState.turn === 'white') {
+        gameState.turn = 'black';
+    } else {
+        gameState.turn = 'white';
+    }
+
+    return gameState;
 }
 
 var withoutDeadGroups = function (gameState) {
-    
+
     var blackStones = [];
     var whiteStones = [];
 
