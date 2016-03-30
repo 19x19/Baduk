@@ -7,6 +7,7 @@ var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 var xss = require('node-xss').clean;
+var git = require('git-rev');
 
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
@@ -33,6 +34,12 @@ app.get('/*', function(req, res, next) {
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
+});
+
+app.get('/hash', function(req, res) {
+    git.long(function (str) {
+        res.send(str);
+    });
 });
 
 app.get('/go', function (req, res) {
