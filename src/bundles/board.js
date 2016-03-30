@@ -31,7 +31,6 @@ socket.on('new_game_state', function (msg) {
     } else {
         $("#gameState").text('Black to play');
     }
-    console.log(msg);
     $('.inner').empty().append(imgOfAll(msg.blackStones, msg.whiteStones));
 });
 

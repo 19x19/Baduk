@@ -80,14 +80,14 @@ var withoutDeadGroups = function (gameState) {
     return {
         'whiteStones': whiteStones,
         'blackStones': blackStones,
-        'turn': gameState.turn
+        'turn': gameState.turn,
+        'size': gameState.size
     };
 
 }
 
 var isInBounds = function (gameState, x, y) {
-    return 0 <= x && x < 9;
-    return 0 <= y && y < 9;
+    return 0 <= x && x < gameState.size && 0 <= y && y < gameState.size;
 }
 
 var colorOf = function (gameState, x, y) {
@@ -144,6 +144,18 @@ var libertiesOf = function (gameState, x, y, blacklist) {
     return ret;
 
 }
+
+// tests
+
+var gs = {"whiteStones":[{"x":1,"y":0},{"x":0,"y":1}],"blackStones":[{"x": 0, "y": 0}, {"x":1,"y":1}],"turn":"black","size":9}
+
+console.log(!isInBounds(gs, 0, -1));
+console.log(libertiesOf(gs, 0, 0).length === 0);
+
+var gsResolved = withoutDeadGroups(gs);
+
+console.log(gsResolved.whiteStones.length === 2);
+console.log(gsResolved.blackStones.length === 1);
 
 exports.applyMove = applyMove;
 
