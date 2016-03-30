@@ -4,7 +4,7 @@ An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.c
 
 ## Installation
 
-Install Node.js and dependencies using the following:
+Install Node.js and dependencies using the following (for OS X):
 
 ```
 brew install wget
