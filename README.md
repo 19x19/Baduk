@@ -4,18 +4,30 @@ An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.c
 
 ## Installation
 
-Install Node.js and dependencies using the following (for OS X):
+First, install Docker Toolbox from https://www.docker.com/products/docker-toolbox. Then run the following to add a new container for Baduk:
 
 ```
-brew install wget
-curl "https://nodejs.org/dist/latest/node-${VERSION:-$(wget -qO- https://nodejs.org/dist/latest/ | sed -nE 's|.*>node-(.*)\.pkg</a>.*|\1|p')}.pkg" > "$HOME/Downloads/node-latest.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-latest.pkg" -target "/"
-npm install && bower install
+git clone https://github.com/19x19/Baduk
+cd Baduk
+docker-machine create default --driver virtualbox
 ```
 
-Run Baduk at localhost:3001:
+Next, install the image using:
 
 ```
-node ./app.js
+docker-compose up
+```
+
+Baduk will now be running at the IP given by:
+
+```
+docker-machine ip default
+```
+
+After pulling new commits, update the image with:
+
+```
+docker-compose build && docker-compose up -d
 ```
 
 ## Infrastructure
