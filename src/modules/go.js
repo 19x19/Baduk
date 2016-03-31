@@ -28,6 +28,11 @@ var applyMove = function (roomId, action) {
 
 }
 
+// Return the current game state of the given room
+var currentState = function(roomId) {
+    return current_games[roomId];
+}
+
 var initialGameState = function () {
     return {
         'whiteStones': [],
@@ -172,4 +177,4 @@ console.log(gsResolved.whiteStones.length === 2);
 console.log(gsResolved.blackStones.length === 1);
 
 exports.applyMove = applyMove;
-
+exports.currentState = currentState;

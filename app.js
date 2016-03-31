@@ -81,6 +81,10 @@ io.on('connection', function (socket) {
         socket.emit('your_name', {
             'username': games.current_users[socket.id].username,
         });
+        var current_state = go.currentState(info.room);
+        if(current_state !== undefined) {
+            socket.emit('new_game_state', go.currentState(info.room));
+        }
     });
 
     // Removes a user from the room
