@@ -36,10 +36,16 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/views/index.html');
 });
 
+// The most recent commit hash
 app.get('/hash', function(req, res) {
     git.long(function (str) {
         res.send(str);
     });
+});
+
+// No robots around here y'all
+app.get('/robots.txt', function(req, res) {
+    res.sendFile(__dirname + '/src/views/robots.txt');
 });
 
 app.get('/go', function (req, res) {
