@@ -23,3 +23,5 @@ node ./app.js
 Baduk updates to origin/master every midnight.
 
 No more pushing to master - if you want to add a feature, make a pull request.
+
+Currently only designed to be used with Chrome.
