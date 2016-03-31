@@ -30,10 +30,11 @@ First, install Docker Toolbox from https://www.docker.com/products/docker-toolbo
 git clone https://github.com/19x19/Baduk
 cd Baduk
 docker-machine create default --driver virtualbox
+docker-machine start default
 docker-compose up
 ```
 
-Then, add the following to your .bashrc::
+Then, add the following to your .bashrc:
 
 ```
 $(docker-machine env default)
