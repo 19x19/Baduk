@@ -13,6 +13,12 @@ docker-machine create default --driver virtualbox
 docker-compose up
 ```
 
+Then, add the following to your .bash_profile:
+
+```
+$(docker-machine env default)
+```
+
 Baduk will now be running at the IP given by:
 
 ```
