@@ -1,25 +1,30 @@
-$(document).ready(function(e) {
-    $('.board').click(function(e){
- 
-        var posX = (e.pageX - 48  - $(this).position().left);
-        var posY = (e.pageY - 70 - $(this).position().top);
+$(document).ready(function (e) {
+    $('.board').click(function (e){
 
-        var row = parseInt(posX / 57);
-        var col = parseInt(posY / 57);
- 
-        if (row === 9) {
-            row = 8;
-        }
- 
-        if (col === 9) {
-            col = 8;
-        }
+        var mouseX = e.pageX;
+        var mouseY = e.pageY;
+
+        var boardX = $(".board").offset().left;
+        var boardY = $(".board").offset().top;
+
+        var mouseRelX = mouseX - boardX;
+        var mouseRelY = mouseY - boardY;
+
+        var mousePctX = mouseRelX / $(".board").width();
+        var mousePctY = mouseRelY / $(".board").height();
+
+        // 0.07 is empirical
+        var mousePicPctX = mousePctX - 0.07;
+        var mousePicPctY = mousePctY - 0.07;
+
+        var pieceCoordX = Math.round(mousePicPctX * 8);
+        var pieceCoordY = Math.round(mousePicPctY * 8);
 
         var room = /[^/]*$/.exec(window.location.pathname)[0];
 
         socket.emit('post_new_piece', {
-            'row': row,
-            'col': col,
+            'row': pieceCoordX,
+            'col': pieceCoordY,
             'room': room
         });
 
