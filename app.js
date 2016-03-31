@@ -8,6 +8,7 @@ var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 var xss = require('node-xss').clean;
 var git = require('git-rev');
+var csurf = require('csurf')
 
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
