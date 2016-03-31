@@ -10,11 +10,6 @@ First, install Docker Toolbox from https://www.docker.com/products/docker-toolbo
 git clone https://github.com/19x19/Baduk
 cd Baduk
 docker-machine create default --driver virtualbox
-```
-
-Next, install the image using:
-
-```
 docker-compose up
 ```
 
