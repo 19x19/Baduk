@@ -74,3 +74,7 @@ socket.on('get_new_disconnect', function(info) {
     }));
     updateRoommates(info.roommates, info.username);
 });
+
+// We don't use the call-backs right now, so just empty functions for the
+// success and error functions
+var cpb = clipboardButton('#roomLink');

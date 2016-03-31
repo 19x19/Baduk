@@ -19,6 +19,7 @@
     "bootstrap": "~3.3.6",
     "jquery": "^2.2.2",
     "socket.io-client": "^1.4.5",
-    "components-font-awesome": "^4.5.0"
+    "components-font-awesome": "^4.5.0",
+    "clipboard-button": "^1.0.0"
   }
 }
