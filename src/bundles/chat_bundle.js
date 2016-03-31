@@ -78,3 +78,4 @@ socket.on('get_new_disconnect', function(info) {
 // We don't use the call-backs right now, so just empty functions for the
 // success and error functions
 var cpb = clipboardButton('#roomLink');
+roomLink.setAttribute("data-clipboard-text", window.location.href);
