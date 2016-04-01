@@ -58,6 +58,7 @@ socket.on('get_new_message', function (info) {
     $("#history").append(
         "<pre>" + wrapName(info.color, info.username) + ': ' + info.message + "</pre>"
     );
+    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 1000);
 });
 
 // Tell the server before the user leaves
@@ -79,3 +80,5 @@ socket.on('get_new_disconnect', function(info) {
 // *** This button does not work with Safari ***
 var cpb = clipboardButton('#roomLink');
 roomLink.setAttribute("data-clipboard-text", window.location.href);
+
+
