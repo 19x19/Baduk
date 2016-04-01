@@ -46,12 +46,7 @@ var copy = function (obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 
-var makeMove = function (gameState, color, x, y) {
-    if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
-
-    var oldNumBlackStones = gameState.blackStones.length;
-    var oldNumWhiteStones = gameState.whiteStones.length;
-
+var withStone = function (gameState, color, x, y) {
     gameState = copy(gameState);
 
     if (color === 'white') {
@@ -66,10 +61,35 @@ var makeMove = function (gameState, color, x, y) {
         });
     }
 
+    return gameState;
+}
+
+var makeMove = function (gameState, color, x, y) {
+    if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
+
+    var oldNumBlackStones = gameState.blackStones.length;
+    var oldNumWhiteStones = gameState.whiteStones.length;
+
+    gameState = withStone(gameState, color, x, y);
     gameState = withoutDeadGroups(gameState);
 
-    if (gameState.turn === 'black' && oldNumBlackStones + 1 !== gameState.blackStones.length) return false;
-    if (gameState.turn === 'white' && oldNumWhiteStones + 1 !== gameState.whiteStones.length) return false;
+    if ((gameState.turn === 'black' && oldNumBlackStones === gameState.blackStones.length)
+     || (gameState.turn === 'white' && oldNumWhiteStones === gameState.whiteStones.length)) {
+
+      // possible suicide
+
+      oldNumBlackStones = gameState.blackStones.length;
+      oldNumWhiteStones = gameState.whiteStones.length;
+
+      gameState = withStone(gameState, color, x, y);
+      gameState = withoutDeadGroups(gameState);
+
+      if ((gameState.turn === 'black' && oldNumBlackStones === gameState.blackStones.length)
+       || (gameState.turn === 'white' && oldNumWhiteStones === gameState.whiteStones.length)) {
+        return false;
+      }
+   
+    }
 
     if (gameState.turn === 'white') {
         gameState.turn = 'black';
