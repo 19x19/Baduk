@@ -54,6 +54,6 @@ docker-compose build && docker-compose up -d
 
 ## For Developers
 
-It's important to note that Baduk updates to origin/master every midnight. As a result, we're no longer allowed pushes to master unless you are an admin. If you're not, please submit a pull request.
+It's important to note that Baduk updates to origin/master every midnight. As a result, we're no longer allowed pushes to master unless you are an admin. If you're not, submit a pull request.
 
-If you want to submit an issue, please use a prefix of FEATURE, BUG, EFFICIENCY, or SECURITY.
+If you'd like to submit an issue, use one of the labels provided.
