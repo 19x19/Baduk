@@ -16,6 +16,7 @@ var applyMove = function (roomId, action) {
 
     // If its not their turn, invalid move
     if (action.player_color !== current_games[roomId].turn) {
+        console.log('illegal move: not your turn');
         return false;
     }
 
@@ -67,6 +68,11 @@ var withStone = function (gameState, color, x, y) {
 var makeMove = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
 
+    if (colorOf(gameState, x, y) !== 'empty') {
+        console.log('illegal move: not an empty intersection');
+        return false;
+    }
+
     var oldNumBlackStones = gameState.blackStones.length;
     var oldNumWhiteStones = gameState.whiteStones.length;
 
@@ -86,6 +92,7 @@ var makeMove = function (gameState, color, x, y) {
 
       if ((gameState.turn === 'black' && oldNumBlackStones === gameState.blackStones.length)
        || (gameState.turn === 'white' && oldNumWhiteStones === gameState.whiteStones.length)) {
+        console.log('illegal move: suicide');
         return false;
       }
    
