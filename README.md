@@ -52,10 +52,8 @@ After pulling new commits, update the image with:
 docker-compose build && docker-compose up -d
 ```
 
-## Infrastructure
+## For Developers
 
-Baduk updates to origin/master every midnight.
+It's important to note that Baduk updates to origin/master every midnight. As a result, we're no longer allowed pushes to master unless you are an admin. If you're not, please submit a pull request.
 
-No more pushing to master - if you want to add a feature, make a pull request.
-
-Currently only designed to be used with Chrome.
+If you want to submit an issue, please use a prefix of FEATURE, BUG, EFFICIENCY, or SECURITY.
