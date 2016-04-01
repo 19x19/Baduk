@@ -38,6 +38,6 @@ pre {
 }
 
 .chat {
-    max-height: 300px;
+    max-height: 30vh;
     overflow-y: scroll;
 }
