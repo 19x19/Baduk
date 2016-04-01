@@ -36,3 +36,8 @@ pre {
 .inner {
     /*position: relative;*/
 }
+
+.chat {
+    max-height: 300px;
+    overflow-y: scroll;
+}
