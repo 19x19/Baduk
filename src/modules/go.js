@@ -65,6 +65,65 @@ var withStone = function (gameState, color, x, y) {
     return gameState;
 }
 
+var isAnyNeighbourEmpty = function (gameState, x, y) {
+    for (var dx=-1; dx <= 1; dx += 1) for (var dy=-1; dy <= 1; dy += 1) {
+
+        if (dx === 0 && dy === 0) continue;
+        if (dx * dy !== 0) continue;
+        if (!isInBounds(gameState, x+dx, y+dy)) continue;
+
+        if (colorOf(gameState, x+dx, y+dy) === 'empty') {
+            return true;
+        }
+    }
+    return false;
+}
+
+var isAnyNeighbourSameColorWithMoreThanOneLiberty = function (gameState, color, x, y) {
+    for (var dx=-1; dx <= 1; dx += 1) for (var dy=-1; dy <= 1; dy += 1) {
+
+        if (dx === 0 && dy === 0) continue;
+        if (dx * dy !== 0) continue;
+        if (!isInBounds(gameState, x+dx, y+dy)) continue;
+
+        if (colorOf(gameState, x+dx, y+dy) === color && libertiesOf(gameState, x+dx, y+dy).length > 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+var isAnyNeighbourDiffColorWithOnlyOneLiberty = function (gameState, color, x, y) {
+    for (var dx=-1; dx <= 1; dx += 1) for (var dy=-1; dy <= 1; dy += 1) {
+
+        if (dx === 0 && dy === 0) continue;
+        if (dx * dy !== 0) continue;
+        if (!isInBounds(gameState, x+dx, y+dy)) continue;
+
+        if (colorOf(gameState, x+dx, y+dy) === oppositeColor(color) && libertiesOf(gameState, x+dx, y+dy).length === 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+var oppositeColor = function (color) {
+    if (color === 'white') return 'black';
+    if (color === 'black') return 'white';
+    throw new Exception('color');
+}
+
+// https://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
+
+var isSuicide = function (gameState, color, x, y) {
+    if (isAnyNeighbourEmpty(gameState, x, y) ||
+        isAnyNeighbourSameColorWithMoreThanOneLiberty(gameState, color, x, y) ||
+        isAnyNeighbourDiffColorWithOnlyOneLiberty(gameState, color, x, y)) {
+        return false;
+    }
+    return true;
+}
+
 var makeMove = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
 
@@ -73,30 +132,28 @@ var makeMove = function (gameState, color, x, y) {
         return false;
     }
 
-    var oldNumBlackStones = gameState.blackStones.length;
-    var oldNumWhiteStones = gameState.whiteStones.length;
+    if (isSuicide(gameState, color, x, y)) {
+        return false;
+    }
+
+    var gs2 = copy(gameState);
+    if (color === 'white') {
+        gs2.whiteStones.push({'x': x, 'y': y});
+    } else {
+        gs2.blackStones.push({'x': x, 'y': y});
+    }
+    grp = groupOf(gs2, x, y);
 
     gameState = withStone(gameState, color, x, y);
     gameState = withoutDeadGroups(gameState);
 
-    if ((gameState.turn === 'black' && oldNumBlackStones === gameState.blackStones.length)
-     || (gameState.turn === 'white' && oldNumWhiteStones === gameState.whiteStones.length)) {
-
-      // possible suicide
-
-      oldNumBlackStones = gameState.blackStones.length;
-      oldNumWhiteStones = gameState.whiteStones.length;
-
-      gameState = withStone(gameState, color, x, y);
-      gameState = withoutDeadGroups(gameState);
-
-      if ((gameState.turn === 'black' && oldNumBlackStones === gameState.blackStones.length)
-       || (gameState.turn === 'white' && oldNumWhiteStones === gameState.whiteStones.length)) {
-        console.log('illegal move: suicide');
-        return false;
-      }
-   
-    }
+    grp.forEach(function (stone) {
+        if (color === 'white') {
+            gameState.whiteStones.push(stone);
+        } else {
+            gameState.blackStones.push(stone);
+        }
+    });
 
     if (gameState.turn === 'white') {
         gameState.turn = 'black';
@@ -152,6 +209,36 @@ var reprStone = function (x, y) {
     return x + ' ' + y;
 }
 
+var groupOf = function (gameState, x, y, blacklist) {
+    blacklist = blacklist || [];
+
+    if (blacklist.indexOf(reprStone(x, y)) !== -1) return [];
+
+    var color = colorOf(gameState, x, y);
+    if (color === 'empty') return [];
+
+    var ret = [{'x': x, 'y': y}];
+
+    for (var dx=-1; dx <= 1; dx += 1) for (var dy=-1; dy <= 1; dy += 1) {
+
+        if (dx === 0 && dy === 0) continue;
+        if (dx * dy !== 0) continue;
+
+        if (isInBounds(gameState, x+dx, y+dy)) {
+
+            var otherColor = colorOf(gameState, x+dx, y+dy);
+
+            if (otherColor === color) {
+                ret.push({'x': x+dx, 'y': y+dy});
+                ret = ret.concat(groupOf(gameState, x+dx, y+dy, blacklist.concat([reprStone(x, y)])));
+            }
+
+        }
+    }
+    return ret;
+
+}
+
 var libertiesOf = function (gameState, x, y, blacklist) {
 
     blacklist = blacklist || [];
@@ -160,12 +247,6 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 
     var color = colorOf(gameState, x, y);
     if (color === 'empty') return [];
-
-    var visitedStones = [];
-
-    var isVisited = function (x, y) {
-        return visitedStones.indexOf(x + ' ' + y) !== -1;
-    }
 
     var ret = [];
 
@@ -202,6 +283,48 @@ var gsResolved = withoutDeadGroups(gs);
 
 console.log(gsResolved.whiteStones.length === 2);
 console.log(gsResolved.blackStones.length === 1);
+
+
+var gs2 = { whiteStones: [ { x: 1, y: 1 }, { x: 2, y: 0 }, { x: 0, y: 0 } ],
+  blackStones: [ { x: 0, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 0 } ],
+  turn: 'white',
+  size: 9,
+  mostRecentMove: { row: 1, col: 0 } 
+}
+
+console.log(groupOf(gs2, 0, 0).length === 1);
+
+// suicide-like capture
+
+var gs3 = { whiteStones: [ { x: 1, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 0 }, { x: 2, y: 0 } ],
+  blackStones: 
+   [ { x: 1, y: 0 },
+     { x: 1, y: 0 },
+     { x: 0, y: 1 },
+     { x: 0, y: 1 },
+     { x: 2, y: 1 },
+     { x: 2, y: 1 } ],
+  turn: 'white',
+  size: 9
+}
+
+console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs3, 'white', 0, 0));
+console.log(isSuicide(gs3, 'white', 0, 0) === false);
+
+// multi-group suicide
+
+var gs4 = { whiteStones: 
+   [ { x: 0, y: 2 },
+     { x: 1, y: 1 },
+     { x: 2, y: 0 }],
+  blackStones: 
+   [ { x: 0, y: 1 },
+     { x: 1, y: 0 }],
+  turn: 'black',
+  size: 9 
+}
+
+console.log(isSuicide(gs4, 'black', 0, 0));
 
 exports.applyMove = applyMove;
 exports.currentState = currentState;
