@@ -70,7 +70,7 @@ imgOf = function (row, col, type, mostRecentMove) {
     };
 
     if (mostRecentMove.row === row && mostRecentMove.col === col) {
-        css['box-shadow'] = "0px 0px 69px 23px rgba(0,0,0,0.75)";
+        css['box-shadow'] = "0px 0px 69px 3px rgba(0,0,0,0.5)";
         css['border-radius'] = "50%";
     }
 
