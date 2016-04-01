@@ -36,22 +36,23 @@ socket.on('new_game_state', function (msg) {
     } else {
         $("#gameState").text('Black to play');
     }
-    $('.inner').empty().append(imgOfAll(msg.blackStones, msg.whiteStones));
+    $('.inner').empty().append(imgOfAll(msg.blackStones, msg.whiteStones, msg.mostRecentMove));
 });
 
 
-imgOfAll = function (blackStones, whiteStones) {
+imgOfAll = function (blackStones, whiteStones, mostRecentMove) {
+    console.log(mostRecentMove);
     var imgOfBlack = blackStones.map(function (stone) {
-        return imgOf(stone.x, stone.y, 'black');
+        return imgOf(stone.x, stone.y, 'black', mostRecentMove);
     });
     var imgOfWhite = whiteStones.map(function (stone) {
-        return imgOf(stone.x, stone.y, 'white');
+        return imgOf(stone.x, stone.y, 'white', mostRecentMove);
     });
     return imgOfBlack.concat(imgOfWhite);
 }
 
 
-imgOf = function (row, col, type) {
+imgOf = function (row, col, type, mostRecentMove) {
     var filename;
     if (type === 'white') {
         filename = '/img/white_circle.png';
@@ -60,14 +61,22 @@ imgOf = function (row, col, type) {
     }
     var posX = (row * 55) + 15;
     var posY = (col * 55) + 80;
+
+    var css = {
+        'position': 'absolute',
+        'left': posX,
+        'top': posY,
+        'width': 60
+    };
+
+    if (mostRecentMove.row === row && mostRecentMove.col === col) {
+        css['box-shadow'] = "0px 0px 69px 23px rgba(0,0,0,0.75)";
+        css['border-radius'] = "50%";
+    }
+
     return $("<img>", {
         'src': filename,
-        'css': {
-            'position': 'absolute',
-            'left': posX,
-            'top': posY,
-            'width': 60
-        }
+        'css': css
     });
 }
 

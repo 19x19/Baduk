@@ -122,6 +122,10 @@ io.on('connection', function (socket) {
         });
 
         if (newState !== false) {
+            newState.mostRecentMove = {
+                'row': info.row,
+                'col': info.col
+            };
             io.to(info.room).emit('new_game_state', newState);
         } else {
             console.log('illegal move');
