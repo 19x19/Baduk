@@ -29,7 +29,7 @@ var updateRoommates = function(roommates, exclude) {
 // Get a message when a new user connects
 socket.on('get_new_connect', function(info) {
     $("#history").append(
-        "<pre><i>" + info.username + "has connected.</i></pre>"
+        "<pre><i>" + info.username + " has connected.</i></pre>"
     );
     updateRoommates(info.roommates);
 });
@@ -70,7 +70,7 @@ jQuery(window).bind('beforeunload', function (e) {
 // Get any disconnects from the server
 socket.on('get_new_disconnect', function(info) {
     $("#history").append(
-        "<pre><i>" + info.username + "has disconnected.</i></pre>"
+        "<pre><i>" + info.username + " has disconnected.</i></pre>"
     );
     updateRoommates(info.roommates, info.username);
 });
