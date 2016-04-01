@@ -1,22 +1,22 @@
-body {                                                                             
+body {
     padding-top: 70px; /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
-}                                                                                  
-                                                                                   
-footer {                                                                           
-    margin: 50px 0;                                                                
-}                                                                                  
-                                                                                   
-/* Used to make sure chat is sent neatly */                                        
-pre {                                                                              
-    white-space: pre-wrap;       /* CSS 3 */                                       
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */                         
-    white-space: -pre-wrap;      /* Opera 4-6 */                                   
-    white-space: -o-pre-wrap;    /* Opera 7 */                                     
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */                      
-} 
+}
+
+footer {
+    margin: 50px 0;
+}
+
+/* Used to make sure chat is sent neatly */
+pre {
+    white-space: pre-wrap;       /* CSS 3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
 
 .wood-color {
-	background-color: #966F33;	
+	background-color: #966F33;
 }
 
 
