@@ -80,4 +80,9 @@ socket.on('get_new_disconnect', function(info) {
 var cpb = clipboardButton('#roomLink');
 roomLink.setAttribute("data-clipboard-text", window.location.href);
 
-
+// Allows you to press "Enter" to send text when input selected
+$("#message").keyup(function(event){
+    if(event.keyCode == 13){
+        $("#send").click();
+    }
+});
