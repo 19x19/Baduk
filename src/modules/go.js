@@ -133,6 +133,7 @@ var makeMove = function (gameState, color, x, y) {
     }
 
     if (isSuicide(gameState, color, x, y)) {
+        console.log('illegal move: suicide');
         return false;
     }
 
@@ -261,7 +262,9 @@ var libertiesOf = function (gameState, x, y, blacklist) {
             var otherColor = colorOf(gameState, x+dx, y+dy);
 
             if (otherColor === 'empty') {
-                ret.push({'x': x+dx, 'y': y+dy});
+                if (ret.map(function (s) { return reprStone(s.x, s.y)}).indexOf(reprStone(x+dx, y+dy)) === -1) {
+                    ret.push({'x': x+dx, 'y': y+dy});
+                }
             } else if (otherColor === color) {
                 ret = ret.concat(libertiesOf(gameState, x+dx, y+dy, blacklist.concat([reprStone(x, y)])));
             }
@@ -329,3 +332,27 @@ console.log(isSuicide(gs4, 'black', 0, 0));
 
 exports.applyMove = applyMove;
 exports.currentState = currentState;
+
+// regression
+
+var gs5 = { whiteStones: 
+   [ { x: 6, y: 7 },
+     { x: 6, y: 8 },
+     { x: 7, y: 6 },
+     { x: 6, y: 6 },
+     { x: 8, y: 6 } ],
+  blackStones: 
+   [ { x: 7, y: 7 },
+     { x: 7, y: 8 },
+     { x: 8, y: 7 },
+     { x: 5, y: 5 },
+     { x: 6, y: 5 },
+     { x: 5, y: 6 } ],
+  turn: 'white',
+  size: 9,
+};
+
+console.log(!isSuicide(gs5, 'white', 8, 8));
+console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs5, 'white', 8, 8));
+console.log(libertiesOf(gs5, 7, 8).length === 1);
+
