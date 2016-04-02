@@ -4,10 +4,13 @@
 
 var current_games = {};
 
-/* exported */
-// update current_games[roomId] with action
-// return false if it is an illegal move
+// public API
+
 var applyMove = function (roomId, action) {
+    /* 
+    update current_games[roomId] with action
+    return false if it is an illegal move
+    */
 
     // If its the first move, initialize the game
     if (current_games[roomId] === undefined) {
@@ -29,22 +32,27 @@ var applyMove = function (roomId, action) {
 
 }
 
-// Return the current game state of the given room
 var currentState = function(roomId) {
+    // Return the current game state of the given room
     return current_games[roomId];
 }
 
-var initialGameState = function () {
-    return {
-        'whiteStones': [],
-        'blackStones': [],
-        'turn': 'black',
-        'size': 9
-    };
-};
+// utility 
 
 var copy = function (obj) {
     return JSON.parse(JSON.stringify(obj));
+}
+
+// board representation
+
+var oppositeColor = function (color) {
+    if (color === 'white') return 'black';
+    if (color === 'black') return 'white';
+    throw new Exception('color');
+}
+
+var reprStone = function (x, y) {
+    return x + ' ' + y;
 }
 
 var withStone = function (gameState, color, x, y) {
@@ -63,6 +71,42 @@ var withStone = function (gameState, color, x, y) {
     }
 
     return gameState;
+}
+
+var isInBounds = function (gameState, x, y) {
+    return 0 <= x && x < gameState.size && 0 <= y && y < gameState.size;
+}
+
+var colorOf = function (gameState, x, y) {
+    for (var i=0; i<gameState.whiteStones.length; i++) {
+        var s = gameState.whiteStones[i];
+        if (s.x === x && s.y === y) return 'white';
+    }
+    for (var i=0; i<gameState.blackStones.length; i++) {
+        var s = gameState.blackStones[i];
+        if (s.x === x && s.y === y) return 'black';
+    }
+    return 'empty';
+}
+
+var initialGameState = function () {
+    return {
+        'whiteStones': [],
+        'blackStones': [],
+        'turn': 'black',
+        'size': 9
+    };
+};
+
+// suicide - https://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
+
+var isSuicide = function (gameState, color, x, y) {
+    if (isAnyNeighbourEmpty(gameState, x, y) ||
+        isAnyNeighbourSameColorWithMoreThanOneLiberty(gameState, color, x, y) ||
+        isAnyNeighbourDiffColorWithOnlyOneLiberty(gameState, color, x, y)) {
+        return false;
+    }
+    return true;
 }
 
 var isAnyNeighbourEmpty = function (gameState, x, y) {
@@ -107,22 +151,7 @@ var isAnyNeighbourDiffColorWithOnlyOneLiberty = function (gameState, color, x, y
     return false;
 }
 
-var oppositeColor = function (color) {
-    if (color === 'white') return 'black';
-    if (color === 'black') return 'white';
-    throw new Exception('color');
-}
-
-// https://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
-
-var isSuicide = function (gameState, color, x, y) {
-    if (isAnyNeighbourEmpty(gameState, x, y) ||
-        isAnyNeighbourSameColorWithMoreThanOneLiberty(gameState, color, x, y) ||
-        isAnyNeighbourDiffColorWithOnlyOneLiberty(gameState, color, x, y)) {
-        return false;
-    }
-    return true;
-}
+// go-specific logic
 
 var makeMove = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
@@ -189,26 +218,6 @@ var withoutDeadGroups = function (gameState) {
         'size': gameState.size
     };
 
-}
-
-var isInBounds = function (gameState, x, y) {
-    return 0 <= x && x < gameState.size && 0 <= y && y < gameState.size;
-}
-
-var colorOf = function (gameState, x, y) {
-    for (var i=0; i<gameState.whiteStones.length; i++) {
-        var s = gameState.whiteStones[i];
-        if (s.x === x && s.y === y) return 'white';
-    }
-    for (var i=0; i<gameState.blackStones.length; i++) {
-        var s = gameState.blackStones[i];
-        if (s.x === x && s.y === y) return 'black';
-    }
-    return 'empty';
-}
-
-var reprStone = function (x, y) {
-    return x + ' ' + y;
 }
 
 var groupOf = function (gameState, x, y, blacklist) {
