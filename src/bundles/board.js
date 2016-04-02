@@ -53,26 +53,21 @@ imgOfAll = function (blackStones, whiteStones, mostRecentMove) {
 
 
 imgOf = function (row, col, type, mostRecentMove) {
-    var filename;
-    if (type === 'white') {
-        filename = '/img/white_circle.png';
-    } else {
-        filename = '/img/black_circle.png';
+    var filename = '/img/' + type + '_circle';
+    if (mostRecentMove.row === row && mostRecentMove.col === col) {
+        filename += '_recent'
     }
-    var posX = (row * 55) + 15;
-    var posY = (col * 55) + 80;
+    filename += '.png';
+
+    var posX = (row * 55) + 20;
+    var posY = (col * 55) + 85;
 
     var css = {
         'position': 'absolute',
         'left': posX,
         'top': posY,
-        'width': 60
+        'width': 50
     };
-
-    if (mostRecentMove.row === row && mostRecentMove.col === col) {
-        css['box-shadow'] = "0px 0px 69px 3px rgba(0,0,0,0.5)";
-        css['border-radius'] = "50%";
-    }
 
     return $("<img>", {
         'src': filename,
