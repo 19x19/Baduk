@@ -148,6 +148,7 @@ var makeMove = function (gameState, color, x, y) {
     gameState = withoutDeadGroups(gameState);
 
     grp.forEach(function (stone) {
+        if (colorOf(gs2, stone.x, stone.y) !== 'empty') return;
         if (color === 'white') {
             gameState.whiteStones.push(stone);
         } else {
