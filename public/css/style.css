@@ -24,21 +24,13 @@ pre {
 
 
 .board {
-	padding: 28.5px;
-    border: 1px solid black;
-}
-
-.board {
+	border: 1px solid black;
     content: '';
     position: relative;
-    /*background: url('../img/white_circle.png') 61px 61px;*/
     background-repeat: no-repeat;
     background-size: 60px;
 }
 
-.inner {
-    /*position: relative;*/
-}
 
 .chat {
     height: 30vh;

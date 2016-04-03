@@ -1,4 +1,9 @@
 $(document).ready(function (e) {
+
+    var boardPadding = ($('.board').width() / 17) + 3;
+    $('.board').css('padding', boardPadding);
+    var stoneSize = $('.board').width() / 8;
+
     $('.board').click(function (e){
 
         var mouseX = e.pageX;
@@ -59,14 +64,20 @@ imgOf = function (row, col, type, mostRecentMove) {
     }
     filename += '.png';
 
-    var posX = (row * 55) + 20;
-    var posY = (col * 55) + 85;
+    var impX = 20; //Imperical addition to the top position
+    var impY = 67; //Imperical addition to the top position
+    if ($('.container').width() > 900) {
+        impY = 85;
+    }
+
+    var posX = (row * stoneSize) + impX;
+    var posY = (col * stoneSize) + impY;
 
     var css = {
         'position': 'absolute',
         'left': posX,
         'top': posY,
-        'width': 50
+        'width': (stoneSize - 1)
     };
 
     return $("<img>", {
