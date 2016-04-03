@@ -77,7 +77,7 @@ imgOf = function (row, col, type, mostRecentMove) {
         'position': 'absolute',
         'left': posX,
         'top': posY,
-        'width': (stoneSize - 1)
+        'width': (stoneSize - 2)
     };
 
     return $("<img>", {
