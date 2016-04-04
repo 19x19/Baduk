@@ -40,7 +40,6 @@ window.drawDebug = function (gameState) {
 }
 
 socket.on('new_game_state', function (msg) {
-    console.log(msg);
     if (msg.turn === 'white') {
         $("#gameState").text('White to play');
     } else {
@@ -55,7 +54,6 @@ imgOfAll = function (stones, boardSize, mostRecentMove) {
     var ret = [];
 
     for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
-        console.log(stones[i][j]);
         if (stones[i][j] === 1) {
             ret.push(imgOf(i, j, 'black', mostRecentMove));
         } else if (stones[i][j] === 2) {
