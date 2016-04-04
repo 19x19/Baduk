@@ -1,5 +1,6 @@
 var socket = io();
 var room = /[^/]*$/.exec(window.location.pathname)[0];
+var game_started = false;
 
 // Tell the server that we've connected to a new room
 socket.emit('post_new_connect', {
@@ -32,6 +33,9 @@ socket.on('get_new_connect', function(info) {
         "<pre><i>" + info.username + " has connected.</i></pre>"
     );
     updateRoommates(info.roommates);
+    if(info.roommates.length > 1 && !game_started) {
+        $("#gameState").text("Black to play");
+    }
 });
 
 socket.on('your_name', function (msg) {
