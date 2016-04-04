@@ -35,25 +35,35 @@ $(document).ready(function (e) {
 
     });
 
+window.drawDebug = function (gameState) {
+    $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
+}
+
 socket.on('new_game_state', function (msg) {
+    console.log(msg);
     if (msg.turn === 'white') {
         $("#gameState").text('White to play');
     } else {
         $("#gameState").text('Black to play');
     }
-    $('.inner').empty().append(imgOfAll(msg.blackStones, msg.whiteStones, msg.mostRecentMove));
+    $('.inner').empty().append(imgOfAll(msg.stones, msg.size, msg.mostRecentMove));
 });
 
 
-imgOfAll = function (blackStones, whiteStones, mostRecentMove) {
-    console.log(mostRecentMove);
-    var imgOfBlack = blackStones.map(function (stone) {
-        return imgOf(stone.x, stone.y, 'black', mostRecentMove);
-    });
-    var imgOfWhite = whiteStones.map(function (stone) {
-        return imgOf(stone.x, stone.y, 'white', mostRecentMove);
-    });
-    return imgOfBlack.concat(imgOfWhite);
+imgOfAll = function (stones, boardSize, mostRecentMove) {
+
+    var ret = [];
+
+    for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+        console.log(stones[i][j]);
+        if (stones[i][j] === 1) {
+            ret.push(imgOf(i, j, 'black', mostRecentMove));
+        } else if (stones[i][j] === 2) {
+            ret.push(imgOf(i, j, 'white', mostRecentMove));
+        }
+    }
+
+    return ret;
 }
 
 

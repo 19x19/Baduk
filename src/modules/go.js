@@ -59,15 +59,9 @@ var withStone = function (gameState, color, x, y) {
     gameState = copy(gameState);
 
     if (color === 'white') {
-        gameState.whiteStones.push({
-            'x': x,
-            'y': y
-        });
+        gameState.stones[x][y] = 2;
     } else {
-        gameState.blackStones.push({
-            'x': x,
-            'y': y
-        });
+        gameState.stones[x][y] = 1;
     }
 
     return gameState;
@@ -78,21 +72,24 @@ var isInBounds = function (gameState, x, y) {
 }
 
 var colorOf = function (gameState, x, y) {
-    for (var i=0; i<gameState.whiteStones.length; i++) {
-        var s = gameState.whiteStones[i];
-        if (s.x === x && s.y === y) return 'white';
-    }
-    for (var i=0; i<gameState.blackStones.length; i++) {
-        var s = gameState.blackStones[i];
-        if (s.x === x && s.y === y) return 'black';
-    }
-    return 'empty';
+    return ['empty', 'black', 'white'][gameState.stones[x][y]];
 }
 
 var initialGameState = function () {
+
+    // 0 - empty
+    // 1 - black
+    // 2 - white
+
+    var stones = [];
+    for (var i=0; i<9; i++) {
+        stones[i] = [];
+        for (var j=0; j<9; j++) {
+            stones[i][j] = 0;
+        }
+    }
     return {
-        'whiteStones': [],
-        'blackStones': [],
+        'stones': stones,
         'turn': 'black',
         'size': 9
     };
@@ -167,23 +164,16 @@ var makeMove = function (gameState, color, x, y) {
     }
 
     var gs2 = copy(gameState);
-    if (color === 'white') {
-        gs2.whiteStones.push({'x': x, 'y': y});
-    } else {
-        gs2.blackStones.push({'x': x, 'y': y});
-    }
-    grp = groupOf(gs2, x, y);
+    gs2.stones[x][y] = { 'black': 1, 'white': 2 }[color];
 
+    groupOfPlayedStone = groupOf(gs2, x, y);
+    
     gameState = withStone(gameState, color, x, y);
     gameState = withoutDeadGroups(gameState);
 
-    grp.forEach(function (stone) {
-        if (colorOf(gs2, stone.x, stone.y) !== 'empty') return;
-        if (color === 'white') {
-            gameState.whiteStones.push(stone);
-        } else {
-            gameState.blackStones.push(stone);
-        }
+
+    groupOfPlayedStone.forEach(function (stone) {
+        gameState.stones[stone.x][stone.y] = { 'black': 1, 'white': 2 }[color];
     });
 
     if (gameState.turn === 'white') {
@@ -197,30 +187,18 @@ var makeMove = function (gameState, color, x, y) {
 
 var withoutDeadGroups = function (gameState) {
 
-    var blackStones = [];
-    var whiteStones = [];
+    var newState = copy(gameState);
 
-    gameState.blackStones.forEach(function (stone) {
-        if (libertiesOf(gameState, stone.x, stone.y).length > 0) {
-            blackStones.push(stone);
-        }
-    });
-    gameState.whiteStones.forEach(function (stone) {
-        if (libertiesOf(gameState, stone.x, stone.y).length > 0) {
-            whiteStones.push(stone);
-        }
-    });
+    for (var i=0; i<gameState.size; i++) for (var j=0; j<gameState.size; j++) {
+        if (colorOf(gameState, i, j) === 'empty') continue;
+        if (libertiesOf(gameState, i, j).length === 0) newState.stones[i][j] = 0;
+    }
 
-    return {
-        'whiteStones': whiteStones,
-        'blackStones': blackStones,
-        'turn': gameState.turn,
-        'size': gameState.size
-    };
+    return newState;
 
 }
 
-var groupOf = function (gameState, x, y, blacklist) {
+var groupOf = function (gameState, x, y, blacklist) { // todo: duplicates?
     blacklist = blacklist || [];
 
     if (blacklist.indexOf(reprStone(x, y)) !== -1) return [];
@@ -240,8 +218,15 @@ var groupOf = function (gameState, x, y, blacklist) {
             var otherColor = colorOf(gameState, x+dx, y+dy);
 
             if (otherColor === color) {
-                ret.push({'x': x+dx, 'y': y+dy});
-                ret = ret.concat(groupOf(gameState, x+dx, y+dy, blacklist.concat([reprStone(x, y)])));
+                if (ret.map(function (s) { return reprStone(s.x, s.y)}).indexOf(reprStone(x+dx, y+dy)) === -1) {
+                    ret.push({'x': x+dx, 'y': y+dy});
+                }
+                var retConcat = groupOf(gameState, x+dx, y+dy, blacklist.concat([reprStone(x, y)]));
+                retConcat.forEach(function (sc) {
+                    if (ret.map(function (s) { return reprStone(s.x, s.y)}).indexOf(reprStone(sc.x, sc.y)) === -1) {
+                        ret.push({'x': sc.x, 'y': sc.y});
+                    }
+                });
             }
 
         }
@@ -275,7 +260,15 @@ var libertiesOf = function (gameState, x, y, blacklist) {
                     ret.push({'x': x+dx, 'y': y+dy});
                 }
             } else if (otherColor === color) {
-                ret = ret.concat(libertiesOf(gameState, x+dx, y+dy, blacklist.concat([reprStone(x, y)])));
+                
+                var retConcat = libertiesOf(gameState, x+dx, y+dy, blacklist.concat([reprStone(x, y)]));
+                
+                retConcat.forEach(function (sc) {
+                    if (ret.map(function (s) { return reprStone(s.x, s.y)}).indexOf(reprStone(sc.x, sc.y)) === -1) {
+                        ret.push({'x': sc.x, 'y': sc.y});
+                    }
+                });
+                
             }
 
         }
@@ -285,62 +278,92 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 
 }
 
+exports.applyMove = applyMove;
+exports.currentState = currentState;
+
 // tests
 
-var gs = {"whiteStones":[{"x":1,"y":0},{"x":0,"y":1}],"blackStones":[{"x": 0, "y": 0}, {"x":1,"y":1}],"turn":"black","size":9}
+var gs1 = {
+    stones: [
+        [1, 2, 0, 0, 0, 0, 0, 0, 0],
+        [2, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    "size":9
+};
 
-console.log(!isInBounds(gs, 0, -1));
-console.log(libertiesOf(gs, 0, 0).length === 0);
+console.log(!isInBounds(gs1, 0, -1));
+console.log(libertiesOf(gs1, 0, 0).length === 0);
 
-var gsResolved = withoutDeadGroups(gs);
+var gsResolved = withoutDeadGroups(gs1);
 
-console.log(gsResolved.whiteStones.length === 2);
-console.log(gsResolved.blackStones.length === 1);
+console.log(colorOf(gsResolved, 0, 0) === 'empty');
 
-
-var gs2 = { whiteStones: [ { x: 1, y: 1 }, { x: 2, y: 0 }, { x: 0, y: 0 } ],
-  blackStones: [ { x: 0, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 0 } ],
-  turn: 'white',
-  size: 9,
-  mostRecentMove: { row: 1, col: 0 } 
-}
+var gs2 = {
+    stones: [
+        [2, 1, 2, 0, 0, 0, 0, 0, 0],
+        [1, 2, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    size: 9
+};
 
 console.log(groupOf(gs2, 0, 0).length === 1);
 
 // suicide-like capture
 
-var gs3 = { whiteStones: [ { x: 1, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 0 }, { x: 2, y: 0 } ],
-  blackStones: 
-   [ { x: 1, y: 0 },
-     { x: 1, y: 0 },
-     { x: 0, y: 1 },
-     { x: 0, y: 1 },
-     { x: 2, y: 1 },
-     { x: 2, y: 1 } ],
-  turn: 'white',
-  size: 9
-}
+var gs3 = {
+    stones: [
+        [0, 1, 2, 0, 0, 0, 0, 0, 0],
+        [1, 2, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    size: 9
+};
 
 console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs3, 'white', 0, 0));
 console.log(isSuicide(gs3, 'white', 0, 0) === false);
 
 // multi-group suicide
 
-var gs4 = { whiteStones: 
-   [ { x: 0, y: 2 },
-     { x: 1, y: 1 },
-     { x: 2, y: 0 }],
-  blackStones: 
-   [ { x: 0, y: 1 },
-     { x: 1, y: 0 }],
-  turn: 'black',
-  size: 9 
-}
+var gs4 = {
+    stones: [
+        [0, 1, 2, 0, 0, 0, 0, 0, 0],
+        [1, 2, 0, 0, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    size: 9
+};
 
 console.log(isSuicide(gs4, 'black', 0, 0));
-
-exports.applyMove = applyMove;
-exports.currentState = currentState;
 
 // regression
 
@@ -361,7 +384,58 @@ var gs5 = { whiteStones:
   size: 9,
 };
 
+
+var gs5 = {
+    stones: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 1, 0, 0],
+        [0, 0, 0, 0, 0, 1, 2, 2, 2],
+        [0, 0, 0, 0, 0, 0, 2, 1, 1],
+        [0, 0, 0, 0, 0, 0, 2, 1, 0],
+    ],
+    turn: "black",
+    size: 9
+};
+
 console.log(!isSuicide(gs5, 'white', 8, 8));
 console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs5, 'white', 8, 8));
 console.log(libertiesOf(gs5, 7, 8).length === 1);
 
+// https://github.com/19x19/Baduk/issues/35
+
+var gs6 = {
+    stones: [
+        [1, 0, 1, 0, 0, 0, 0, 0, 0],
+        [2, 2, 1, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "white",
+    size: 9
+};
+
+var gs7 = makeMove(gs6, 'white', 0, 1);
+
+console.log(gs7.stones[0][0] === 0);
+console.log(gs7.stones[1][0] === 2);
+console.log(gs7.stones[2][0] === 1);
+
+console.log(isSuicide(gs7, 'black', 0, 0) === false);
+console.log(isSuicide(gs7, 'white', 0, 0) === true);
+
+console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs7, 'black', 0, 0));
+
+var gs8 = makeMove(gs7, 'black', 0, 0);
+
+console.log(gs8.stones[0][0] === 1);
+console.log(gs8.stones[1][0] === 0);
+console.log(gs8.stones[2][0] === 1);
