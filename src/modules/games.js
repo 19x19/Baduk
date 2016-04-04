@@ -92,6 +92,7 @@ exports.game_exists = game_exists;
 exports.add_user = add_user;
 exports.remove_user = remove_user;
 exports.players_in_room = players_in_room;
+exports.cleanse = cleanse;
 
 exports.current_games = current_games;
 exports.current_users = current_users;
