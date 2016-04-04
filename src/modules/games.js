@@ -1,5 +1,6 @@
 var sha1 = require('sha1');
 var moniker = require('moniker');
+var schedule = require('node-schedule');
 
 /*
     Javascript module for general games (NOT GO SPECIFIC!)
@@ -75,6 +76,16 @@ var players_in_room = function(room) {
                 'color' : current_users[id].color};
     });
 }
+
+// Cleanse all rooms that are empty every 12 hours
+var cleanse = schedule.scheduleJob('0 0 12 * * *', function() {
+    for (var room in current_games) {
+        if(players_in_room(room).length == 0) {
+            var index = current_games.indexOf(room);
+            delete players_in_room[index];
+        }
+    }
+});
 
 exports.current_hash = current_hash;
 exports.game_exists = game_exists;
