@@ -30,6 +30,8 @@ var add_user = function(info, socket) {
     console.log(info);
     if(info.returning !== undefined) {
         // TODO: Figure out why prepending a /# is required here
+        // TODO: Major clean up [cisplatin]
+        // TODO: Handle players in two different tabs
         current_users[socket.id] = {};
         current_users[socket.id]['username'] = old_users["/#" + info.returning]['username'];
         current_users[socket.id]['room'] = old_users["/#" + info.returning]['room'];
