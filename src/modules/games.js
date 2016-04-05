@@ -8,6 +8,7 @@ var schedule = require('node-schedule');
 
 var current_games = [];
 var current_users = {};
+var old_users = {};
 
 var game_hash = function() {
     return function() {
@@ -30,11 +31,9 @@ var add_user = function(info, socket) {
     if(info.returning !== undefined) {
         // TODO: Figure out why prepending a /# is required here
         current_users[socket.id] = {};
-        current_users[socket.id]['username'] = current_users["/#" + info.returning]['username'];
-        current_users[socket.id]['room'] = current_users["/#" + info.returning]['room'];
-        current_users[socket.id]['color'] = current_users["/#" + info.returning]['color'];
-        // TODO remove user by info.returning socket id
-        // remove_user("/#" + info.returning);
+        current_users[socket.id]['username'] = old_users["/#" + info.returning]['username'];
+        current_users[socket.id]['room'] = old_users["/#" + info.returning]['room'];
+        current_users[socket.id]['color'] = old_users["/#" + info.returning]['color'];
     } else {
         current_users[socket.id] = {};
         current_users[socket.id]['username'] = moniker.choose();
@@ -70,7 +69,11 @@ var add_user = function(info, socket) {
 // Removes the user from a given room
 var remove_user = function(info, socket) {
     socket.leave(info.room);
-    // delete current_users[socket.id];
+    old_users[socket.id] = {};
+    old_users[socket.id]['username'] = current_users[socket.id]['username'];
+    old_users[socket.id]['color'] = current_users[socket.id]['color'];
+    old_users[socket.id]['room'] = current_users[socket.id]['room'];
+    delete current_users[socket.id];
 }
 
 // Gets all ids of players in the given room
