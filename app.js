@@ -74,9 +74,6 @@ io.on('connection', function (socket) {
 
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
-        if(games.current_users[socket.id] !== undefined) {
-            
-        }
         games.add_user(info, socket);
         io.to(info.room).emit('get_new_connect', {
             'username' : games.current_users[socket.id].username,

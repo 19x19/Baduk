@@ -25,17 +25,25 @@ var game_exists = function(hash) {
     return current_games.indexOf(hash) >= 0;
 };
 
+var save_old_player = function(id) {
+    old_users[id] = {};
+    old_users[id]['username'] = current_users[id]['username'];
+    old_users[id]['room'] = current_users[id]['room'];
+    old_users[id]['color'] = current_users[id]['color'];
+};
+
 // Adds a user to the given room
 var add_user = function(info, socket) {
-    console.log(info);
     if(info.returning !== undefined) {
         // TODO: Figure out why prepending a /# is required here
         // TODO: Major clean up [cisplatin]
         // TODO: Handle players in two different tabs
         current_users[socket.id] = {};
+        console.log(old_users);
         current_users[socket.id]['username'] = old_users["/#" + info.returning]['username'];
         current_users[socket.id]['room'] = old_users["/#" + info.returning]['room'];
         current_users[socket.id]['color'] = old_users["/#" + info.returning]['color'];
+        save_old_player(socket.id);
     } else {
         current_users[socket.id] = {};
         current_users[socket.id]['username'] = moniker.choose();
@@ -71,10 +79,7 @@ var add_user = function(info, socket) {
 // Removes the user from a given room
 var remove_user = function(info, socket) {
     socket.leave(info.room);
-    old_users[socket.id] = {};
-    old_users[socket.id]['username'] = current_users[socket.id]['username'];
-    old_users[socket.id]['color'] = current_users[socket.id]['color'];
-    old_users[socket.id]['room'] = current_users[socket.id]['room'];
+    save_old_player(socket.id);
     delete current_users[socket.id];
 }
 
