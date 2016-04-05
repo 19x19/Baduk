@@ -26,26 +26,37 @@ var game_exists = function(hash) {
 
 // Adds a user to the given room
 var add_user = function(info, socket) {
-    current_users[socket.id] = {};
-    current_users[socket.id]['username'] = moniker.choose();
-    current_users[socket.id]['room'] = info.room;
-
-    // Determine the color randomly
-    var current_sockets = sockets_in_room(info.room);
-    if(current_sockets.length == 1) {
-        // If there are no players, randomly assign a color
-        current_users[socket.id].color = (Math.random() < 0.5 ? 'white' : 'black');
-    } else if(current_sockets.length == 2) {
-        // If there is one player, get the opposite of his color
-        var other_color = current_users[current_sockets[0]]['color'];
-        current_users[socket.id]['color'] = (other_color === 'white' ? 'black' : 'white');
+    console.log(info);
+    if(info.returning !== undefined) {
+        // TODO: Figure out why prepending a /# is required here
+        current_users[socket.id] = {};
+        current_users[socket.id]['username'] = current_users["/#" + info.returning]['username'];
+        current_users[socket.id]['room'] = current_users["/#" + info.returning]['room'];
+        current_users[socket.id]['color'] = current_users["/#" + info.returning]['color'];
+        // TODO remove user by info.returning socket id
+        // remove_user("/#" + info.returning);
     } else {
-        // If there is already two players in the room, no color
-        current_users[socket.id]['color'] = 'Spectator';
+        current_users[socket.id] = {};
+        current_users[socket.id]['username'] = moniker.choose();
+        current_users[socket.id]['room'] = info.room;
+
+        // Determine the color randomly
+        var current_sockets = sockets_in_room(info.room);
+        if(current_sockets.length == 1) {
+            // If there are no players, randomly assign a color
+            current_users[socket.id].color = (Math.random() < 0.5 ? 'white' : 'black');
+        } else if(current_sockets.length == 2) {
+            // If there is one player, get the opposite of his color
+            var other_color = current_users[current_sockets[0]]['color'];
+            current_users[socket.id]['color'] = (other_color === 'white' ? 'black' : 'white');
+        } else {
+            // If there is already two players in the room, no color
+            current_users[socket.id]['color'] = 'Spectator';
+        }
     }
 
     socket.emit('your_color', {
-        color: current_users[socket.id].color
+        color: current_users[socket.id].color,
     });
 
     console.log(sockets_in_room(info.room).map(function (socketId) {
@@ -59,7 +70,7 @@ var add_user = function(info, socket) {
 // Removes the user from a given room
 var remove_user = function(info, socket) {
     socket.leave(info.room);
-    delete current_users[socket.id];
+    // delete current_users[socket.id];
 }
 
 // Gets all ids of players in the given room
