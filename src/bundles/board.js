@@ -45,9 +45,12 @@ socket.on('new_game_state', function (msg) {
     } else {
         $("#gameState").text('Black to play');
     }
-    $('.inner').empty().append(imgOfAll(msg.stones, msg.size, msg.mostRecentMove));
+    render(msg);
 });
 
+var render = function (gameState) {
+    $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.mostRecentMove));
+}
 
 imgOfAll = function (stones, boardSize, mostRecentMove) {
 
