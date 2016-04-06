@@ -13,13 +13,17 @@ socket.emit('post_new_connect', {
     'returning' : returning,
 });
 
+var faClassNameOf = function (color) {
+    if (color === 'white') return 'circle-thin';
+    if (color === 'black') return 'circle';
+    if (color === 'admin') return 'bullhorn';
+    return 'eye';
+}
+
 // Wraps a name with the appropriate image
-var wrapName = function(color, name) {
-    if (color === "white")      { var player = "circle-thin"; }
-    else if (color === "black") { var player = "circle"; }
-    else if (color === "admin") { var player = "bullhorn"; }
-    else                        { var player = "eye"; }
-    return "<i class=\"fa fa-" + player + "\"></i> " + name;
+var wrapName = function (color, name) {
+    var player = faClassNameOf(color);
+    return "<i class=\"fa fa-" + faClassNameOf(color) + "\"></i> " + name;
 }
 
 // Updates the list of roommates
@@ -65,19 +69,20 @@ $("#send").on('click', function () {
     });
 });
 
-// Gets a new message from the server
-socket.on('get_new_message', function (info) {
+var appendToChatHistory = function (color, username, message) {
     $("#history").append(
-        "<pre>" + wrapName(info.color, info.username) + ': ' + info.message + "</pre>"
+        "<pre>" + wrapName(color, username) + ': ' + message + '</pre>'
     );
     $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 1000);
+}
+
+// Gets a new message from the server
+socket.on('get_new_message', function (info) {
+    appendToChatHistory(info.color, info.username, info.message);
 });
 
 window.notifyFromServer = function (message) {
-    $("#history").append(
-        "<pre>" + wrapName('admin', 'admin') + ': ' + message + "</pre>"
-    );
-    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 1000);
+    appendToChatHistory('admin', 'admin', message);
 }
 
 // Tell the server before the user leaves
