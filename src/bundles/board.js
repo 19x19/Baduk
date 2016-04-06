@@ -3,7 +3,6 @@ $(document).ready(function (e) {
     var boardPadding = ($('.board').width() / 17) + 3;
     $('.board').css('padding', boardPadding);
     var stoneSize = $('.board').width() / 8;
-    //$(window).on('resize',function(){location.reload();});
     $('#userWait').modal('show');
 
     $('.board').click(function (e){
@@ -37,25 +36,51 @@ $(document).ready(function (e) {
 
     });
 
+$(window).resize(function () {
+    window.renderMostRecentGameState();
+});
+
+window.drawDebug = function (gameState) {
+    $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
+}
+
+window.renderMostRecentGameState = function () {
+    if (window.mostRecentGameState) {
+        render(window.mostRecentGameState);
+    }
+}
+
 socket.on('new_game_state', function (msg) {
     if (msg.turn === 'white') {
         $("#gameState").text('White to play');
     } else {
         $("#gameState").text('Black to play');
     }
-    $('.inner').empty().append(imgOfAll(msg.blackStones, msg.whiteStones, msg.mostRecentMove));
+    window.mostRecentGameState = msg;
+    window.renderMostRecentGameState();
 });
 
+socket.on('move_is_illegal', function (msg) {
+    window.notifyFromServer('move is illegal');
+});
 
-imgOfAll = function (blackStones, whiteStones, mostRecentMove) {
-    console.log(mostRecentMove);
-    var imgOfBlack = blackStones.map(function (stone) {
-        return imgOf(stone.x, stone.y, 'black', mostRecentMove);
-    });
-    var imgOfWhite = whiteStones.map(function (stone) {
-        return imgOf(stone.x, stone.y, 'white', mostRecentMove);
-    });
-    return imgOfBlack.concat(imgOfWhite);
+var render = function (gameState) {
+    $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.mostRecentMove));
+}
+
+imgOfAll = function (stones, boardSize, mostRecentMove) {
+
+    var ret = [];
+
+    for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+        if (stones[i][j] === 1) {
+            ret.push(imgOf(i, j, 'black', mostRecentMove));
+        } else if (stones[i][j] === 2) {
+            ret.push(imgOf(i, j, 'white', mostRecentMove));
+        }
+    }
+
+    return ret;
 }
 
 
@@ -72,16 +97,17 @@ imgOf = function (row, col, type, mostRecentMove) {
         impY = 85;
     }
 
+    var stoneSize2 = $('.board').width() / 8;
     
-    var posX = (row * stoneSize) + impX;
-    var posY = (col * stoneSize) + impY;
+    var posX = (row * stoneSize2) + impX;
+    var posY = (col * stoneSize2) + impY;
 
 
     var css = {
         'position': 'absolute',
         'left': posX,
         'top': posY,
-        'width': (stoneSize - 2)
+        'width': (stoneSize2 - 2)
     };
 
     return $("<img>", {

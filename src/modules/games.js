@@ -1,5 +1,6 @@
 var sha1 = require('sha1');
 var moniker = require('moniker');
+var schedule = require('node-schedule');
 
 /*
     Javascript module for general games (NOT GO SPECIFIC!)
@@ -7,6 +8,7 @@ var moniker = require('moniker');
 
 var current_games = [];
 var current_users = {};
+var old_users = {};
 
 var game_hash = function() {
     return function() {
@@ -23,28 +25,47 @@ var game_exists = function(hash) {
     return current_games.indexOf(hash) >= 0;
 };
 
+var save_old_player = function(id) {
+    old_users[id] = {};
+    old_users[id]['username'] = current_users[id]['username'];
+    old_users[id]['room'] = current_users[id]['room'];
+    old_users[id]['color'] = current_users[id]['color'];
+};
+
 // Adds a user to the given room
 var add_user = function(info, socket) {
-    current_users[socket.id] = {};
-    current_users[socket.id]['username'] = moniker.choose();
-    current_users[socket.id]['room'] = info.room;
-
-    // Determine the color randomly
-    var current_sockets = sockets_in_room(info.room);
-    if(current_sockets.length == 1) {
-        // If there are no players, randomly assign a color
-        current_users[socket.id].color = (Math.random() < 0.5 ? 'white' : 'black');
-    } else if(current_sockets.length == 2) {
-        // If there is one player, get the opposite of his color
-        var other_color = current_users[current_sockets[0]]['color'];
-        current_users[socket.id]['color'] = (other_color === 'white' ? 'black' : 'white');
+    if(info.returning !== undefined) {
+        // TODO: Figure out why prepending a /# is required here
+        // TODO: Major clean up [cisplatin]
+        // TODO: Handle players in two different tabs
+        current_users[socket.id] = {};
+        console.log(old_users);
+        current_users[socket.id]['username'] = old_users["/#" + info.returning]['username'];
+        current_users[socket.id]['room'] = old_users["/#" + info.returning]['room'];
+        current_users[socket.id]['color'] = old_users["/#" + info.returning]['color'];
+        save_old_player(socket.id);
     } else {
-        // If there is already two players in the room, no color
-        current_users[socket.id]['color'] = 'Spectator';
+        current_users[socket.id] = {};
+        current_users[socket.id]['username'] = moniker.choose();
+        current_users[socket.id]['room'] = info.room;
+
+        // Determine the color randomly
+        var current_sockets = sockets_in_room(info.room);
+        if(current_sockets.length == 1) {
+            // If there are no players, randomly assign a color
+            current_users[socket.id].color = (Math.random() < 0.5 ? 'white' : 'black');
+        } else if(current_sockets.length == 2) {
+            // If there is one player, get the opposite of his color
+            var other_color = current_users[current_sockets[0]]['color'];
+            current_users[socket.id]['color'] = (other_color === 'white' ? 'black' : 'white');
+        } else {
+            // If there is already two players in the room, no color
+            current_users[socket.id]['color'] = 'Spectator';
+        }
     }
 
     socket.emit('your_color', {
-        color: current_users[socket.id].color
+        color: current_users[socket.id].color,
     });
 
     console.log(sockets_in_room(info.room).map(function (socketId) {
@@ -58,6 +79,7 @@ var add_user = function(info, socket) {
 // Removes the user from a given room
 var remove_user = function(info, socket) {
     socket.leave(info.room);
+    save_old_player(socket.id);
     delete current_users[socket.id];
 }
 
@@ -76,11 +98,22 @@ var players_in_room = function(room) {
     });
 }
 
+// Cleanse all rooms that are empty every 12 hours
+var cleanse = schedule.scheduleJob('0 0 12 * * *', function() {
+    for (var room in current_games) {
+        if(players_in_room(room).length == 0) {
+            var index = current_games.indexOf(room);
+            delete players_in_room[index];
+        }
+    }
+});
+
 exports.current_hash = current_hash;
 exports.game_exists = game_exists;
 exports.add_user = add_user;
 exports.remove_user = remove_user;
 exports.players_in_room = players_in_room;
+exports.cleanse = cleanse;
 
 exports.current_games = current_games;
 exports.current_users = current_users;

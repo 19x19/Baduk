@@ -1,17 +1,28 @@
 var socket = io();
 var room = /[^/]*$/.exec(window.location.pathname)[0];
+var game_started = false;
 
 // Tell the server that we've connected to a new room
+var returning = undefined;
+if(Cookies.get('socket_id') !== undefined && Cookies.get('room') === room) {
+    returning = Cookies.get('socket_id');
+}
+
 socket.emit('post_new_connect', {
     'room' : room,
+    'returning' : returning,
 });
 
+var faClassNameOf = function (color) {
+    if (color === 'white') return 'circle-thin';
+    if (color === 'black') return 'circle';
+    return 'eye';
+}
+
 // Wraps a name with the appropriate image
-var wrapName = function(color, name) {
-    if(color == "white")      { var player = "circle-thin"; }
-    else if(color == "black") { var player = "circle"; }
-    else                      { var player = "eye"; }
-    return "<i class=\"fa fa-" + player + "\"></i> " + name;
+var wrapName = function (color, name) {
+    var player = faClassNameOf(color);
+    return "<i class=\"fa fa-" + faClassNameOf(color) + "\"></i> " + name;
 }
 
 // Updates the list of roommates
@@ -36,10 +47,15 @@ socket.on('get_new_connect', function(info) {
         console.log("enter");
         $('#userWait').modal('hide');        
     }
+    if(info.roommates.length > 1 && !game_started) {
+        $("#gameState").text("Black to play");
+    }
 });
 
 socket.on('your_name', function (msg) {
     $("#yourName").text(msg.username);
+    Cookies.set('socket_id', socket.id);
+    Cookies.set('room', room);
 });
 
 socket.on('your_color', function (msg) {
@@ -56,13 +72,23 @@ $("#send").on('click', function () {
     });
 });
 
-// Gets a new message from the server
-socket.on('get_new_message', function (info) {
+var appendToChatHistory = function (color, username, message) {
     $("#history").append(
-        "<pre>" + wrapName(info.color, info.username) + ': ' + info.message + "</pre>"
+        "<pre>" + wrapName(color, username) + ': ' + message + '</pre>'
     );
     $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 1000);
+}
+
+// Gets a new message from the server
+socket.on('get_new_message', function (info) {
+    appendToChatHistory(info.color, info.username, info.message);
 });
+
+window.notifyFromServer = function (message) {
+    $("#history").append(
+        "<pre><i>Illegal move</i></pre>"
+    );
+}
 
 // Tell the server before the user leaves
 jQuery(window).bind('beforeunload', function (e) {

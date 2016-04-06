@@ -10,6 +10,7 @@
     "express": "^4.13.4",
     "git-rev": "^0.2.1",
     "moniker": "^0.1.2",
+    "node-schedule": "^1.1.0",
     "node-xss": "0.0.1",
     "serve-favicon": "^2.3.0",
     "sha1": "^1.1.1",
