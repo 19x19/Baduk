@@ -35,8 +35,18 @@ $(document).ready(function (e) {
 
     });
 
+$(window).resize(function () {
+    window.renderMostRecentGameState();
+});
+
 window.drawDebug = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
+}
+
+window.renderMostRecentGameState = function () {
+    if (window.mostRecentGameState) {
+        render(window.mostRecentGameState);
+    }
 }
 
 socket.on('new_game_state', function (msg) {
@@ -45,7 +55,8 @@ socket.on('new_game_state', function (msg) {
     } else {
         $("#gameState").text('Black to play');
     }
-    render(msg);
+    window.mostRecentGameState = msg;
+    window.renderMostRecentGameState();
 });
 
 socket.on('move_is_illegal', function (msg) {
