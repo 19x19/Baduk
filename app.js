@@ -125,6 +125,7 @@ io.on('connection', function (socket) {
             };
             io.to(info.room).emit('new_game_state', newState);
         } else {
+            socket.emit('move_is_illegal', {}); // FIXME: this is a race condition
             console.log('illegal move');
         }
 

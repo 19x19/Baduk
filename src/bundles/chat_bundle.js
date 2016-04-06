@@ -15,9 +15,10 @@ socket.emit('post_new_connect', {
 
 // Wraps a name with the appropriate image
 var wrapName = function(color, name) {
-    if(color == "white")      { var player = "circle-thin"; }
-    else if(color == "black") { var player = "circle"; }
-    else                      { var player = "eye"; }
+    if (color === "white")      { var player = "circle-thin"; }
+    else if (color === "black") { var player = "circle"; }
+    else if (color === "admin") { var player = "bullhorn"; }
+    else                        { var player = "eye"; }
     return "<i class=\"fa fa-" + player + "\"></i> " + name;
 }
 
@@ -71,6 +72,13 @@ socket.on('get_new_message', function (info) {
     );
     $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 1000);
 });
+
+window.notifyFromServer = function (message) {
+    $("#history").append(
+        "<pre>" + wrapName('admin', 'admin') + ': ' + message + "</pre>"
+    );
+    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 1000);
+}
 
 // Tell the server before the user leaves
 jQuery(window).bind('beforeunload', function (e) {

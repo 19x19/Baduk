@@ -48,6 +48,10 @@ socket.on('new_game_state', function (msg) {
     render(msg);
 });
 
+socket.on('move_is_illegal', function (msg) {
+    window.notifyFromServer('move is illegal');
+});
+
 var render = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.mostRecentMove));
 }
