@@ -3,6 +3,8 @@ $(document).ready(function (e) {
     var boardPadding = ($('.board').width() / 17) + 3;
     $('.board').css('padding', boardPadding);
     var stoneSize = $('.board').width() / 8;
+    //$(window).on('resize',function(){location.reload();});
+    $('#userWait').modal('show');
 
     $('.board').click(function (e){
 
@@ -70,8 +72,10 @@ imgOf = function (row, col, type, mostRecentMove) {
         impY = 85;
     }
 
+    
     var posX = (row * stoneSize) + impX;
     var posY = (col * stoneSize) + impY;
+
 
     var css = {
         'position': 'absolute',
