@@ -16,7 +16,6 @@ socket.emit('post_new_connect', {
 var faClassNameOf = function (color) {
     if (color === 'white') return 'circle-thin';
     if (color === 'black') return 'circle';
-    if (color === 'admin') return 'bullhorn';
     return 'eye';
 }
 
@@ -82,7 +81,9 @@ socket.on('get_new_message', function (info) {
 });
 
 window.notifyFromServer = function (message) {
-    appendToChatHistory('admin', 'admin', message);
+    $("#history").append(
+        "<pre><i>illegal move</i></pre>"
+    );
 }
 
 // Tell the server before the user leaves
