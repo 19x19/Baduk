@@ -1,8 +1,13 @@
-$(document).ready(function (e) {
 
+// Changes the Border of the board dynamically
+var setBorder = function () {
     var boardPadding = ($('.board').width() / 17) + 3;
     $('.board').css('padding', boardPadding);
-    var stoneSize = $('.board').width() / 8;
+}
+
+$(document).ready(function (e) {
+
+    setBorder();
     $('#userWait').modal('show');
 
     $('.board').click(function (e){
@@ -37,7 +42,7 @@ $(document).ready(function (e) {
     });
 
 $(window).resize(function () {
-    window.renderMostRecentGameState();
+     window.renderMostRecentGameState();
 });
 
 window.drawDebug = function (gameState) {
@@ -68,6 +73,7 @@ var render = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.mostRecentMove));
 }
 
+
 imgOfAll = function (stones, boardSize, mostRecentMove) {
 
     var ret = [];
@@ -93,21 +99,21 @@ imgOf = function (row, col, type, mostRecentMove) {
 
     var impX = 20; //Imperical addition to the top position
     var impY = 67; //Imperical addition to the top position
-    if ($('.container').width() > 900) {
+    if ($('.container').width() > 900) { // Because the margins change when the containers size changes
         impY = 85;
     }
 
-    var stoneSize2 = $('.board').width() / 8;
+    setBorder();
+    var stoneSize = $('.board').width() / 8;
     
-    var posX = (row * stoneSize2) + impX;
-    var posY = (col * stoneSize2) + impY;
-
+    var posX = (row * stoneSize) + impX;
+    var posY = (col * stoneSize) + impY;
 
     var css = {
         'position': 'absolute',
         'left': posX,
         'top': posY,
-        'width': (stoneSize2 - 2)
+        'width': (stoneSize - 2)
     };
 
     return $("<img>", {
