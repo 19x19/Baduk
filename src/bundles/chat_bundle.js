@@ -43,7 +43,7 @@ socket.on('get_new_connect', function(info) {
         "<pre><i>" + info.username + " has connected.</i></pre>"
     );
     updateRoommates(info.roommates);
-    if( $('#roommates > pre').length == 2) {
+    if( $('#roommates > pre').length >= 2) {
         console.log("enter");
         $('#userWait').modal('hide');        
     }
