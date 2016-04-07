@@ -58,7 +58,6 @@ var add_user = function(info, socket) {
 
 // Removes the user from a given room
 var remove_user = function(info, socket) {
-    socket.leave(info.room);
     delete current_users[socket.id];
 }
 
