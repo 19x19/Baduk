@@ -2,15 +2,8 @@ var socket = io();
 var room = /[^/]*$/.exec(window.location.pathname)[0];
 var game_started = false;
 
-// Tell the server that we've connected to a new room
-var returning = undefined;
-if(Cookies.get('socket_id') !== undefined && Cookies.get('room') === room) {
-    returning = Cookies.get('socket_id');
-}
-
 socket.emit('post_new_connect', {
     'room' : room,
-    'returning' : returning,
 });
 
 var faClassNameOf = function (color) {
@@ -50,8 +43,6 @@ socket.on('get_new_connect', function(info) {
 
 socket.on('your_name', function (msg) {
     $("#yourName").text(msg.username);
-    Cookies.set('socket_id', socket.id);
-    Cookies.set('room', room);
 });
 
 socket.on('your_color', function (msg) {
