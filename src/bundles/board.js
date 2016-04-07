@@ -1,8 +1,14 @@
-$(document).ready(function (e) {
 
+// Sets the Border to the board dynamically
+var setBorder = function () {
     var boardPadding = ($('.board').width() / 17) + 3;
     $('.board').css('padding', boardPadding);
-    var stoneSize = $('.board').width() / 8;
+}
+
+$(document).ready(function (e) {
+
+    setBorder();
+    $('#userWait').modal('show');
 
     $('.board').click(function (e){
 
@@ -35,8 +41,18 @@ $(document).ready(function (e) {
 
     });
 
+$(window).resize(function () {
+     window.renderMostRecentGameState();
+});
+
 window.drawDebug = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
+}
+
+window.renderMostRecentGameState = function () {
+    if (window.mostRecentGameState) {
+        render(window.mostRecentGameState);
+    }
 }
 
 socket.on('new_game_state', function (msg) {
@@ -45,7 +61,8 @@ socket.on('new_game_state', function (msg) {
     } else {
         $("#gameState").text('Black to play');
     }
-    render(msg);
+    window.mostRecentGameState = msg;
+    window.renderMostRecentGameState();
 });
 
 socket.on('move_is_illegal', function (msg) {
@@ -55,6 +72,7 @@ socket.on('move_is_illegal', function (msg) {
 var render = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.mostRecentMove));
 }
+
 
 imgOfAll = function (stones, boardSize, mostRecentMove) {
 
@@ -81,10 +99,13 @@ imgOf = function (row, col, type, mostRecentMove) {
 
     var impX = 20; //Imperical addition to the top position
     var impY = 67; //Imperical addition to the top position
-    if ($('.container').width() > 900) {
+    if ($('.container').width() > 900) { // Because the margins change when the containers size changes
         impY = 85;
     }
 
+    setBorder();
+    var stoneSize = $('.board').width() / 8;
+    
     var posX = (row * stoneSize) + impX;
     var posY = (col * stoneSize) + impY;
 
