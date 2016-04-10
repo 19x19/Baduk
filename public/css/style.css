@@ -1,7 +1,8 @@
-body {
-    padding-top: 70px; /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+@import url(https://fonts.googleapis.com/css?family=Lato:400,300,700);
+*{
+    font-family: "Lato";
+    font-weight: 300;
 }
-
 footer {
     margin: 50px 0;
 }
@@ -40,4 +41,43 @@ pre {
 #userWait {
     position: absolute;
     top: 10%;
+}
+.navbar-inverse{
+    background-color: rgba(0,0,0,0);
+    border:none;
+}
+.navbar-inverse .navbar-brand{
+    color:#fff;
+}
+nav.navbar.navbar-inverse.navbar-fixed-top{
+    margin-bottom: 0;
+}
+section{
+    padding: 100px 0;
+}
+section.header{
+    padding-top: 150px;
+    background: url(../img/go.jpg);
+    background-size: cover;
+    background-position: center;
+}
+section.header .main-header h1{
+    font-family: 400;
+    font-size: 72px;
+    color: #fff;
+}
+section.header .main-header p{
+    font-size: 28px;
+    color: #fff;
+    text-transform: uppercase;
+}
+section.header .main-header button{
+    font-size: 28px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    padding: 7px 20px;
+    border: 1px solid #fff;
+    color:#fff;
+    background-color: rgba(0,0,0,0);
+    margin-top: 40px;
 }
