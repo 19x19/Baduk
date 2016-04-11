@@ -75,7 +75,6 @@ $('#passBtn').click(function () {
 
         var pieceCoordX = Math.round(mousePicPctX * 8);
         var pieceCoordY = Math.round(mousePicPctY * 8);
-        console.log(pieceCoordX + ", " + pieceCoordY);
 
         var impX = 20; //Imperical addition to the top position
         var impY = 67; //Imperical addition to the top position
@@ -83,8 +82,7 @@ $('#passBtn').click(function () {
             impY = 85;
         }
         var stoneSize = $('.board').width() / 8;
-        var posX = (pieceCoordX * stoneSize) + impX;
-        var posY = (pieceCoordY * stoneSize) + impY;
+        var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
         $('.ghostPiece').remove();
         if(pieceCoordX < 9 && pieceCoordY < 9) {
@@ -94,8 +92,8 @@ $('#passBtn').click(function () {
                 'css': {
                     position: 'absolute',
                     opacity: 0.4,
-                    left: posX,
-                    top: posY,
+                    left: posOfStone.x,
+                    top: posOfStone.y,
                     width: stoneSize - 2,
                 }
             });
@@ -172,11 +170,8 @@ imgOfAll = function (stones, boardSize, mostRecentMove) {
 
 posOf = function (row, col) {
     var stoneSize = $('.board').width() / 8;
-    var impX = 20; // Emperical addition to the top position
-    var impY = 67; // Emperical addition to the top position
-    if ($('.container').width() > 900) { // Because the margins change when the containers size changes
-        impY = 85;
-    }
+    var impX = 19;
+    var impY = $('.container').width() > 900 ? 85 : 67;
     return {
         x: (row * stoneSize) + impX,
         y: (col * stoneSize) + impY,
