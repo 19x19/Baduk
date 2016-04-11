@@ -121,6 +121,7 @@ io.on('connection', function (socket) {
 
         if (newState !== false) {
             newState.mostRecentMove = {
+                'action': 'new_piece',
                 'row': info.row,
                 'col': info.col
             };
