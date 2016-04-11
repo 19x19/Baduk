@@ -75,7 +75,6 @@ $('#passBtn').click(function () {
 
         var pieceCoordX = Math.round(mousePicPctX * 8);
         var pieceCoordY = Math.round(mousePicPctY * 8);
-        console.log(pieceCoordX + ", " + pieceCoordY);
 
         var impX = 20; //Imperical addition to the top position
         var impY = 67; //Imperical addition to the top position
