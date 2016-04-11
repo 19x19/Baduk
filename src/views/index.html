@@ -13,6 +13,8 @@
 
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.2.4/css/simple-line-icons.css">
+
 
     <!-- Custom CSS -->
     <link href="css/style.css" rel="stylesheet">
@@ -31,74 +33,62 @@
 
 <body>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Baduk</a>
-            </div>
-            <!-- /.navbar-collapse -->
+    <section class="header">
+        <div class="container main-header text-center">
+            <h1 class="">Baduk</h1>
+            <p>The easiest gaming platform you've ever used.</p>
+            <a href="/go"><button class="btn btn-primary" ><i class="icon-control-play icons"></i> Play Go</button></a>
         </div>
-        <!-- /.container -->
-    </nav>
+    </section>
 
     <!-- Page Content -->
-    <div class="container">
-
-        <div class="row">
-
-            <!-- Blog Entries Column -->
-            <div class="col-md-8">
-
-                <h1 class="page-header">
-                    Baduk
-                    <small>The easiest gaming platform you've ever used.</small>
-                </h1>
-
-                <!-- First Blog Post -->
-                <h2>
-                    <a href="/go">Go</a>
-                </h2>
-                <img class="img-responsive" src="/img/go.png" alt="">
-                <hr>
-                <p>
-Go (圍棋; literally: "encircling game") is an abstract strategy board game for two players, in which the aim is to surround more territory than the opponent.
-<br><br>
-The game originated in ancient China more than 2,500 years ago, and is one of the oldest board games played today. It was considered one of the four essential arts of a cultured Chinese scholar in antiquity. The earliest written reference to the game is generally recognized as the historical annal Zuo Zhuan (c. 4th century BC). The current game of Go as we know was formalized in Japan in the 15th century CE.
-                </p>
-<a class="btn btn-primary" href="/go">Play Go<span class="glyphicon glyphicon-chevron-right"></span></a>
+    <section class="container text-center about">
+        <h1>What do we do?</h1>
+        <p>Baduk lets you and your friends play Go without all the bullshit of traditional websites. Developed by a group of students who are sick and tired of ads, sign up processes, emails and laggy Flash platforms, we make sure you enjoy Go the way its meant to be. Here are some key features:</p>
+        <div class="row features-row">
+            <div class="col-md-4">
+                <i class="icon-game-controller icons"></i>
+                <h3>Ad Free</h3>
+                <p>We know that ads are the last thing you wanna see when playing a game, so we took them out completely. Enjoy a distraction free environment that no other site can provide.</p>
             </div>
-
-            <!-- Blog Sidebar Widgets Column -->
-            <div class="col-md-4"><br>
-
-                <!-- Side Widget Well -->
-                <div class="well">
-                    <h4>Free games? What's the catch?</h4>
-                    <p>
-As gamers ourselves, we're sick and tired of gaming sites having countless ads, sign-up processes, e-mail verification, and a tonne of other annoying site-related obstacles. We just want to play our damn games. Inspired by the great <a href="http://en.lichess.org/">Lichess</a>, we will never have any of the aforementioned annoyances.
-                    </p>
-                </div>
-
-                <div class="well">
-                    <h4>About Baduk</h4>
-                    <p>
-We're a bunch of students at the University of Waterloo, studying computer science. Baduk is built using Node.js and Socket.io. If you'd like to give back, you can help contribute to the site. Baduk is an open-source project, so feel free to submit a feature or an issue to our <a href="https://github.com/19x19/baduk">repository</a>.
-                    </p>
-                </div>
-
+            <div class="col-md-4">
+                <i class="icon-compass icons"></i>
+                <h3>Ready-to-go</h3>
+                <p>With one click you will get a unique link to share to play with your friends. Skip the sign in bullshit completely and head stright into game mode.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="icon-eye icons"></i>
+                <h3>Fluid UI</h3>
+                <p>Everything is done with the latest coding paradigms, everything is pretty and clean. Above all, its fast as hell.</p>
             </div>
         </div>
-        <!-- /.row -->
+        <a href="/go"><button class="btn btn-primary" ><i class="icon-control-play icons"></i> Play Now</button></a>
+    </section>
+    <section class="container-fluid info">
+        <div class="" style="display: flex;">
+            <div class="col-md-6">
+                <div class="">
+                    <div class="col-md-8 col-md-offset-4 info-content">
+                        <h4>Free games? What's the catch?</h4>
+                        <p>
+        As gamers ourselves, we're sick and tired of gaming sites having countless ads, sign-up processes, e-mail verification, and a tonne of other annoying site-related obstacles. We just want to play our damn games. Inspired by the great <a href="http://en.lichess.org/">Lichess</a>, we will never have any of the aforementioned annoyances.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    </div>
+            <div class="col-md-6">
+                <div class="">
+                    <div class="col-md-8 info-content">
+                        <h4>About Baduk</h4>
+                        <p>
+        We're a bunch of students at the University of Waterloo, studying computer science. Baduk is built using Node.js and Socket.io. If you'd like to give back, you can help contribute to the site. Baduk is an open-source project, so feel free to submit a feature or an issue to our <a href="https://github.com/19x19/baduk">repository</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- /.container -->
 
     <!-- jQuery -->
