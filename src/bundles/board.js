@@ -76,7 +76,6 @@ $('#passBtn').click(function () {
         var pieceCoordX = Math.round(mousePicPctX * 8);
         var pieceCoordY = Math.round(mousePicPctY * 8);
         console.log(pieceCoordX + ", " + pieceCoordY);
-        //alert(pieceCoordX);
 
         var impX = 20; //Imperical addition to the top position
         var impY = 67; //Imperical addition to the top position
@@ -89,7 +88,17 @@ $('#passBtn').click(function () {
 
         $('.ghostPiece').remove();
         if(pieceCoordX < 9 && pieceCoordY < 9) {
-            var ghostPiece = $('<img  class="ghostPiece" src="/img/hover_circle.png" style = " position: absolute; opacity: 0.4; left: ' + posX + 'px; top: ' + posY + 'px; " width=" '+ (stoneSize - 2) + '" />');
+            var ghostPiece = $('<img>', {
+                'class': 'ghostPiece',
+                'src': '/img/black_circle.png',
+                'css': {
+                    position: 'absolute',
+                    opacity: 0.4,
+                    left: posX,
+                    top: posY,
+                    width: stoneSize - 2,
+                }
+            });
             ghostPiece.click(function (event) {
                 window.onBoardClick(event);
             });
@@ -160,6 +169,19 @@ imgOfAll = function (stones, boardSize, mostRecentMove) {
     return ret;
 }
 
+posOf = function (row, col) {
+    var stoneSize = $('.board').width() / 8;
+    var impX = 20; // Emperical addition to the top position
+    var impY = 67; // Emperical addition to the top position
+    if ($('.container').width() > 900) { // Because the margins change when the containers size changes
+        impY = 85;
+    }
+    return {
+        x: (row * stoneSize) + impX,
+        y: (col * stoneSize) + impY,
+    };
+
+}
 
 imgOf = function (row, col, type, mostRecentMove) {
     var filename = '/img/' + type + '_circle';
@@ -168,21 +190,13 @@ imgOf = function (row, col, type, mostRecentMove) {
     }
     filename += '.png';
 
-    var impX = 20; // Emperical addition to the top position
-    var impY = 67; // Emperical addition to the top position
-    if ($('.container').width() > 900) { // Because the margins change when the containers size changes
-        impY = 85;
-    }
-
     var stoneSize = $('.board').width() / 8;
-    
-    var posX = (row * stoneSize) + impX;
-    var posY = (col * stoneSize) + impY;
+    var posOfStone = posOf(row, col);
 
     var css = {
         'position': 'absolute',
-        'left': posX,
-        'top': posY,
+        'left': posOfStone.x,
+        'top': posOfStone.y,
         'width': (stoneSize - 2)
     };
 
