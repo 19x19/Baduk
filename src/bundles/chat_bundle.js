@@ -76,7 +76,7 @@ socket.on('get_new_message', function (info) {
 
 window.notifyFromServer = function (message) {
     $("#history").append(
-        "<pre><i>Illegal move</i></pre>"
+        "<pre><i>" + message + "</i></pre>"
     );
 }
 
