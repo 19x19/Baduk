@@ -167,8 +167,8 @@ imgOf = function (row, col, type, mostRecentMove) {
     }
     filename += '.png';
 
-    var impX = 20; //Imperical addition to the top position
-    var impY = 67; //Imperical addition to the top position
+    var impX = 20; // Emperical addition to the top position
+    var impY = 67; // Emperical addition to the top position
     if ($('.container').width() > 900) { // Because the margins change when the containers size changes
         impY = 85;
     }
