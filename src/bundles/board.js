@@ -12,7 +12,8 @@ if( $('#roommates > pre').length < 2) {
     $('#userWait').modal('show');
 }
 
-$('.board').click(function (e){
+window.onBoardClick = function (e) {
+    console.log('click');
 
     var mouseX = e.pageX;
     var mouseY = e.pageY;
@@ -33,6 +34,8 @@ $('.board').click(function (e){
     var pieceCoordX = Math.round(mousePicPctX * 8);
     var pieceCoordY = Math.round(mousePicPctY * 8);
 
+    console.log(pieceCoordX, pieceCoordY);
+
     var room = /[^/]*$/.exec(window.location.pathname)[0];
 
     socket.emit('post_new_piece', {
@@ -40,8 +43,9 @@ $('.board').click(function (e){
         'col': pieceCoordY,
         'room': room
     });
+}
 
-});
+$('.board').click(window.onBoardClick);
 
 $('#passBtn').click(function () {
     socket.emit('post_pass', {
@@ -81,9 +85,14 @@ $('#passBtn').click(function () {
         var posX = (pieceCoordX * stoneSize) + impX;
         var posY = (pieceCoordY * stoneSize) + impY;
 
-        $('.inner').empty();
-        if(pieceCoordX < 9 && pieceCoordY < 9)
-        $(".inner").prepend('<img  class="abcd" src="/img/black_circle.png" style = " position: absolute; opacity: 0.4; left: ' + posX + 'px; top: ' + posY + 'px; " width=" '+ (stoneSize - 2) + '" />');
+        $('.ghostPiece').remove();
+        if(pieceCoordX < 9 && pieceCoordY < 9) {
+            var ghostPiece = $('<img  class="ghostPiece" src="/img/black_circle.png" style = " position: absolute; opacity: 0.4; left: ' + posX + 'px; top: ' + posY + 'px; " width=" '+ (stoneSize - 2) + '" />');
+            ghostPiece.click(function (event) {
+                window.onBoardClick(event);
+            });
+            $(".inner").prepend(ghostPiece);
+        }
 
         
         // var room = /[^/]*$/.exec(window.location.pathname)[0];
@@ -95,11 +104,6 @@ $('#passBtn').click(function () {
         // });
 
     });
-
-    $('.abcd').mouseleave(function(){
-            $('.inner').empty();
-            return;
-        });
 
 $(window).resize(function () {
      window.renderMostRecentGameState();
@@ -123,7 +127,7 @@ socket.on('new_game_state', function (msg) {
     }
     window.mostRecentGameState = msg;
 
-    if (msg.mostRecentMove.action === 'pass') {
+    if (msg.mostRecentMove && msg.mostRecentMove.action === 'pass') {
         window.notifyFromServer(msg.mostRecentMove.color + ' passed');
     }
 
