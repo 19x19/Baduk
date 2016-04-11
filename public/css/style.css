@@ -26,8 +26,6 @@ pre {
 .board {
 	border: 1px solid black;
     position: relative;
-    background-repeat: no-repeat;
-    background-size: 60px;
 }
 
 

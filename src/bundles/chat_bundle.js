@@ -44,7 +44,6 @@ socket.on('get_new_connect', function(info) {
     );
     updateRoommates(info.roommates);
     if( $('#roommates > pre').length >= 2) {
-        console.log("enter");
         $('#userWait').modal('hide');        
     }
     if(info.roommates.length > 1 && !game_started) {
