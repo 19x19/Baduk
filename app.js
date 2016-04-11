@@ -12,6 +12,7 @@ var xss = require('node-xss').clean;
 var git = require('git-rev');
 var csurf = require('csurf');
 var ddos = new Ddos;
+var emoji = require('node-emoji');
 
 // Baduk modules
 var games = require('./src/modules/games.js');
@@ -102,7 +103,7 @@ io.on('connection', function (socket) {
     // Posts a new message to the room
     socket.on('post_new_message', function (info) {
         io.to(info.room).emit('get_new_message', xss({
-            'message' : info.message,
+            'message' : emoji.emojify(info.message),
             'username' : games.current_users[socket.id]['username'],
             'color' : games.current_users[socket.id]['color'],
         }));
