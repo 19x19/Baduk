@@ -130,6 +130,28 @@ io.on('connection', function (socket) {
         }
 
     });
+
+    socket.on('post_pass', function (info) {
+
+        var color = games.current_users[socket.id]['color'];
+        var newState = go.applyMove(info.room, {
+            'action': 'pass',
+            'player_color': color
+        });
+
+        if (newState !== false) {
+            newState.mostRecentMove = {
+                'action': 'pass',
+                'color': color
+            };
+            io.to(info.room).emit('new_game_state', newState);
+        } else {
+            socket.emit('move_is_illegal', {});
+            console.log('illegal move');
+        }
+
+
+    });
 });
 
 http.listen(port, function () {
