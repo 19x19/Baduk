@@ -1,6 +1,6 @@
 # Baduk
 
-An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.ca. Ey.
+An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.ca.
 
 Currently in the pre-alpha stage. When we finish all the issues labelled "ALPHA RELEASE", we will officially ship and be in alpha stage.
 
