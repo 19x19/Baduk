@@ -45,6 +45,58 @@ $(document).ready(function (e) {
 
     });
 
+    $('.board').mousemove(function (e){
+
+        var mouseX = e.pageX;
+        var mouseY = e.pageY;
+
+        var boardX = $(".board").offset().left;
+        var boardY = $(".board").offset().top;
+
+        var mouseRelX = mouseX - boardX;
+        var mouseRelY = mouseY - boardY;
+
+        var mousePctX = mouseRelX / $(".board").width();
+        var mousePctY = mouseRelY / $(".board").height();
+
+        // 0.07 is empirical
+        var mousePicPctX = mousePctX - 0.07;
+        var mousePicPctY = mousePctY - 0.07;
+
+        var pieceCoordX = Math.round(mousePicPctX * 8);
+        var pieceCoordY = Math.round(mousePicPctY * 8);
+        console.log(pieceCoordX + ", " + pieceCoordY);
+        //alert(pieceCoordX);
+
+        var impX = 20; //Imperical addition to the top position
+        var impY = 67; //Imperical addition to the top position
+        if ($('.container').width() > 900) { // Because the margins change when the containers size changes
+            impY = 85;
+        }
+        var stoneSize = $('.board').width() / 8;
+        var posX = (pieceCoordX * stoneSize) + impX;
+        var posY = (pieceCoordY * stoneSize) + impY;
+
+        $('.inner').empty();
+        if(pieceCoordX < 9 && pieceCoordY < 9)
+        $(".inner").prepend('<img  class="abcd" src="/img/black_circle.png" style = " position: absolute; opacity: 0.4; left: ' + posX + 'px; top: ' + posY + 'px; " width=" '+ (stoneSize - 2) + '" />');
+
+        
+        // var room = /[^/]*$/.exec(window.location.pathname)[0];
+
+        // socket.emit('isValid', {
+        //     'row': pieceCoordX,
+        //     'col': pieceCoordY,
+        //     'room': room
+        // });
+
+    });
+
+    $('.abcd').mouseleave(function(){
+            $('.inner').empty();
+            return;
+        });
+
 $(window).resize(function () {
      window.renderMostRecentGameState();
 });
@@ -74,6 +126,7 @@ socket.on('move_is_illegal', function (msg) {
 });
 
 var render = function (gameState) {
+    setBorder();
     $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.mostRecentMove));
 }
 
@@ -107,7 +160,6 @@ imgOf = function (row, col, type, mostRecentMove) {
         impY = 85;
     }
 
-    setBorder();
     var stoneSize = $('.board').width() / 8;
     
     var posX = (row * stoneSize) + impX;
