@@ -23,13 +23,30 @@ var applyMove = function (roomId, action) {
         return false;
     }
 
-    var newState = makeMove(current_games[roomId], action.player_color, action.row, action.col);
+    if (action['action'] === 'pass') {
 
-    if (newState === false) return false;
+        var newState = copy(current_games[roomId]);
 
-    current_games[roomId] = newState;
-    return newState;
+        // TODO: enter scoring mode if 2 passes in a row
 
+        if (newState.turn === 'white') {
+            newState.turn = 'black';
+        } else {
+            newState.turn = 'white';
+        }
+
+        current_games[roomId] = newState;
+        return newState;
+
+    } else if (action['action'] === 'new_piece') {
+
+        var newState = makeMove(current_games[roomId], action.player_color, action.row, action.col);
+
+        if (newState === false) return false;
+
+        current_games[roomId] = newState;
+        return newState;
+    }
 }
 
 var currentState = function(roomId) {

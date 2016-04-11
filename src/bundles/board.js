@@ -2,48 +2,54 @@
 // Sets the Border to the board dynamically
 var setBorder = function () {
     var boardPadding = ($('.board').width() / 17) + 3;
-    $('.board').css('padding', boardPadding);
+    $('.board').css('padding', boardPadding).fadeTo(1, .99).fadeTo(1, 1);
 }
 
 $(document).ready(function (e) {
 
-    setBorder();
-    setTimeout (function (){
-    if( $('#roommates > pre').length < 2) {
-        $('#userWait').modal('show');        
-    }
-    }, 1000);
+setBorder();
+setTimeout (function (){
+if( $('#roommates > pre').length < 2) {
+    $('#userWait').modal('show');
+}
+}, 1000);
 
-    $('.board').click(function (e){
+$('.board').click(function (e){
 
-        var mouseX = e.pageX;
-        var mouseY = e.pageY;
+    var mouseX = e.pageX;
+    var mouseY = e.pageY;
 
-        var boardX = $(".board").offset().left;
-        var boardY = $(".board").offset().top;
+    var boardX = $(".board").offset().left;
+    var boardY = $(".board").offset().top;
 
-        var mouseRelX = mouseX - boardX;
-        var mouseRelY = mouseY - boardY;
+    var mouseRelX = mouseX - boardX;
+    var mouseRelY = mouseY - boardY;
 
-        var mousePctX = mouseRelX / $(".board").width();
-        var mousePctY = mouseRelY / $(".board").height();
+    var mousePctX = mouseRelX / $(".board").width();
+    var mousePctY = mouseRelY / $(".board").height();
 
-        // 0.07 is empirical
-        var mousePicPctX = mousePctX - 0.07;
-        var mousePicPctY = mousePctY - 0.07;
+    // 0.07 is empirical
+    var mousePicPctX = mousePctX - 0.07;
+    var mousePicPctY = mousePctY - 0.07;
 
-        var pieceCoordX = Math.round(mousePicPctX * 8);
-        var pieceCoordY = Math.round(mousePicPctY * 8);
+    var pieceCoordX = Math.round(mousePicPctX * 8);
+    var pieceCoordY = Math.round(mousePicPctY * 8);
 
-        var room = /[^/]*$/.exec(window.location.pathname)[0];
+    var room = /[^/]*$/.exec(window.location.pathname)[0];
 
-        socket.emit('post_new_piece', {
-            'row': pieceCoordX,
-            'col': pieceCoordY,
-            'room': room
-        });
-
+    socket.emit('post_new_piece', {
+        'row': pieceCoordX,
+        'col': pieceCoordY,
+        'room': room
     });
+
+});
+
+$('#passBtn').click(function () {
+    socket.emit('post_pass', {
+        'room': room
+    });
+});
 
     $('.board').mousemove(function (e){
 
@@ -118,11 +124,16 @@ socket.on('new_game_state', function (msg) {
         $("#gameState").text('Black to play');
     }
     window.mostRecentGameState = msg;
+
+    if (msg.mostRecentMove.action === 'pass') {
+        window.notifyFromServer(msg.mostRecentMove.color + ' passed');
+    }
+
     window.renderMostRecentGameState();
 });
 
 socket.on('move_is_illegal', function (msg) {
-    window.notifyFromServer('move is illegal');
+    window.notifyFromServer('Illegal move');
 });
 
 var render = function (gameState) {

@@ -37,7 +37,7 @@ socket.on('get_new_connect', function(info) {
     );
     updateRoommates(info.roommates);
     if( $('#roommates > pre').length >= 2) {
-        $('#userWait').modal('hide');        
+        $('#userWait').modal('hide');
     }
     if(info.roommates.length > 1 && !game_started) {
         $("#gameState").text("Black to play");
@@ -55,9 +55,19 @@ socket.on('your_color', function (msg) {
 // Send a new message to the room
 $("#send").on('click', function () {
     var message = $("#message").val();
-    $("#message").val('');
+    if(message !== '') {
+        $("#message").val('');
+        socket.emit('post_new_message', {
+            'message': message,
+            'room': room,
+        });
+    }
+});
+
+// Send a new message to the room
+$("#plus_one").on('click', function () {
     socket.emit('post_new_message', {
-        'message': message,
+        'message': ':+1:',
         'room': room,
     });
 });
@@ -76,7 +86,7 @@ socket.on('get_new_message', function (info) {
 
 window.notifyFromServer = function (message) {
     $("#history").append(
-        "<pre><i>Illegal move</i></pre>"
+        "<pre><i>" + message + "</i></pre>"
     );
 }
 

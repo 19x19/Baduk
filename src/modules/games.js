@@ -48,10 +48,6 @@ var add_user = function(info, socket) {
         color: current_users[socket.id].color,
     });
 
-    console.log(sockets_in_room(info.room).map(function (socketId) {
-        return current_users[socketId];
-    }));
-
     socket.room = info.room;
     socket.join(info.room);
 }

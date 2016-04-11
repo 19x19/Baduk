@@ -1,19 +1,24 @@
+// Node.js and ExpressDB related
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var port = 3001;
 
+// Third-party libraries
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 var xss = require('node-xss').clean;
 var git = require('git-rev');
-var csurf = require('csurf')
+var csurf = require('csurf');
+var ddos = new Ddos;
+var emoji = require('node-emoji');
 
+// Baduk modules
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
 
-var ddos = new Ddos;
+// What to use, what not to use, that is the question
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
@@ -66,11 +71,7 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
-var socketOfId = {};
-
 io.on('connection', function (socket) {
-
-    socketOfId[socket.id] = socket;
 
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
@@ -102,7 +103,7 @@ io.on('connection', function (socket) {
     // Posts a new message to the room
     socket.on('post_new_message', function (info) {
         io.to(info.room).emit('get_new_message', xss({
-            'message' : info.message,
+            'message' : emoji.emojify(info.message),
             'username' : games.current_users[socket.id]['username'],
             'color' : games.current_users[socket.id]['color'],
         }));
@@ -120,6 +121,7 @@ io.on('connection', function (socket) {
 
         if (newState !== false) {
             newState.mostRecentMove = {
+                'action': 'new_piece',
                 'row': info.row,
                 'col': info.col
             };
@@ -128,6 +130,28 @@ io.on('connection', function (socket) {
             socket.emit('move_is_illegal', {}); // FIXME: this is a race condition
             console.log('illegal move');
         }
+
+    });
+
+    socket.on('post_pass', function (info) {
+
+        var color = games.current_users[socket.id]['color'];
+        var newState = go.applyMove(info.room, {
+            'action': 'pass',
+            'player_color': color
+        });
+
+        if (newState !== false) {
+            newState.mostRecentMove = {
+                'action': 'pass',
+                'color': color
+            };
+            io.to(info.room).emit('new_game_state', newState);
+        } else {
+            socket.emit('move_is_illegal', {});
+            console.log('illegal move');
+        }
+
 
     });
 });
