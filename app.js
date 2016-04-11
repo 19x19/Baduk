@@ -1,19 +1,23 @@
+// Node.js and ExpressDB related
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var port = 3001;
 
+// Third-party libraries
 var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 var xss = require('node-xss').clean;
 var git = require('git-rev');
 var csurf = require('csurf');
+var ddos = new Ddos;
 
+// Baduk modules
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
 
-var ddos = new Ddos;
+// What to use, what not to use, that is the question
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
@@ -66,11 +70,7 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
-var socketOfId = {};
-
 io.on('connection', function (socket) {
-
-    socketOfId[socket.id] = socket;
 
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
