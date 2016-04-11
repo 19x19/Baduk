@@ -37,6 +37,7 @@ var applyMove = function (roomId, action) {
 
         current_games[roomId] = newState;
         return newState;
+
     } else if (action['action'] === 'new_piece') {
 
         var newState = makeMove(current_games[roomId], action.player_color, action.row, action.col);
