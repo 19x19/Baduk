@@ -87,14 +87,13 @@ $('#passBtn').click(function () {
 
         $('.ghostPiece').remove();
         if(pieceCoordX < 9 && pieceCoordY < 9) {
-            var ghostPiece = $('<img  class="ghostPiece" src="/img/black_circle.png" style = " position: absolute; opacity: 0.4; left: ' + posX + 'px; top: ' + posY + 'px; " width=" '+ (stoneSize - 2) + '" />');
+            var ghostPiece = $('<img  class="ghostPiece" src="/img/hover_circle.png" style = " position: absolute; opacity: 0.4; left: ' + posX + 'px; top: ' + posY + 'px; " width=" '+ (stoneSize - 2) + '" />');
             ghostPiece.click(function (event) {
                 window.onBoardClick(event);
             });
             $(".inner").prepend(ghostPiece);
         }
 
-        
         // var room = /[^/]*$/.exec(window.location.pathname)[0];
 
         // socket.emit('isValid', {
