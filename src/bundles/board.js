@@ -138,7 +138,8 @@ socket.on('new_game_state', function (msg) {
     window.mostRecentGameState = msg;
 
     if (msg.mostRecentMove && msg.mostRecentMove.action === 'pass') {
-        window.notifyFromServer(msg.mostRecentMove.color + ' passed');
+        color = msg.mostRecentMove.color.charAt(0).toUpperCase() + msg.mostRecentMove.color.slice(1);
+        window.notifyFromServer(color + ' passed');
     }
 
     window.renderMostRecentGameState();
