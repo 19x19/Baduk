@@ -55,11 +55,13 @@ socket.on('your_color', function (msg) {
 // Send a new message to the room
 $("#send").on('click', function () {
     var message = $("#message").val();
-    $("#message").val('');
-    socket.emit('post_new_message', {
-        'message': message,
-        'room': room,
-    });
+    if(message !== '') {
+        $("#message").val('');
+        socket.emit('post_new_message', {
+            'message': message,
+            'room': room,
+        });
+    }
 });
 
 // Send a new message to the room
