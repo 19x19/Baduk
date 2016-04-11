@@ -2,7 +2,7 @@
 // Sets the Border to the board dynamically
 var setBorder = function () {
     var boardPadding = ($('.board').width() / 17) + 3;
-    $('.board').css('padding', boardPadding);
+    $('.board').css('padding', boardPadding).fadeTo(1, .99).fadeTo(1, 1);
 }
 
 $(document).ready(function (e) {
