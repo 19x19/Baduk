@@ -2,6 +2,8 @@
 
 An easy-to-use online Go gaming platform. Currently hosted at http://www.baduk.ca.
 
+Currently in the pre-alpha stage. When we finish all the issues labelled "ALPHA RELEASE", we will officially ship and be in alpha stage.
+
 ## Installation
 
 You can either install Baduk locally, or use Docker. I recommend you install it locally unless you know what you're doing with Docker.
