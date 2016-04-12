@@ -3,6 +3,13 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var port = 3001;
+var cookieParser = require('cookie-parser');
+var session = require("express-session")({
+    secret: "h0!9&nc7clz_6idaa!k0^9-gt4+!x9gi!o7_l_v-=fca9lh16c",
+    resave: true,
+    saveUninitialized: true
+});
+var sharedsession = require("express-socket.io-session");
 
 // Third-party libraries
 var io = require('socket.io')(http);
@@ -24,6 +31,7 @@ app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
+app.use(session);
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
@@ -62,7 +70,6 @@ app.get('/go', function (req, res) {
 });
 
 app.get('/go/:id', function (req, res) {
-    console.log(req.session);
     // Check if the room id games.currently exists. If not, send them back
     // to the homepage.
     if(games.game_exists(req.params.id)) {
@@ -72,10 +79,17 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
+io.use(sharedsession(session));
 io.on('connection', function (socket) {
 
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
+        console.log(socket.handshake.session);
+        if(socket.handshake.session.userdata === undefined) {
+            socket.handshake.session.userdata = socket.id;
+            socket.handshake.session.save();
+        }
+        console.log(socket.handshake.session);
         games.add_user(info, socket);
         io.to(info.room).emit('get_new_connect', {
             'username' : games.current_users[socket.id].username,
