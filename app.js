@@ -3,10 +3,10 @@ var config = require('./config.js');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = config.port || 3001;
+var port = config.port;
 var cookieParser = require('cookie-parser');
 var session = require("express-session")({
-    secret: config.session_key || "h0!9&nc7clz_6idaa!k0^9-gt4+!x9gi!o7_l_v-=fca9lh16c",
+    secret: config.session_key,
     resave: true,
     saveUninitialized: true
 });
