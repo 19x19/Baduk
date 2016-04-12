@@ -17,7 +17,17 @@ var applyMove = function (roomId, action) {
         current_games[roomId] = initialGameState();
     }
 
-    // If its not their turn, invalid move
+    if (action['action'] === 'resign') {
+        var newState = copy(current_games[roomId]);
+        newState.result = {
+            'winner': oppositeColor(action.player_color),
+            'advantage': 'resign',
+        };
+        current_games[roomId] = newState;
+        return newState;
+    }
+
+    // if it's not their turn, invalid move
     if (action.player_color !== current_games[roomId].turn) {
         console.log('illegal move: not your turn');
         return false;

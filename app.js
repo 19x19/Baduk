@@ -170,8 +170,20 @@ io.on('connection', function (socket) {
             socket.emit('move_is_illegal', {});
             console.log('illegal move');
         }
+    });
 
+    socket.on('post_resign', function (info) {
+        var color = games.current_users[socket.handshake.session.id]['color'];
+        var newState = go.applyMove(info.room, {
+            'action': 'resign',
+            'player_color': color
+        });
 
+        newState.mostRecentMove = {
+            'action': 'resign',
+            'color': color
+        }
+        io.to(info.room).emit('new_game_state', newState);
     });
 });
 
