@@ -26,26 +26,30 @@ var game_exists = function(hash) {
 
 // Adds a user to the given room
 var add_user = function(info, socket) {
-    current_users[socket.id] = {};
-    current_users[socket.id]['username'] = moniker.choose();
-    current_users[socket.id]['room'] = info.room;
+    if(current_users[socket.handshake.session.id] === undefined) {
+        current_users[socket.handshake.session.id] = {};
+        current_users[socket.handshake.session.id]['username'] = moniker.choose();
+        current_users[socket.handshake.session.id]['room'] = info.room;
+        current_users[socket.handshake.session.id]['instances'] = 0;
 
-    // Determine the color randomly
-    var current_sockets = sockets_in_room(info.room);
-    if(current_sockets.length == 1) {
-        // If there are no players, randomly assign a color
-        current_users[socket.id].color = (Math.random() < 0.5 ? 'white' : 'black');
-    } else if(current_sockets.length == 2) {
-        // If there is one player, get the opposite of his color
-        var other_color = current_users[current_sockets[0]]['color'];
-        current_users[socket.id]['color'] = (other_color === 'white' ? 'black' : 'white');
-    } else {
-        // If there is already two players in the room, no color
-        current_users[socket.id]['color'] = 'Spectator';
+        // Determine the color randomly
+        var current_sockets = sockets_in_room(info.room);
+        if(current_sockets.length == 1) {
+            // If there are no players, randomly assign a color
+            current_users[socket.handshake.session.id].color = (Math.random() < 0.5 ? 'white' : 'black');
+        } else if(current_sockets.length == 2) {
+            // If there is one player, get the opposite of his color
+            var other_color = current_users[current_sockets[0]]['color'];
+            current_users[socket.handshake.session.id]['color'] = (other_color === 'white' ? 'black' : 'white');
+        } else {
+            // If there is already two players in the room, no color
+            current_users[socket.handshake.session.id]['color'] = 'Spectator';
+        }
     }
 
+    current_users[socket.handshake.session.id]['instances'] += 1;
     socket.emit('your_color', {
-        color: current_users[socket.id].color,
+        color: current_users[socket.handshake.session.id].color,
     });
 
     socket.room = info.room;
@@ -54,7 +58,9 @@ var add_user = function(info, socket) {
 
 // Removes the user from a given room
 var remove_user = function(info, socket) {
-    delete current_users[socket.id];
+    socket.leave(info.room);
+    current_users[socket.handshake.session.id]['instances'] -= 1;
+    delete current_users[socket.handshake.session.id];
 }
 
 // Gets all ids of players in the given room
