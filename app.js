@@ -98,6 +98,7 @@ io.on('connection', function (socket) {
         }
         socket.emit('your_name', {
             'username': games.current_users[socket.handshake.session.id].username,
+            'roommates' : games.players_in_room(info.room),
         });
         var current_state = go.currentState(info.room);
         if(current_state !== undefined) {
@@ -107,7 +108,7 @@ io.on('connection', function (socket) {
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
-        if(current_users[socket.handshake.session.id]['instances'] == 0) {
+        if(games.current_users[socket.handshake.session.id]['instances'] == 0) {
             io.to(info.room).emit('get_new_disconnect', {
                 // TODO for some reason sometimes the user has no username on
                 // disconnect...

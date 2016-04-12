@@ -46,6 +46,7 @@ socket.on('get_new_connect', function(info) {
 
 socket.on('your_name', function (msg) {
     $("#yourName").text(msg.username);
+    updateRoommates(msg.roommates);
 });
 
 socket.on('your_color', function (msg) {
