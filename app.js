@@ -3,6 +3,13 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var port = 3001;
+var cookieParser = require('cookie-parser');
+var session = require("express-session")({
+    secret: "h0!9&nc7clz_6idaa!k0^9-gt4+!x9gi!o7_l_v-=fca9lh16c",
+    resave: true,
+    saveUninitialized: true
+});
+var sharedsession = require("express-socket.io-session");
 
 // Third-party libraries
 var io = require('socket.io')(http);
@@ -24,6 +31,7 @@ app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
+app.use(session);
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
@@ -71,17 +79,26 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
+io.use(sharedsession(session));
 io.on('connection', function (socket) {
+    // If they don't already have a session, get one started
+    if(socket.handshake.session.id === undefined) {
+        socket.handshake.session.id = socket.id;
+        socket.handshake.session.save();
+    }
 
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
         games.add_user(info, socket);
-        io.to(info.room).emit('get_new_connect', {
-            'username' : games.current_users[socket.id].username,
-            'roommates' : games.players_in_room(info.room),
-        });
+        if(games.current_users[socket.handshake.session.id]['instances'] == 1) {
+            io.to(info.room).emit('get_new_connect', {
+                'username' : games.current_users[socket.handshake.session.id].username,
+                'roommates' : games.players_in_room(info.room),
+            });
+        }
         socket.emit('your_name', {
-            'username': games.current_users[socket.id].username,
+            'username': games.current_users[socket.handshake.session.id].username,
+            'roommates' : games.players_in_room(info.room),
         });
         var current_state = go.currentState(info.room);
         if(current_state !== undefined) {
@@ -91,27 +108,28 @@ io.on('connection', function (socket) {
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
-        io.to(info.room).emit('get_new_disconnect', {
-            // TODO for some reason sometimes the user has no username on
-            // disconnect...
-            'username' : games.current_users[socket.id]['username'],
-            'roommates' : games.players_in_room(info.room),
-        });
-        games.remove_user(info, socket);
+        if(games.current_users[socket.handshake.session.id]['instances'] == 0) {
+            io.to(info.room).emit('get_new_disconnect', {
+                // TODO for some reason sometimes the user has no username on
+                // disconnect...
+                'username' : games.current_users[socket.handshake.session.id]['username'],
+                'roommates' : games.players_in_room(info.room),
+            });
+        }
     });
 
     // Posts a new message to the room
     socket.on('post_new_message', function (info) {
         io.to(info.room).emit('get_new_message', xss({
             'message' : emoji.emojify(info.message),
-            'username' : games.current_users[socket.id]['username'],
-            'color' : games.current_users[socket.id]['color'],
+            'username' : games.current_users[socket.handshake.session.id]['username'],
+            'color' : games.current_users[socket.handshake.session.id]['color'],
         }));
     });
 
     // Add a piece at the given position
     socket.on('post_new_piece', function (info) {
-        var color = games.current_users[socket.id]['color'];
+        var color = games.current_users[socket.handshake.session.id]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'new_piece',
             'row': info.row,
@@ -135,7 +153,7 @@ io.on('connection', function (socket) {
 
     socket.on('post_pass', function (info) {
 
-        var color = games.current_users[socket.id]['color'];
+        var color = games.current_users[socket.handshake.session.id]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'pass',
             'player_color': color
