@@ -173,7 +173,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('post_resign', function (info) {
-        var color = games.current_users[socket.handshake.session.id]['color'];
+        var color = games.current_users[socket.handshake.session.id][info.room]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'resign',
             'player_color': color

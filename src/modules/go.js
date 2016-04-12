@@ -75,7 +75,7 @@ var copy = function (obj) {
 var oppositeColor = function (color) {
     if (color === 'white') return 'black';
     if (color === 'black') return 'white';
-    throw new Exception('color');
+    throw 'oppositeColor received argument ' + color;
 }
 
 var reprStone = function (x, y) {
