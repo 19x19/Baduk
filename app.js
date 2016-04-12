@@ -62,6 +62,7 @@ app.get('/go', function (req, res) {
 });
 
 app.get('/go/:id', function (req, res) {
+    console.log(req.session);
     // Check if the room id games.currently exists. If not, send them back
     // to the homepage.
     if(games.game_exists(req.params.id)) {
