@@ -30,6 +30,7 @@ var add_user = function(info, socket) {
         current_users[socket.handshake.session.id] = {};
         current_users[socket.handshake.session.id]['username'] = moniker.choose();
         current_users[socket.handshake.session.id]['room'] = info.room;
+        current_users[socket.handshake.session.id]['instances'] = 0;
 
         // Determine the color randomly
         var current_sockets = sockets_in_room(info.room);
@@ -46,6 +47,7 @@ var add_user = function(info, socket) {
         }
     }
 
+    current_users[socket.handshake.session.id]['instances'] += 1;
     socket.emit('your_color', {
         color: current_users[socket.handshake.session.id].color,
     });
@@ -57,6 +59,7 @@ var add_user = function(info, socket) {
 // Removes the user from a given room
 var remove_user = function(info, socket) {
     socket.leave(info.room);
+    current_users[socket.handshake.session.id]['instances'] -= 1;
     delete current_users[socket.handshake.session.id];
 }
 

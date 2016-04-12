@@ -90,10 +90,12 @@ io.on('connection', function (socket) {
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
         games.add_user(info, socket);
-        io.to(info.room).emit('get_new_connect', {
-            'username' : games.current_users[socket.handshake.session.id].username,
-            'roommates' : games.players_in_room(info.room),
-        });
+        if(games.current_users[socket.handshake.session.id]['instances'] == 1) {
+            io.to(info.room).emit('get_new_connect', {
+                'username' : games.current_users[socket.handshake.session.id].username,
+                'roommates' : games.players_in_room(info.room),
+            });
+        }
         socket.emit('your_name', {
             'username': games.current_users[socket.handshake.session.id].username,
         });
@@ -105,12 +107,14 @@ io.on('connection', function (socket) {
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
-        io.to(info.room).emit('get_new_disconnect', {
-            // TODO for some reason sometimes the user has no username on
-            // disconnect...
-            'username' : games.current_users[socket.handshake.session.id]['username'],
-            'roommates' : games.players_in_room(info.room),
-        });
+        if(current_users[socket.handshake.session.id]['instances'] == 0) {
+            io.to(info.room).emit('get_new_disconnect', {
+                // TODO for some reason sometimes the user has no username on
+                // disconnect...
+                'username' : games.current_users[socket.handshake.session.id]['username'],
+                'roommates' : games.players_in_room(info.room),
+            });
+        }
     });
 
     // Posts a new message to the room
