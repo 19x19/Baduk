@@ -85,7 +85,7 @@ $('#passBtn').click(function () {
         var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
         $('.ghostPiece').remove();
-        if(pieceCoordX < 9 && pieceCoordY < 9) {
+        if (0 <= pieceCoordX && pieceCoordX < 9 && 0 <= pieceCoordY && pieceCoordY < 9) {
             var ghostPiece = $('<img>', {
                 'class': 'ghostPiece',
                 'src': '/img/black_circle.png',
