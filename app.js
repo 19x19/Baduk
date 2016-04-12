@@ -23,7 +23,7 @@ app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
-app.use(ddos.express)
+app.use(ddos.express);
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
