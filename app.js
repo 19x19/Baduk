@@ -24,6 +24,7 @@ var emoji = require('node-emoji');
 // Baduk modules
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
+var config = require('./config');
 
 // What to use, what not to use, that is the question
 app.use(express.static('public'));
@@ -32,6 +33,8 @@ app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
 app.use(session);
+
+console.log(config.test || 'test');
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
