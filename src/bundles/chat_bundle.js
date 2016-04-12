@@ -77,7 +77,7 @@ var appendToChatHistory = function (color, username, message) {
     $("#history").append(
         "<pre>" + wrapName(color, username) + ': ' + message + '</pre>'
     );
-    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 1000);
+    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 200);
 }
 
 // Gets a new message from the server
