@@ -1,5 +1,5 @@
 // Node.js and ExpressDB related
-var config = require('./config');
+var config = require('./config.js');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
