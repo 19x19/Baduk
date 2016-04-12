@@ -8,6 +8,7 @@ var setBorder = function () {
 $(document).ready(function (e) {
 
 setBorder();
+setBorder();
 setTimeout (function (){
   if( $('#roommates > pre').length < 2) {
       $('#userWait').modal('show');
