@@ -7,7 +7,7 @@ var current_games = {};
 // public API
 
 var applyMove = function (roomId, action) {
-    /* 
+    /*
     update current_games[roomId] with action
     return false if it is an illegal move
     */

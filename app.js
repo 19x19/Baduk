@@ -91,7 +91,7 @@ io.on('connection', function (socket) {
     // Receives some information when a new user joins
     socket.on('post_new_connect', function(info) {
         games.add_user(info, socket);
-        if(games.current_users[socket.handshake.session.id]['instances'] == 1) {
+        if(games.current_users[socket.handshake.session.id][info.room]['instances'] == 1) {
             io.to(info.room).emit('get_new_connect', {
                 'username' : games.current_users[socket.handshake.session.id].username,
                 'roommates' : games.players_in_room(info.room),
@@ -109,7 +109,7 @@ io.on('connection', function (socket) {
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
-        if(games.current_users[socket.handshake.session.id]['instances'] == 0) {
+        if(games.current_users[socket.handshake.session.id][info.room]['instances'] == 0) {
             io.to(info.room).emit('get_new_disconnect', {
                 // TODO for some reason sometimes the user has no username on
                 // disconnect...
@@ -124,13 +124,13 @@ io.on('connection', function (socket) {
         io.to(info.room).emit('get_new_message', xss({
             'message' : emoji.emojify(info.message),
             'username' : games.current_users[socket.handshake.session.id]['username'],
-            'color' : games.current_users[socket.handshake.session.id]['color'],
+            'color' : games.current_users[socket.handshake.session.id][info.room]['color'],
         }));
     });
 
     // Add a piece at the given position
     socket.on('post_new_piece', function (info) {
-        var color = games.current_users[socket.handshake.session.id]['color'];
+        var color = games.current_users[socket.handshake.session.id][info.room]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'new_piece',
             'row': info.row,
@@ -154,7 +154,7 @@ io.on('connection', function (socket) {
 
     socket.on('post_pass', function (info) {
 
-        var color = games.current_users[socket.handshake.session.id]['color'];
+        var color = games.current_users[socket.handshake.session.id][info.room]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'pass',
             'player_color': color
