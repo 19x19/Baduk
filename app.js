@@ -1,11 +1,12 @@
 // Node.js and ExpressDB related
+var config = require('./config');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = 3001;
+var port = config.port || 3001;
 var cookieParser = require('cookie-parser');
 var session = require("express-session")({
-    secret: "h0!9&nc7clz_6idaa!k0^9-gt4+!x9gi!o7_l_v-=fca9lh16c",
+    secret: config.session_key || "h0!9&nc7clz_6idaa!k0^9-gt4+!x9gi!o7_l_v-=fca9lh16c",
     resave: true,
     saveUninitialized: true
 });
@@ -24,7 +25,6 @@ var emoji = require('node-emoji');
 // Baduk modules
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
-var config = require('./config');
 
 // What to use, what not to use, that is the question
 app.use(express.static('public'));
@@ -33,8 +33,6 @@ app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
 app.use(session);
-
-console.log(config.test || 'test');
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
