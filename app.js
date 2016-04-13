@@ -33,6 +33,7 @@ app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
 app.use(session);
+app.disable('X-Powered-By');
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
