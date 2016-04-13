@@ -142,25 +142,26 @@ var resultStringOf = function (color, advantage) {
     }
 }
 
-socket.on('new_game_state', function (msg) {
+socket.on('new_game_state', function (gameState) {
 
-    console.log(msg);
+    console.log(gameState);
 
-    if (msg.result) {
-        $("#gameState").text(resultStringOf(msg.result.winner, msg.result.advantage));
-    } else if (msg.turn === 'white') {
+    if (gameState.result) {
+        $("#gameState").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
+    } else if (gameState.turn === 'white') {
         $("#gameState").text('White to play');
     } else {
         $("#gameState").text('Black to play');
     }
-    window.mostRecentGameState = msg;
+    window.mostRecentGameState = gameState;
 
-    if (msg.mostRecentMove) {
-        if (msg.mostRecentMove.action === 'pass') {
-            color = msg.mostRecentMove.color.charAt(0).toUpperCase() + msg.mostRecentMove.color.slice(1);
+    if (gameState.moves.length > 0) {
+        var mostRecentMove = gameState.moves.slice(-1)[0];
+        if (mostRecentMove.action === 'pass') {
+            color = gameState.mostRecentMove.color.charAt(0).toUpperCase() + gameState.mostRecentMove.color.slice(1);
             window.notifyFromServer(color + ' passed');
-        } else if (msg.mostRecentMove.action === 'resign') {
-            color = msg.mostRecentMove.color.charAt(0).toUpperCase() + msg.mostRecentMove.color.slice(1);
+        } else if (mostRecentMove.action === 'resign') {
+            color = gameState.mostRecentMove.color.charAt(0).toUpperCase() + gameState.mostRecentMove.color.slice(1);
             window.notifyFromServer(color + ' resigned');
         }
     }
