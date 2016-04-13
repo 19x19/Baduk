@@ -89,6 +89,7 @@ window.notifyFromServer = function (message) {
     $("#history").append(
         "<pre><i>" + message + "</i></pre>"
     );
+    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 0);
 }
 
 // Tell the server before the user leaves
