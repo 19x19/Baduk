@@ -140,11 +140,6 @@ io.on('connection', function (socket) {
         });
 
         if (newState !== false) {
-            newState.mostRecentMove = {
-                'action': 'new_piece',
-                'row': info.row,
-                'col': info.col
-            };
             io.to(info.room).emit('new_game_state', newState);
         } else {
             socket.emit('move_is_illegal', {}); // FIXME: this is a race condition
@@ -162,17 +157,21 @@ io.on('connection', function (socket) {
         });
 
         if (newState !== false) {
-            newState.mostRecentMove = {
-                'action': 'pass',
-                'color': color
-            };
             io.to(info.room).emit('new_game_state', newState);
         } else {
             socket.emit('move_is_illegal', {});
             console.log('illegal move');
         }
+    });
 
+    socket.on('post_resign', function (info) {
+        var color = games.current_users[socket.handshake.session.id][info.room]['color'];
+        var newState = go.applyMove(info.room, {
+            'action': 'resign',
+            'player_color': color
+        });
 
+        io.to(info.room).emit('new_game_state', newState);
     });
 });
 

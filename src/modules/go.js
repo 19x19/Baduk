@@ -9,23 +9,53 @@ var current_games = {};
 var applyMove = function (roomId, action) {
     /*
     update current_games[roomId] with action
-    return false if it is an illegal move
+    return false and do nothing else if it is an illegal move
     */
 
-    // If its the first move, initialize the game
     if (current_games[roomId] === undefined) {
         current_games[roomId] = initialGameState();
     }
 
-    // If its not their turn, invalid move
-    if (action.player_color !== current_games[roomId].turn) {
+    var newState = withMove(current_games[roomId], action);
+    if (newState === false) return false;
+
+    newState.moves.push(action);
+
+    current_games[roomId] = newState;
+    return newState;
+}
+
+var currentState = function(roomId) {
+    // Return the current game state of the given room
+    return current_games[roomId];
+}
+
+// turn-taking logic
+
+var withMove = function (gameState, action) {
+
+    if (gameState.result) {
+        console.log('illegal move: game is over');
+        return false;
+    }
+
+    if (action['action'] === 'resign') {
+        var newState = copy(gameState);
+        newState.result = {
+            'winner': oppositeColor(action.player_color),
+            'advantage': 'resign',
+        };
+        return newState;
+    }
+
+    if (action.player_color !== gameState.turn) {
         console.log('illegal move: not your turn');
         return false;
     }
 
     if (action['action'] === 'pass') {
 
-        var newState = copy(current_games[roomId]);
+        var newState = copy(gameState);
 
         // TODO: enter scoring mode if 2 passes in a row
 
@@ -35,23 +65,16 @@ var applyMove = function (roomId, action) {
             newState.turn = 'white';
         }
 
-        current_games[roomId] = newState;
         return newState;
 
-    } else if (action['action'] === 'new_piece') {
+    }
 
-        var newState = makeMove(current_games[roomId], action.player_color, action.row, action.col);
-
+    if (action['action'] === 'new_piece') {
+        var newState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
         if (newState === false) return false;
-
-        current_games[roomId] = newState;
         return newState;
     }
-}
 
-var currentState = function(roomId) {
-    // Return the current game state of the given room
-    return current_games[roomId];
 }
 
 // utility 
@@ -65,7 +88,7 @@ var copy = function (obj) {
 var oppositeColor = function (color) {
     if (color === 'white') return 'black';
     if (color === 'black') return 'white';
-    throw new Exception('color');
+    throw 'oppositeColor received argument ' + color;
 }
 
 var reprStone = function (x, y) {
@@ -108,7 +131,8 @@ var initialGameState = function () {
     return {
         'stones': stones,
         'turn': 'black',
-        'size': 9
+        'size': 9,
+        'moves': [],
     };
 };
 
@@ -167,7 +191,7 @@ var isAnyNeighbourDiffColorWithOnlyOneLiberty = function (gameState, color, x, y
 
 // go-specific logic
 
-var makeMove = function (gameState, color, x, y) {
+var withNewPiece = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
 
     if (colorOf(gameState, x, y) !== 'empty') {
@@ -187,7 +211,6 @@ var makeMove = function (gameState, color, x, y) {
     
     gameState = withStone(gameState, color, x, y);
     gameState = withoutDeadGroups(gameState);
-
 
     groupOfPlayedStone.forEach(function (stone) {
         gameState.stones[stone.x][stone.y] = { 'black': 1, 'white': 2 }[color];
@@ -298,161 +321,17 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 exports.applyMove = applyMove;
 exports.currentState = currentState;
 
+// exported for testing
+
+exports.isInBounds = isInBounds;
+exports.libertiesOf = libertiesOf;
+exports.withoutDeadGroups = withoutDeadGroups;
+exports.colorOf = colorOf;
+exports.groupOf = groupOf;
+exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
+exports.isSuicide = isSuicide;
+exports.withNewPiece = withNewPiece;
+
 // tests
 
-var gs1 = {
-    stones: [
-        [1, 2, 0, 0, 0, 0, 0, 0, 0],
-        [2, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ],
-    turn: "black",
-    "size":9
-};
 
-console.log(!isInBounds(gs1, 0, -1));
-console.log(libertiesOf(gs1, 0, 0).length === 0);
-
-var gsResolved = withoutDeadGroups(gs1);
-
-console.log(colorOf(gsResolved, 0, 0) === 'empty');
-
-var gs2 = {
-    stones: [
-        [2, 1, 2, 0, 0, 0, 0, 0, 0],
-        [1, 2, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ],
-    turn: "black",
-    size: 9
-};
-
-console.log(groupOf(gs2, 0, 0).length === 1);
-
-// suicide-like capture
-
-var gs3 = {
-    stones: [
-        [0, 1, 2, 0, 0, 0, 0, 0, 0],
-        [1, 2, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ],
-    turn: "black",
-    size: 9
-};
-
-console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs3, 'white', 0, 0));
-console.log(isSuicide(gs3, 'white', 0, 0) === false);
-
-// multi-group suicide
-
-var gs4 = {
-    stones: [
-        [0, 1, 2, 0, 0, 0, 0, 0, 0],
-        [1, 2, 0, 0, 0, 0, 0, 0, 0],
-        [2, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ],
-    turn: "black",
-    size: 9
-};
-
-console.log(isSuicide(gs4, 'black', 0, 0));
-
-// regression
-
-var gs5 = { whiteStones: 
-   [ { x: 6, y: 7 },
-     { x: 6, y: 8 },
-     { x: 7, y: 6 },
-     { x: 6, y: 6 },
-     { x: 8, y: 6 } ],
-  blackStones: 
-   [ { x: 7, y: 7 },
-     { x: 7, y: 8 },
-     { x: 8, y: 7 },
-     { x: 5, y: 5 },
-     { x: 6, y: 5 },
-     { x: 5, y: 6 } ],
-  turn: 'white',
-  size: 9,
-};
-
-
-var gs5 = {
-    stones: [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 1, 0, 0],
-        [0, 0, 0, 0, 0, 1, 2, 2, 2],
-        [0, 0, 0, 0, 0, 0, 2, 1, 1],
-        [0, 0, 0, 0, 0, 0, 2, 1, 0],
-    ],
-    turn: "black",
-    size: 9
-};
-
-console.log(!isSuicide(gs5, 'white', 8, 8));
-console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs5, 'white', 8, 8));
-console.log(libertiesOf(gs5, 7, 8).length === 1);
-
-// https://github.com/19x19/Baduk/issues/35
-
-var gs6 = {
-    stones: [
-        [1, 0, 1, 0, 0, 0, 0, 0, 0],
-        [2, 2, 1, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ],
-    turn: "white",
-    size: 9
-};
-
-var gs7 = makeMove(gs6, 'white', 0, 1);
-
-console.log(gs7.stones[0][0] === 0);
-console.log(gs7.stones[1][0] === 2);
-console.log(gs7.stones[2][0] === 1);
-
-console.log(isSuicide(gs7, 'black', 0, 0) === false);
-console.log(isSuicide(gs7, 'white', 0, 0) === true);
-
-console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs7, 'black', 0, 0));
-
-var gs8 = makeMove(gs7, 'black', 0, 0);
-
-console.log(gs8.stones[0][0] === 1);
-console.log(gs8.stones[1][0] === 0);
-console.log(gs8.stones[2][0] === 1);

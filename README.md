@@ -22,4 +22,4 @@ node ./app.js
 
 ## For Developers
 
-It's important to note that Baduk updates to origin/master every midnight (UTC). As a result, we're no longer allowed pushes to master unless you are an admin. If you're not, submit a pull request. If you'd like to submit an issue, use one of the labels provided.
+It's important to note that Baduk updates to origin/master every midnight (UTC). If you'd like to submit an issue, use one of the labels provided.
