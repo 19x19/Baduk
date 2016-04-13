@@ -6,7 +6,7 @@ var colorOf = go.colorOf;
 var groupOf = go.groupOf;
 var isAnyNeighbourDiffColorWithOnlyOneLiberty = go.isAnyNeighbourDiffColorWithOnlyOneLiberty;
 var isSuicide = go.isSuicide;
-var makeMove = go.makeMove;
+var withNewPiece = go.withNewPiece;
 
 var gs1 = {
     stones: [
@@ -148,7 +148,7 @@ var gs6 = {
     size: 9
 };
 
-var gs7 = makeMove(gs6, 'white', 0, 1);
+var gs7 = withNewPiece(gs6, 'white', 0, 1);
 
 console.log(gs7.stones[0][0] === 0);
 console.log(gs7.stones[1][0] === 2);
@@ -159,7 +159,7 @@ console.log(isSuicide(gs7, 'white', 0, 0) === true);
 
 console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs7, 'black', 0, 0));
 
-var gs8 = makeMove(gs7, 'black', 0, 0);
+var gs8 = withNewPiece(gs7, 'black', 0, 0);
 
 console.log(gs8.stones[0][0] === 1);
 console.log(gs8.stones[1][0] === 0);

@@ -12,7 +12,6 @@ var applyMove = function (roomId, action) {
     return false if it is an illegal move
     */
 
-    // If its the first move, initialize the game
     if (current_games[roomId] === undefined) {
         current_games[roomId] = initialGameState();
     }
@@ -27,7 +26,6 @@ var applyMove = function (roomId, action) {
         return newState;
     }
 
-    // if it's not their turn, invalid move
     if (action.player_color !== current_games[roomId].turn) {
         console.log('illegal move: not your turn');
         return false;
@@ -48,9 +46,11 @@ var applyMove = function (roomId, action) {
         current_games[roomId] = newState;
         return newState;
 
-    } else if (action['action'] === 'new_piece') {
+    }
 
-        var newState = makeMove(current_games[roomId], action.player_color, action.row, action.col);
+    if (action['action'] === 'new_piece') {
+
+        var newState = withNewPiece(current_games[roomId], action.player_color, action.row, action.col);
 
         if (newState === false) return false;
 
@@ -177,7 +177,7 @@ var isAnyNeighbourDiffColorWithOnlyOneLiberty = function (gameState, color, x, y
 
 // go-specific logic
 
-var makeMove = function (gameState, color, x, y) {
+var withNewPiece = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
 
     if (colorOf(gameState, x, y) !== 'empty') {
@@ -317,7 +317,7 @@ exports.colorOf = colorOf;
 exports.groupOf = groupOf;
 exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
 exports.isSuicide = isSuicide;
-exports.makeMove = makeMove;
+exports.withNewPiece = withNewPiece;
 
 // tests
 
