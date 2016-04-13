@@ -1,0 +1,166 @@
+var go = require('./go');
+var isInBounds = go.isInBounds;
+var libertiesOf = go.libertiesOf;
+var withoutDeadGroups = go.withoutDeadGroups;
+var colorOf = go.colorOf;
+var groupOf = go.groupOf;
+var isAnyNeighbourDiffColorWithOnlyOneLiberty = go.isAnyNeighbourDiffColorWithOnlyOneLiberty;
+var isSuicide = go.isSuicide;
+var makeMove = go.makeMove;
+
+var gs1 = {
+    stones: [
+        [1, 2, 0, 0, 0, 0, 0, 0, 0],
+        [2, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    "size":9
+};
+
+console.log(!isInBounds(gs1, 0, -1));
+console.log(libertiesOf(gs1, 0, 0).length === 0);
+
+var gsResolved = withoutDeadGroups(gs1);
+
+console.log(colorOf(gsResolved, 0, 0) === 'empty');
+
+var gs2 = {
+    stones: [
+        [2, 1, 2, 0, 0, 0, 0, 0, 0],
+        [1, 2, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    size: 9
+};
+
+console.log(groupOf(gs2, 0, 0).length === 1);
+
+// suicide-like capture
+
+var gs3 = {
+    stones: [
+        [0, 1, 2, 0, 0, 0, 0, 0, 0],
+        [1, 2, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    size: 9
+};
+
+console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs3, 'white', 0, 0));
+console.log(isSuicide(gs3, 'white', 0, 0) === false);
+
+// multi-group suicide
+
+var gs4 = {
+    stones: [
+        [0, 1, 2, 0, 0, 0, 0, 0, 0],
+        [1, 2, 0, 0, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "black",
+    size: 9
+};
+
+console.log(isSuicide(gs4, 'black', 0, 0));
+
+// regression
+
+var gs5 = { whiteStones: 
+   [ { x: 6, y: 7 },
+     { x: 6, y: 8 },
+     { x: 7, y: 6 },
+     { x: 6, y: 6 },
+     { x: 8, y: 6 } ],
+  blackStones: 
+   [ { x: 7, y: 7 },
+     { x: 7, y: 8 },
+     { x: 8, y: 7 },
+     { x: 5, y: 5 },
+     { x: 6, y: 5 },
+     { x: 5, y: 6 } ],
+  turn: 'white',
+  size: 9,
+};
+
+
+var gs5 = {
+    stones: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 1, 0, 0],
+        [0, 0, 0, 0, 0, 1, 2, 2, 2],
+        [0, 0, 0, 0, 0, 0, 2, 1, 1],
+        [0, 0, 0, 0, 0, 0, 2, 1, 0],
+    ],
+    turn: "black",
+    size: 9
+};
+
+console.log(!isSuicide(gs5, 'white', 8, 8));
+console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs5, 'white', 8, 8));
+console.log(libertiesOf(gs5, 7, 8).length === 1);
+
+// https://github.com/19x19/Baduk/issues/35
+
+var gs6 = {
+    stones: [
+        [1, 0, 1, 0, 0, 0, 0, 0, 0],
+        [2, 2, 1, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    turn: "white",
+    size: 9
+};
+
+var gs7 = makeMove(gs6, 'white', 0, 1);
+
+console.log(gs7.stones[0][0] === 0);
+console.log(gs7.stones[1][0] === 2);
+console.log(gs7.stones[2][0] === 1);
+
+console.log(isSuicide(gs7, 'black', 0, 0) === false);
+console.log(isSuicide(gs7, 'white', 0, 0) === true);
+
+console.log(isAnyNeighbourDiffColorWithOnlyOneLiberty(gs7, 'black', 0, 0));
+
+var gs8 = makeMove(gs7, 'black', 0, 0);
+
+console.log(gs8.stones[0][0] === 1);
+console.log(gs8.stones[1][0] === 0);
+console.log(gs8.stones[2][0] === 1);
