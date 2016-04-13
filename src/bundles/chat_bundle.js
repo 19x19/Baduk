@@ -65,11 +65,6 @@ $("#send").on('click', function () {
     }
 });
 
-// Opens the modal to change your moniker
-$("#moniker").on('click', function () {
-    $('#moniker').modal('show');
-});
-
 // Send a new message to the room
 $("#plus_one").on('click', function () {
     socket.emit('post_new_message', {
