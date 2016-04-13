@@ -139,11 +139,6 @@ io.on('connection', function (socket) {
         });
 
         if (newState !== false) {
-            newState.mostRecentMove = {
-                'action': 'new_piece',
-                'row': info.row,
-                'col': info.col
-            };
             io.to(info.room).emit('new_game_state', newState);
         } else {
             socket.emit('move_is_illegal', {}); // FIXME: this is a race condition
@@ -161,10 +156,6 @@ io.on('connection', function (socket) {
         });
 
         if (newState !== false) {
-            newState.mostRecentMove = {
-                'action': 'pass',
-                'color': color
-            };
             io.to(info.room).emit('new_game_state', newState);
         } else {
             socket.emit('move_is_illegal', {});
@@ -179,10 +170,6 @@ io.on('connection', function (socket) {
             'player_color': color
         });
 
-        newState.mostRecentMove = {
-            'action': 'resign',
-            'color': color
-        }
         io.to(info.room).emit('new_game_state', newState);
     });
 });

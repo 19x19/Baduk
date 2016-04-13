@@ -157,11 +157,12 @@ socket.on('new_game_state', function (gameState) {
 
     if (gameState.moves.length > 0) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
+        console.log(gameState.moves, mostRecentMove);
         if (mostRecentMove.action === 'pass') {
-            color = gameState.mostRecentMove.color.charAt(0).toUpperCase() + gameState.mostRecentMove.color.slice(1);
+            color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
             window.notifyFromServer(color + ' passed');
         } else if (mostRecentMove.action === 'resign') {
-            color = gameState.mostRecentMove.color.charAt(0).toUpperCase() + gameState.mostRecentMove.color.slice(1);
+            color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
             window.notifyFromServer(color + ' resigned');
         }
     }
@@ -175,7 +176,7 @@ socket.on('move_is_illegal', function (msg) {
 
 var render = function (gameState) {
     setBorder();
-    $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.mostRecentMove));
+    $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.moves.slice(-1)[0]));
 }
 
 
