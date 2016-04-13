@@ -117,7 +117,10 @@ io.on('connection', function (socket) {
                     'username' : games.current_users[socket.handshake.session.id]['username'],
                     'roommates' : games.players_in_room(info.room),
                 });
-        } catch(e) { /* Research suggests that this is a socket.io issue */ }
+            }
+        } catch(e) {
+            console.log("Socket.IO disconnect error.");
+        }
     });
 
     // Posts a new message to the room
