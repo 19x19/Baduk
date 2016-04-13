@@ -9,7 +9,7 @@ var current_games = {};
 var applyMove = function (roomId, action) {
     /*
     update current_games[roomId] with action
-    return false if it is an illegal move
+    return false and do nothing else if it is an illegal move
     */
 
     if (current_games[roomId] === undefined) {
@@ -17,15 +17,17 @@ var applyMove = function (roomId, action) {
     }
 
     var newState = withMove(current_games[roomId], action);
-    if (newState === false) {
-        return false;
-    } else {
-        current_games[roomId] = newState;
-        return newState;
-    }
+    if (newState !== false) current_games[roomId] = newState;
+    return newState;
 }
 
 var withMove = function (gameState, action) {
+
+    if (gameState.result) {
+        console.log('illegal move: game is over');
+        return false;
+    }
+
     if (action['action'] === 'resign') {
         var newState = copy(gameState);
         newState.result = {
