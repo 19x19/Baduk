@@ -143,6 +143,9 @@ var resultStringOf = function (color, advantage) {
 }
 
 socket.on('new_game_state', function (msg) {
+
+    console.log(msg);
+
     if (msg.result) {
         $("#gameState").text(resultStringOf(msg.result.winner, msg.result.advantage));
     } else if (msg.turn === 'white') {

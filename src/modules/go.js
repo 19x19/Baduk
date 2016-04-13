@@ -17,9 +17,20 @@ var applyMove = function (roomId, action) {
     }
 
     var newState = withMove(current_games[roomId], action);
-    if (newState !== false) current_games[roomId] = newState;
+    if (newState === false) return false;
+
+    newState.moves.push(action);
+
+    current_games[roomId] = newState;
     return newState;
 }
+
+var currentState = function(roomId) {
+    // Return the current game state of the given room
+    return current_games[roomId];
+}
+
+// turn-taking logic
 
 var withMove = function (gameState, action) {
 
@@ -64,11 +75,6 @@ var withMove = function (gameState, action) {
         return newState;
     }
 
-}
-
-var currentState = function(roomId) {
-    // Return the current game state of the given room
-    return current_games[roomId];
 }
 
 // utility 
@@ -125,7 +131,8 @@ var initialGameState = function () {
     return {
         'stones': stones,
         'turn': 'black',
-        'size': 9
+        'size': 9,
+        'moves': [],
     };
 };
 
@@ -204,7 +211,6 @@ var withNewPiece = function (gameState, color, x, y) {
     
     gameState = withStone(gameState, color, x, y);
     gameState = withoutDeadGroups(gameState);
-
 
     groupOfPlayedStone.forEach(function (stone) {
         gameState.stones[stone.x][stone.y] = { 'black': 1, 'white': 2 }[color];
