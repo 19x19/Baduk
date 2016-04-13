@@ -16,7 +16,6 @@ setTimeout (function (){
 }, 1000);
 
 window.onBoardClick = function (e) {
-    console.log('click');
 
     var mouseX = e.pageX;
     var mouseY = e.pageY;
@@ -36,8 +35,6 @@ window.onBoardClick = function (e) {
 
     var pieceCoordX = Math.round(mousePicPctX * 8);
     var pieceCoordY = Math.round(mousePicPctY * 8);
-
-    console.log(pieceCoordX, pieceCoordY);
 
     var room = /[^/]*$/.exec(window.location.pathname)[0];
 
@@ -157,7 +154,6 @@ socket.on('new_game_state', function (gameState) {
 
     if (gameState.moves.length > 0) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
-        console.log(gameState.moves, mostRecentMove);
         if (mostRecentMove.action === 'pass') {
             color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
             window.notifyFromServer(color + ' passed');
@@ -177,6 +173,47 @@ socket.on('move_is_illegal', function (msg) {
 var render = function (gameState) {
     setBorder();
     $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.moves.slice(-1)[0]));
+
+    $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState));
+}
+
+var pairsOf = function (arr) {
+    // return array of pairs [[arr[0], arr[1]], [arr[2], arr[3]] ...]
+    var ret = [];
+    for (var i=0; i<arr.length; i+=2) {
+        if (i+1 < arr.length) {
+            ret.push([arr[i], arr[i+1]]);
+        } else {
+            ret.push([arr[i]]);
+        }
+    }
+    return ret;
+}
+
+// return modified european coordinates of a move
+// top left = A1, bottom right = T19 (I is skipped)
+var reprOfMove = function (move) {
+    if (move.action === 'pass') return 'pass';
+    if (move.action === 'resign') return 'resign';
+    if (move.action === 'new_piece') {
+        return 'ABCDEFGHJKLMNOPQRST'[move.row] + (move.col + 1).toString();
+    }
+    if (move.action === undefined) throw "no action in " + JSON.stringify(move);
+    throw "unrecognized move action " + move.action;
+}
+
+var renderedMoveHistoryOf = function (gameState) {
+    return pairsOf(gameState.moves).map(function (moves) {
+        if (moves.length === 2) {
+            return $('<div>', {
+                text: reprOfMove(moves[0]) + ' | ' + reprOfMove(moves[1]),
+            });
+        } else {
+            return $('<div>', {
+                text: reprOfMove(moves[0]),
+            });
+        }
+    });
 }
 
 
