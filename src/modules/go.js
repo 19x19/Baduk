@@ -16,24 +16,33 @@ var applyMove = function (roomId, action) {
         current_games[roomId] = initialGameState();
     }
 
+    var newState = withMove(current_games[roomId], action);
+    if (newState === false) {
+        return false;
+    } else {
+        current_games[roomId] = newState;
+        return newState;
+    }
+}
+
+var withMove = function (gameState, action) {
     if (action['action'] === 'resign') {
-        var newState = copy(current_games[roomId]);
+        var newState = copy(gameState);
         newState.result = {
             'winner': oppositeColor(action.player_color),
             'advantage': 'resign',
         };
-        current_games[roomId] = newState;
         return newState;
     }
 
-    if (action.player_color !== current_games[roomId].turn) {
+    if (action.player_color !== gameState.turn) {
         console.log('illegal move: not your turn');
         return false;
     }
 
     if (action['action'] === 'pass') {
 
-        var newState = copy(current_games[roomId]);
+        var newState = copy(gameState);
 
         // TODO: enter scoring mode if 2 passes in a row
 
@@ -43,20 +52,16 @@ var applyMove = function (roomId, action) {
             newState.turn = 'white';
         }
 
-        current_games[roomId] = newState;
         return newState;
 
     }
 
     if (action['action'] === 'new_piece') {
-
-        var newState = withNewPiece(current_games[roomId], action.player_color, action.row, action.col);
-
+        var newState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
         if (newState === false) return false;
-
-        current_games[roomId] = newState;
         return newState;
     }
+
 }
 
 var currentState = function(roomId) {
