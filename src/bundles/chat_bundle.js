@@ -116,10 +116,17 @@ var cpb = clipboardButton('#roomLink', success, fail);
 $(roomLink).attr("data-clipboard-text", window.location.href);
 
 function success() {
-    $('#roomLink').attr('data-content', 'copied');
-    setTimeout (function (){
-      $('.popover').remove();
-    }, 2000);
+    if(Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
+        $('#roomLink').attr('data-content', 'Press cmd + C to copy');
+        setTimeout (function (){
+          $('.popover').remove();
+        }, 2000);  
+    } else {
+        $('#roomLink').attr('data-content', 'copied');
+        setTimeout (function (){
+          $('.popover').remove();
+        }, 2000);
+    }
 };
 
 function fail() {
