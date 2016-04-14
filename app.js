@@ -110,16 +110,12 @@ io.on('connection', function (socket) {
 
     // Removes a user from the room
     socket.on('post_new_disconnect', function(info) {
-        try {
-            games.remove_user(info, socket);
-            if(games.current_users[socket.handshake.session.id][info.room]['instances'] == 0) {
-                io.to(info.room).emit('get_new_disconnect', {
-                    'username' : games.current_users[socket.handshake.session.id]['username'],
-                    'roommates' : games.players_in_room(info.room),
-                });
-            }
-        } catch(e) {
-            console.log("Socket.IO disconnect error.");
+        games.remove_user(info, socket);
+        if(games.current_users[socket.handshake.session.id][info.room]['instances'] === 0) {
+            io.to(info.room).emit('get_new_disconnect', {
+                'username' : games.current_users[socket.handshake.session.id]['username'],
+                'roommates' : games.players_in_room(info.room),
+            });
         }
     });
 
