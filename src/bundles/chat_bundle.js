@@ -126,10 +126,10 @@ function success_cpy() {
     }
 };
 
-
 // Allows you to press "Enter" to send text when input selected
 $("#message").keyup(function(event){
     if(event.keyCode == 13){
         $("#send").click();
     }
 });
+
