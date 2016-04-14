@@ -123,7 +123,7 @@ function success() {
 };
 
 function fail() {
-    $('#roomLink').attr('data-content', 'Press cmd + C to copy');
+    $('#roomLink').attr('data-content', 'Press ⌘+C to copy');
     setTimeout (function (){
       $('.popover').remove();
     }, 2000);
