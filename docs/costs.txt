@@ -8,3 +8,7 @@ hosting on digital ocean
 --
 $5.00 (Mar-29-16 to Apr-29-16)
 $5.00 (Apr-29-16 to May-29-16)
+
+ssl certificate
+--
+$9.00 (Apr-14-16 to Apr-14-17)
