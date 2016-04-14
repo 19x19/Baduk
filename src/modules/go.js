@@ -91,6 +91,18 @@ var oppositeColor = function (color) {
     throw 'oppositeColor received argument ' + color;
 }
 
+var reprOfPositionalBoardState = function (gameState) {
+    return gameState.turn + JSON.stringify(gameState.stones);
+}
+
+var prettyReprOfStones = function (stones) {
+    return stones.map(function (row) {
+        return row.map(function (stone) {
+            return '_bw'[stone];
+        }).join('');
+    }).join('\n');
+}
+
 var reprStone = function (x, y) {
     return x + ' ' + y;
 }
@@ -187,6 +199,18 @@ var isAnyNeighbourDiffColorWithOnlyOneLiberty = function (gameState, color, x, y
         }
     }
     return false;
+}
+
+// ko
+
+var boardStateHistoryOf = function (gameState) {
+    var bs = initialGameState();
+    var ret = [bs];
+    gameState.moves.forEach(function (move) {
+        bs = withMove(bs, move);
+        ret.push(bs);
+    });
+    return ret;
 }
 
 // go-specific logic
@@ -331,7 +355,6 @@ exports.groupOf = groupOf;
 exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
 exports.isSuicide = isSuicide;
 exports.withNewPiece = withNewPiece;
-
-// tests
-
-
+exports.reprOfPositionalBoardState = reprOfPositionalBoardState;
+exports.boardStateHistoryOf = boardStateHistoryOf;
+exports.prettyReprOfStones = prettyReprOfStones;

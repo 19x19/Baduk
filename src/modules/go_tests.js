@@ -7,6 +7,9 @@ var groupOf = go.groupOf;
 var isAnyNeighbourDiffColorWithOnlyOneLiberty = go.isAnyNeighbourDiffColorWithOnlyOneLiberty;
 var isSuicide = go.isSuicide;
 var withNewPiece = go.withNewPiece;
+var reprOfPositionalBoardState = go.reprOfPositionalBoardState;
+var boardStateHistoryOf = go.boardStateHistoryOf;
+var prettyReprOfStones = go.prettyReprOfStones
 
 var gs1 = {
     stones: [
@@ -164,3 +167,38 @@ var gs8 = withNewPiece(gs7, 'black', 0, 0);
 console.log(gs8.stones[0][0] === 1);
 console.log(gs8.stones[1][0] === 0);
 console.log(gs8.stones[2][0] === 1);
+
+// console.log(reprOfPositionalBoardState(gs8));
+
+var gs9 = {
+    stones: [
+        [1, 2, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    moves: [
+        {
+            'action': 'new_piece',
+            'player_color': 'black',
+            'row': 0,
+            'col': 0
+        },
+        {
+            'action': 'new_piece',
+            'player_color': 'white',
+            'row': 0,
+            'col': 1
+        }
+    ]
+}
+
+boardStateHistoryOf(gs9).forEach(function (boardState) {
+    console.log(prettyReprOfStones(boardState.stones));
+    console.log('\n');
+});
