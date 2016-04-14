@@ -112,7 +112,7 @@ socket.on('get_new_disconnect', function(info) {
 
 
 
-var cpb = clipboardButton('#roomLink', success_cpy, fail_cpy);
+var cpb = clipboardButton('#roomLink', success, fail);
 $(roomLink).attr("data-clipboard-text", window.location.href);
 
 function success() {
