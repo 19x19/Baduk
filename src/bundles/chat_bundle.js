@@ -114,14 +114,14 @@ $(roomLink).attr("data-clipboard-text", window.location.href);
 
 function success_cpy() {
     if(Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
-        $('#roomLink').attr('data-content', 'Press cmd + C to copy');
-        setTimeout (function (){
-          $('.popover').remove();
-        }, 2000);  
+        $('#roomLink').attr('data-content', 'Press ⌘ +C to copy');
+        setTimeout (function () {
+            $('.popover').fadeOut(300, function() { $(this).remove(); });
+        }, 2000);
     } else {
-        $('#roomLink').attr('data-content', 'copied');
-        setTimeout (function (){
-          $('.popover').remove();
+        $('#roomLink').attr('data-content', 'Copied!');
+        setTimeout (function () {
+            $('.popover').fadeOut(300, function() { $(this).remove(); });
         }, 2000);
     }
 };
