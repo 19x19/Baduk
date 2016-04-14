@@ -112,18 +112,18 @@ socket.on('get_new_disconnect', function(info) {
 
 
 
-var cpb = clipboardButton('#roomLink', success, fail);
+var cpb = clipboardButton('#roomLink', success_cpy, fail_cpy);
 $(roomLink).attr("data-clipboard-text", window.location.href);
 
-function success() {
-    $('#roomLink').attr('data-content', 'copied');
+function success_cpy() {
+    $('#roomLink').attr('data-content', 'Copied!');
     setTimeout (function (){
       $('.popover').remove();
     }, 2000);
 };
 
-function fail() {
-    $('#roomLink').attr('data-content', 'Press ⌘+C to copy');
+function fail_cpy(err) {
+    $('#roomLink').attr('data-content', 'Press ⌘+C to copy!');
     setTimeout (function (){
       $('.popover').remove();
     }, 2000);
