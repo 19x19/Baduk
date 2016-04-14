@@ -6,6 +6,7 @@ var setBorder = function () {
 }
 
 $(document).ready(function (e) {
+$('[data-toggle="popover"]').popover();
 
 setBorder();
 setBorder();

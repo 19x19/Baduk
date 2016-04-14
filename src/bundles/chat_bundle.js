@@ -109,8 +109,25 @@ socket.on('get_new_disconnect', function(info) {
 
 // Links the button to copy the URL. Currently doesn't use the callbacks
 // *** This button does not work with Safari ***
-var cpb = clipboardButton('#roomLink');
+
+
+
+var cpb = clipboardButton('#roomLink', success, fail);
 $(roomLink).attr("data-clipboard-text", window.location.href);
+
+function success() {
+    $('#roomLink').attr('data-content', 'copied');
+    setTimeout (function (){
+      $('.popover').remove();
+    }, 2000);
+};
+
+function fail() {
+    $('#roomLink').attr('data-content', 'Press cmd + C to copy');
+    setTimeout (function (){
+      $('.popover').remove();
+    }, 2000);
+};
 
 // Allows you to press "Enter" to send text when input selected
 $("#message").keyup(function(event){
