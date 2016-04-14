@@ -1,0 +1,10 @@
+This is a document with the costs for Baduk, just for future reference. All prices are in USD.
+
+baduk.ca domain name
+--
+$11.98 (Mar-29-16 to Mar-29-17)
+
+hosting on digital ocean
+--
+$5.00 (Mar-29-16 to Apr-29-16)
+$5.00 (Apr-29-16 to May-29-16)
