@@ -112,8 +112,12 @@ socket.on('get_new_disconnect', function(info) {
 var cpb = clipboardButton('#roomLink', success_cpy);
 $(roomLink).attr("data-clipboard-text", window.location.href);
 
+var isCurrentBrowserSafari = function() {
+    return Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+}
+
 function success_cpy() {
-    if(Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
+    if(isCurrentBrowserSafari()) {
         $('#roomLink').attr('data-content', 'Press ⌘ +C to copy');
         setTimeout (function () {
             $('.popover').fadeOut(300, function() { $(this).remove(); });
