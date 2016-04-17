@@ -60,7 +60,7 @@ $('#resignBtn').click(function () {
     });
 });
 
-$('.board').mousemove(function (e){
+$(window).mousemove(function (e){
 
     var mouseX = e.pageX;
     var mouseY = e.pageY;
