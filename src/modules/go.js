@@ -37,7 +37,7 @@ var currentState = function(roomId) {
 var withMove = function (gameState, action) {
 
     if (gameState.result) {
-        console.log('illegal move: game is over');
+        if (isNodejs()) console.log('illegal move: game is over');
         return false;
     }
 
@@ -51,7 +51,7 @@ var withMove = function (gameState, action) {
     }
 
     if (action.player_color !== gameState.turn) {
-        console.log('illegal move: not your turn');
+        if (isNodejs()) console.log('illegal move: not your turn');
         return false;
     }
 
@@ -83,6 +83,14 @@ var withMove = function (gameState, action) {
 
 var copy = function (obj) {
     return JSON.parse(JSON.stringify(obj));
+}
+
+var isNodejs = function () {
+    return typeof(exports) !== 'undefined';
+}
+
+var isBrowser = function () {
+    return typeof(window) !== 'undefined';
 }
 
 // board representation
@@ -231,12 +239,12 @@ var withNewPiece = function (gameState, color, x, y) {
     var oldGameState = copy(gameState);
 
     if (colorOf(gameState, x, y) !== 'empty') {
-        console.log('illegal move: not an empty intersection');
+        if (isNodejs()) console.log('illegal move: not an empty intersection');
         return false;
     }
 
     if (isSuicide(gameState, color, x, y)) {
-        console.log('illegal move: suicide');
+        if (isNodejs()) console.log('illegal move: suicide');
         return false;
     }
 
@@ -262,7 +270,7 @@ var withNewPiece = function (gameState, color, x, y) {
     });
 
     if (repeatedOldPosition) {
-        console.log('illegal: positional superko');
+        if (isNodejs()) console.log('illegal: positional superko');
         return false;
     }
 
@@ -368,7 +376,7 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 
 }
 
-if (typeof(exports) !== 'undefined') {
+if (isNodejs()) {
     exports.applyMove = applyMove;
     exports.currentState = currentState;
 
@@ -386,7 +394,7 @@ if (typeof(exports) !== 'undefined') {
     exports.prettyReprOfStones = prettyReprOfStones;
 }
 
-if (typeof(window) !== 'undefined') {
+if (isBrowser()) {
     window.isLegalMove = isLegalMove;
 }
 
