@@ -215,7 +215,12 @@ var boardStateHistoryOf = function (gameState) {
 // exported to browser
 
 var isLegalMove = function (gameState, color, x, y) {
-    return withNewPiece(gameState, color, x, y) !== false;
+    return gameState && withMove(gameState, {
+        player_color: color,
+        action: 'new_piece',
+        row: x,
+        col: y
+    }) !== false;
 }
 
 // go-specific logic
