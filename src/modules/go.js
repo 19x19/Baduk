@@ -2,6 +2,8 @@
     Go game rules
 */
 
+(function () {
+
 var current_games = {};
 
 // public API
@@ -209,6 +211,13 @@ var boardStateHistoryOf = function (gameState) {
     return ret;
 }
 
+
+// exported to browser
+
+var isLegalMove = function (gameState, color, x, y) {
+    return withNewPiece(gameState, color, x, y) !== false;
+}
+
 // go-specific logic
 
 var withNewPiece = function (gameState, color, x, y) {
@@ -354,18 +363,26 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 
 }
 
-exports.applyMove = applyMove;
-exports.currentState = currentState;
+if (typeof(exports) !== 'undefined') {
+    exports.applyMove = applyMove;
+    exports.currentState = currentState;
 
-// exported for testing
+    // exported for testing
 
-exports.isInBounds = isInBounds;
-exports.libertiesOf = libertiesOf;
-exports.withoutDeadGroups = withoutDeadGroups;
-exports.colorOf = colorOf;
-exports.groupOf = groupOf;
-exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
-exports.isSuicide = isSuicide;
-exports.withNewPiece = withNewPiece;
-exports.boardStateHistoryOf = boardStateHistoryOf;
-exports.prettyReprOfStones = prettyReprOfStones;
+    exports.isInBounds = isInBounds;
+    exports.libertiesOf = libertiesOf;
+    exports.withoutDeadGroups = withoutDeadGroups;
+    exports.colorOf = colorOf;
+    exports.groupOf = groupOf;
+    exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
+    exports.isSuicide = isSuicide;
+    exports.withNewPiece = withNewPiece;
+    exports.boardStateHistoryOf = boardStateHistoryOf;
+    exports.prettyReprOfStones = prettyReprOfStones;
+}
+
+if (typeof(window) !== 'undefined') {
+    window.isLegalMove = isLegalMove;
+}
+
+})();
