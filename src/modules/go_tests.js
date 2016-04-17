@@ -7,7 +7,6 @@ var groupOf = go.groupOf;
 var isAnyNeighbourDiffColorWithOnlyOneLiberty = go.isAnyNeighbourDiffColorWithOnlyOneLiberty;
 var isSuicide = go.isSuicide;
 var withNewPiece = go.withNewPiece;
-var reprOfPositionalBoardState = go.reprOfPositionalBoardState;
 var boardStateHistoryOf = go.boardStateHistoryOf;
 var prettyReprOfStones = go.prettyReprOfStones
 
@@ -168,8 +167,6 @@ console.log(gs8.stones[0][0] === 1);
 console.log(gs8.stones[1][0] === 0);
 console.log(gs8.stones[2][0] === 1);
 
-// console.log(reprOfPositionalBoardState(gs8));
-
 var gs9 = {
     stones: [
         [1, 2, 0, 0, 0, 0, 0, 0, 0],
@@ -198,7 +195,34 @@ var gs9 = {
     ]
 }
 
-boardStateHistoryOf(gs9).forEach(function (boardState) {
-    console.log(prettyReprOfStones(boardState.stones));
-    console.log('\n');
+var gs9BoardStates = ["_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________",
+"b________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________",
+"bw_______\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________"];
+
+boardStateHistoryOf(gs9).forEach(function (boardState, i) {
+    console.log(prettyReprOfStones(boardState.stones) === gs9BoardStates[i]);
 });

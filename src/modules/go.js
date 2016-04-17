@@ -91,10 +91,6 @@ var oppositeColor = function (color) {
     throw 'oppositeColor received argument ' + color;
 }
 
-var reprOfPositionalBoardState = function (gameState) {
-    return gameState.turn + JSON.stringify(gameState.stones);
-}
-
 var prettyReprOfStones = function (stones) {
     return stones.map(function (row) {
         return row.map(function (stone) {
@@ -218,6 +214,8 @@ var boardStateHistoryOf = function (gameState) {
 var withNewPiece = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
 
+    var oldGameState = copy(gameState);
+
     if (colorOf(gameState, x, y) !== 'empty') {
         console.log('illegal move: not an empty intersection');
         return false;
@@ -233,12 +231,26 @@ var withNewPiece = function (gameState, color, x, y) {
 
     groupOfPlayedStone = groupOf(gs2, x, y);
     
-    gameState = withStone(gameState, color, x, y);
-    gameState = withoutDeadGroups(gameState);
+    gameState = withStone(gameState, color, x, y); // place move
+    gameState = withoutDeadGroups(gameState);      // remove all dead stones
 
-    groupOfPlayedStone.forEach(function (stone) {
+    groupOfPlayedStone.forEach(function (stone) {  // put back group of played stone
         gameState.stones[stone.x][stone.y] = { 'black': 1, 'white': 2 }[color];
     });
+
+    var repeatedOldPosition = false;
+    boardStateHistoryOf(oldGameState).forEach(function (boardState) {
+        var stones = boardState.stones;
+
+        if (prettyReprOfStones(stones) === prettyReprOfStones(gameState.stones)) {
+            repeatedOldPosition = true;
+        }
+    });
+
+    if (repeatedOldPosition) {
+        console.log('illegal: positional superko');
+        return false;
+    }
 
     if (gameState.turn === 'white') {
         gameState.turn = 'black';
@@ -355,6 +367,5 @@ exports.groupOf = groupOf;
 exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
 exports.isSuicide = isSuicide;
 exports.withNewPiece = withNewPiece;
-exports.reprOfPositionalBoardState = reprOfPositionalBoardState;
 exports.boardStateHistoryOf = boardStateHistoryOf;
 exports.prettyReprOfStones = prettyReprOfStones;
