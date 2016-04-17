@@ -22,6 +22,19 @@ var csurf = require('csurf');
 var ddos = new Ddos;
 var emoji = require('node-emoji');
 
+var winston = require('winston');
+var logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.Console)({
+        level: 'info',
+    }),
+    new winston.transports.File({
+        filename: '/var/log/baduk.log',
+        level: 'verbose',
+    })
+  ]
+});
+
 // Baduk modules
 var games = require('./src/modules/games.js');
 var go = require('./src/modules/go.js');
@@ -90,7 +103,10 @@ io.on('connection', function (socket) {
     }
 
     // Receives some information when a new user joins
-    socket.on('post_new_connect', function(info) {
+    socket.on('post_new_connect', function (info) {
+
+        logger.verbose('post_new_connect', info);
+
         games.add_user(info, socket);
         if(games.current_users[socket.handshake.session.id][info.room]['instances'] == 1) {
             io.to(info.room).emit('get_new_connect', {
@@ -109,7 +125,10 @@ io.on('connection', function (socket) {
     });
 
     // Removes a user from the room
-    socket.on('post_new_disconnect', function(info) {
+    socket.on('post_new_disconnect', function (info) {
+
+        logger.verbose('post_new_disconnect', info);
+
         games.remove_user(info, socket);
         if(games.current_users[socket.handshake.session.id][info.room]['instances'] === 0) {
             io.to(info.room).emit('get_new_disconnect', {
@@ -121,6 +140,9 @@ io.on('connection', function (socket) {
 
     // Posts a new message to the room
     socket.on('post_new_message', function (info) {
+
+        logger.verbose('post_new_message', info);
+
         io.to(info.room).emit('get_new_message', xss({
             'message' : emoji.emojify(info.message),
             'username' : games.current_users[socket.handshake.session.id]['username'],
@@ -130,6 +152,9 @@ io.on('connection', function (socket) {
 
     // Add a piece at the given position
     socket.on('post_new_piece', function (info) {
+
+        logger.verbose('post_new_piece', info);
+
         var color = games.current_users[socket.handshake.session.id][info.room]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'new_piece',
@@ -148,6 +173,8 @@ io.on('connection', function (socket) {
 
     socket.on('post_pass', function (info) {
 
+        logger.verbose('post_pass', info);
+
         var color = games.current_users[socket.handshake.session.id][info.room]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'pass',
@@ -158,11 +185,14 @@ io.on('connection', function (socket) {
             io.to(info.room).emit('new_game_state', newState);
         } else {
             socket.emit('move_is_illegal', {});
-            console.log('illegal move');
+            logger.info('illegal move');
         }
     });
 
     socket.on('post_resign', function (info) {
+
+        logger.verbose('post_resign', info);
+
         var color = games.current_users[socket.handshake.session.id][info.room]['color'];
         var newState = go.applyMove(info.room, {
             'action': 'resign',
@@ -174,5 +204,5 @@ io.on('connection', function (socket) {
 });
 
 http.listen(port, function () {
-    console.log('Listening on *:' + port);
+    logger.info('Listening on', port);
 });
