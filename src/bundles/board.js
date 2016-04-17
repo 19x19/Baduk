@@ -16,8 +16,7 @@ setTimeout (function (){
   }
 }, 1000);
 
-window.onBoardClick = function (e) {
-
+var coordOfClick = function (e) {
     var mouseX = e.pageX;
     var mouseY = e.pageY;
 
@@ -37,11 +36,21 @@ window.onBoardClick = function (e) {
     var pieceCoordX = Math.round(mousePicPctX * 8);
     var pieceCoordY = Math.round(mousePicPctY * 8);
 
+    return {
+        x: pieceCoordX,
+        y: pieceCoordY
+    }
+}
+
+window.onBoardClick = function (e) {
+
+    var coordOfClickE = coordOfClick(e);
+
     var room = /[^/]*$/.exec(window.location.pathname)[0];
 
     socket.emit('post_new_piece', {
-        'row': pieceCoordX,
-        'col': pieceCoordY,
+        'row': coordOfClickE.x,
+        'col': coordOfClickE.y,
         'room': room
     });
 }
@@ -64,30 +73,11 @@ $(window).mousemove(function (e) {
 
     if (typeof(window.your_color) === 'undefined') return;
 
-    var mouseX = e.pageX;
-    var mouseY = e.pageY;
+    var coordOfClickE = coordOfClick(e);
 
-    var boardX = $(".board").offset().left;
-    var boardY = $(".board").offset().top;
+    var pieceCoordX = coordOfClickE.x;
+    var pieceCoordY = coordOfClickE.y;
 
-    var mouseRelX = mouseX - boardX;
-    var mouseRelY = mouseY - boardY;
-
-    var mousePctX = mouseRelX / $(".board").width();
-    var mousePctY = mouseRelY / $(".board").height();
-
-    // 0.07 is empirical
-    var mousePicPctX = mousePctX - 0.07;
-    var mousePicPctY = mousePctY - 0.07;
-
-    var pieceCoordX = Math.round(mousePicPctX * 8);
-    var pieceCoordY = Math.round(mousePicPctY * 8);
-
-    var impX = 20; //Imperical addition to the top position
-    var impY = 67; //Imperical addition to the top position
-    if ($('.container').width() > 900) { // Because the margins change when the containers size changes
-        impY = 85;
-    }
     var stoneSize = $('.board').width() / 8;
     var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
