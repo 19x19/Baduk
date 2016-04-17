@@ -60,7 +60,9 @@ $('#resignBtn').click(function () {
     });
 });
 
-$(window).mousemove(function (e){
+$(window).mousemove(function (e) {
+
+    if (typeof(window.your_color) === 'undefined') return;
 
     var mouseX = e.pageX;
     var mouseY = e.pageY;
@@ -90,7 +92,10 @@ $(window).mousemove(function (e){
     var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
     $('.ghostPiece').remove();
-    if (0 <= pieceCoordX && pieceCoordX < 9 && 0 <= pieceCoordY && pieceCoordY < 9) {
+    if (0 <= pieceCoordX && pieceCoordX < 9
+     && 0 <= pieceCoordY && pieceCoordY < 9
+     && isLegalMove(window.mostRecentGameState, window.your_color, pieceCoordX, pieceCoordY)
+    ) {
         var ghostPiece = $('<img>', {
             'class': 'ghostPiece',
             'src': '/img/black_circle.png',
@@ -107,14 +112,6 @@ $(window).mousemove(function (e){
         });
         $(".inner").prepend(ghostPiece);
     }
-
-    // var room = /[^/]*$/.exec(window.location.pathname)[0];
-
-    // socket.emit('isValid', {
-    //     'row': pieceCoordX,
-    //     'col': pieceCoordY,
-    //     'room': room
-    // });
 
 });
 
