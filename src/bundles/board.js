@@ -106,16 +106,16 @@ $(window).mousemove(function (e) {
 });
 
 $(window).resize(function () {
-     window.renderMostRecentGameState();
+     window.renderSelectedGameState();
 });
 
 window.drawDebug = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
 }
 
-window.renderMostRecentGameState = function () {
+window.renderSelectedGameState = function () {
     if (window.mostRecentGameState) {
-        render(window.mostRecentGameState);
+        render(window.mostRecentGameState, window.selectedMoveIdx);
     }
 }
 
@@ -133,7 +133,6 @@ socket.on('new_game_state', function (gameState) {
     var move_sound = new Audio("/sounds/move.wav");
     move_sound.play();
 
-    // Figure out where the piece goes
     if (gameState.result) {
         $("#gameState").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
     } else if (gameState.turn === 'white') {
@@ -154,18 +153,22 @@ socket.on('new_game_state', function (gameState) {
         }
     }
 
-    window.renderMostRecentGameState();
+    window.selectedMoveIdx = gameState.moves.length - 1;
+    window.renderSelectedGameState();
 });
 
 socket.on('move_is_illegal', function (msg) {
     window.notifyFromServer('Illegal move');
 });
 
-var render = function (gameState) {
+var render = function (gameState, selectedMoveIdx) {
     setBorder();
-    $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.moves.slice(-1)[0]));
 
-    $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState));
+    var selectedStones = boardStateHistoryOf(gameState)[selectedMoveIdx + 1].stones;
+    var selectedMove = gameState.moves[selectedMoveIdx];
+
+    $('.inner').empty().append(imgOfAll(selectedStones, gameState.size, selectedMove));
+    $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState, selectedMoveIdx));
 }
 
 var pairsOf = function (arr) {
@@ -173,9 +176,18 @@ var pairsOf = function (arr) {
     var ret = [];
     for (var i=0; i<arr.length; i+=2) {
         if (i+1 < arr.length) {
-            ret.push([arr[i], arr[i+1]]);
+            ret.push([{
+                'idx': i,
+                'elem': arr[i],
+            }, {
+                'idx': i+1,
+                'elem': arr[i+1],
+            }]);
         } else {
-            ret.push([arr[i]]);
+            ret.push([{
+                'idx': i,
+                'elem': arr[i],
+            }]);
         }
     }
     return ret;
@@ -193,16 +205,61 @@ var reprOfMove = function (move) {
     throw "unrecognized move action " + move.action;
 }
 
-var renderedMoveHistoryOf = function (gameState) {
+var renderedMoveHistoryOf = function (gameState, selectedMoveIdx) {
     return pairsOf(gameState.moves).map(function (moves) {
         if (moves.length === 2) {
-            return $('<div>', {
-                text: reprOfMove(moves[0]) + ' | ' + reprOfMove(moves[1]),
+
+            var container = $('<div>');
+
+            var move1 = $('<span>', {
+                text: reprOfMove(moves[0].elem),
             });
+            var move2 = $('<span>', {
+                text: reprOfMove(moves[1].elem),
+            });
+
+            if (moves[0].idx === selectedMoveIdx) {
+                move1.css('font-weight', 'bold');
+            } else if (moves[1].idx === selectedMoveIdx) {
+                move2.css('font-weight', 'bold');
+            }
+
+            move1.click(function () {
+                console.log('selected', moves[0].idx);
+                window.selectedMoveIdx = moves[0].idx;
+                window.renderSelectedGameState();
+            });
+            move2.click(function () {
+                console.log('selected', moves[1].idx);
+                window.selectedMoveIdx = moves[1].idx;
+                window.renderSelectedGameState();
+            });
+
+            container.append(move1);
+            container.append('|');
+            container.append(move2);
+
+
+
+            return container;
         } else {
-            return $('<div>', {
-                text: reprOfMove(moves[0]),
+            var container = $('<div>');
+            var move1 = $('<span>', {
+                text: reprOfMove(moves[0].elem),
             });
+
+            if (moves[0].idx === selectedMoveIdx) {
+                move1.css('font-weight', 'bold');
+            }
+
+            move1.click(function () {
+                console.log('selected', moves[0].idx);
+                window.selectedMoveIdx = moves[0].idx;
+                window.renderSelectedGameState();
+            });
+
+            container.append(move1);
+            return container;
         }
     });
 }

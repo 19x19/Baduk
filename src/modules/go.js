@@ -396,6 +396,7 @@ if (isNodejs()) {
 
 if (isBrowser()) {
     window.isLegalMove = isLegalMove;
+    window.boardStateHistoryOf = boardStateHistoryOf;
 }
 
 })();
