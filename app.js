@@ -13,12 +13,20 @@ var sharedsession = require("express-socket.io-session");
 // Setting up HTTPS variables
 var http = require('http').Server(app);
 var https = require('https');
+if(config.HTTPS) {
+    const options = {
+        key: fs.readFileSync('../SSL/baduk_ca.key'),
+        cert: fs.readFileSync('../SSL/baduk_ca.crt'),
+        ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
+    };
+    var server = https.createServer(options, app);
+}
 
 // Third-party libraries
 var fs = require('fs');
 var io;
 if(config.HTTPS) {
-    io = require('socket.io')(https);
+    io = require('socket.io')(server);
 } else {
     io = require('socket.io')(http);
 }
@@ -238,12 +246,6 @@ io.on('connection', function (socket) {
 
 // Figure out if we want HTTPS or not
 if(config.HTTPS) {
-    const options = {
-        key: fs.readFileSync('../SSL/baduk_ca.key'),
-        cert: fs.readFileSync('../SSL/baduk_ca.crt'),
-        ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
-    };
-    var server = https.createServer(options, app);
     server.listen(config.HTTPS_port, function(){
         logger.info('Listening on *:' + config.HTTPS_port);
     });
