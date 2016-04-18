@@ -214,8 +214,8 @@ io.on('connection', function (socket) {
 // Figure out if we want HTTPS or not
 if(config.HTTPS) {
     const options = {
-        key: fs.readFileSync('../SSL/baduk-key.pem'),
-        cert: fs.readFileSync('../SSL/baduk-cert.pem'),
+        key: fs.readFileSync('../SSL/baduk_ca.key'),
+        cert: fs.readFileSync('../SSL/baduk_ca.crt'),
         ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
     };
     var server = http.createServer(options, app);
