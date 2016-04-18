@@ -284,7 +284,7 @@ posOf = function (row, col) {
     var stoneSize = $('.board').width() / 8;
     return {
         x: (row * stoneSize) + 18,
-        y: (col * stoneSize),
+        y: (col * stoneSize) + 3,
     };
 
 }
