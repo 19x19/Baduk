@@ -56,6 +56,13 @@ app.use(ddos.express);
 app.use(session);
 app.disable('X-Powered-By');
 
+// Force HTTPS in production
+if(config.HTTPS) {
+    app.get('*',function (req, res) {
+        res.redirect('https://baduk.ca' + req.url);
+    });
+}
+
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
     // General headers for security, ranging from clickjacking protection to
