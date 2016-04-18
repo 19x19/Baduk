@@ -65,6 +65,9 @@ app.get('/*', function(req, res, next) {
     res.header('X-Robots-Tag', 'noindex');
     res.header('X-XSS-Protection', '1; mode=block');
     res.header('X-Content-Type-Options', 'nosniff');
+    if(config.HTTPS) {
+        res.header('Strict-Tranport-Security', 'max-age=31536000');
+    }
 
     next();
 });
