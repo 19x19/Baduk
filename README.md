@@ -2,7 +2,7 @@
 
 An easy-to-use online Go gaming platform. Currently hosted at https://www.baduk.ca.
 
-Currently in the pre-alpha stage.
+Currently in the pre-alpha stage. Expected Alpha release date is April 29th, 2016. This release will be a minimum viable product, and will have full functionality for players facing each other anonymously.
 
 ## Installation
 
