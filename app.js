@@ -242,12 +242,12 @@ if(config.HTTPS) {
         ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
     };
     var server = http.createServer(options, app);
-    server.listen(config.port, function(){
-        logger.info('Listening on *:' + config.port);
+    server.listen(config.HTTPS_port, function(){
+        logger.info('Listening on *:' + config.HTTPS_port);
     });
 }
 
 // Listen on the normal server too
-http.listen(config.port, function () {
-    logger.info('Listening on *:' + config.port);
+http.listen(config.HTTP_port, function () {
+    logger.info('Listening on *:' + config.HTTP_port);
 });
