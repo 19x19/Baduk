@@ -13,6 +13,7 @@ var sharedsession = require("express-socket.io-session");
 // Setting up HTTPS variables
 var http = require('http').Server(app);
 var https = require('https');
+var fs = require('fs');
 if(config.HTTPS) {
     const options = {
         key: fs.readFileSync('../SSL/baduk_ca.key'),
@@ -23,7 +24,6 @@ if(config.HTTPS) {
 }
 
 // Third-party libraries
-var fs = require('fs');
 var io;
 if(config.HTTPS) {
     io = require('socket.io')(server);
