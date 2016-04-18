@@ -245,8 +245,9 @@ if(config.HTTPS) {
     server.listen(config.port, function(){
         logger.info('Listening on *:' + config.port);
     });
-} else {
-    http.listen(config.port, function () {
-        logger.info('Listening on *:' + config.port);
-    });
 }
+
+// Listen on the normal server too
+http.listen(config.port, function () {
+    logger.info('Listening on *:' + config.port);
+});
