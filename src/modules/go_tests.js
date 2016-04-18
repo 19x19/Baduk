@@ -7,6 +7,8 @@ var groupOf = go.groupOf;
 var isAnyNeighbourDiffColorWithOnlyOneLiberty = go.isAnyNeighbourDiffColorWithOnlyOneLiberty;
 var isSuicide = go.isSuicide;
 var withNewPiece = go.withNewPiece;
+var boardStateHistoryOf = go.boardStateHistoryOf;
+var prettyReprOfStones = go.prettyReprOfStones
 
 var gs1 = {
     stones: [
@@ -164,3 +166,63 @@ var gs8 = withNewPiece(gs7, 'black', 0, 0);
 console.log(gs8.stones[0][0] === 1);
 console.log(gs8.stones[1][0] === 0);
 console.log(gs8.stones[2][0] === 1);
+
+var gs9 = {
+    stones: [
+        [1, 2, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    moves: [
+        {
+            'action': 'new_piece',
+            'player_color': 'black',
+            'row': 0,
+            'col': 0
+        },
+        {
+            'action': 'new_piece',
+            'player_color': 'white',
+            'row': 0,
+            'col': 1
+        }
+    ]
+}
+
+var gs9BoardStates = ["_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________",
+"b________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________",
+"bw_______\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________\n\
+_________"];
+
+boardStateHistoryOf(gs9).forEach(function (boardState, i) {
+    console.log(prettyReprOfStones(boardState.stones) === gs9BoardStates[i]);
+});

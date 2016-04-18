@@ -2,6 +2,8 @@
     Go game rules
 */
 
+(function () {
+
 var current_games = {};
 
 // public API
@@ -35,7 +37,7 @@ var currentState = function(roomId) {
 var withMove = function (gameState, action) {
 
     if (gameState.result) {
-        console.log('illegal move: game is over');
+        if (isNodejs()) console.log('illegal move: game is over');
         return false;
     }
 
@@ -49,7 +51,7 @@ var withMove = function (gameState, action) {
     }
 
     if (action.player_color !== gameState.turn) {
-        console.log('illegal move: not your turn');
+        if (isNodejs()) console.log('illegal move: not your turn');
         return false;
     }
 
@@ -83,12 +85,28 @@ var copy = function (obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 
+var isNodejs = function () {
+    return typeof(exports) !== 'undefined';
+}
+
+var isBrowser = function () {
+    return typeof(window) !== 'undefined';
+}
+
 // board representation
 
 var oppositeColor = function (color) {
     if (color === 'white') return 'black';
     if (color === 'black') return 'white';
     throw 'oppositeColor received argument ' + color;
+}
+
+var prettyReprOfStones = function (stones) {
+    return stones.map(function (row) {
+        return row.map(function (stone) {
+            return '_bw'[stone];
+        }).join('');
+    }).join('\n');
 }
 
 var reprStone = function (x, y) {
@@ -189,18 +207,44 @@ var isAnyNeighbourDiffColorWithOnlyOneLiberty = function (gameState, color, x, y
     return false;
 }
 
+// ko
+
+var boardStateHistoryOf = function (gameState) {
+    var bs = initialGameState();
+    var ret = [bs];
+    gameState.moves.forEach(function (move) {
+        bs = withMove(bs, move);
+        ret.push(bs);
+    });
+    return ret;
+}
+
+
+// exported to browser
+
+var isLegalMove = function (gameState, color, x, y) {
+    return gameState && withMove(gameState, {
+        player_color: color,
+        action: 'new_piece',
+        row: x,
+        col: y
+    }) !== false;
+}
+
 // go-specific logic
 
 var withNewPiece = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
 
+    var oldGameState = copy(gameState);
+
     if (colorOf(gameState, x, y) !== 'empty') {
-        console.log('illegal move: not an empty intersection');
+        if (isNodejs()) console.log('illegal move: not an empty intersection');
         return false;
     }
 
     if (isSuicide(gameState, color, x, y)) {
-        console.log('illegal move: suicide');
+        if (isNodejs()) console.log('illegal move: suicide');
         return false;
     }
 
@@ -209,12 +253,26 @@ var withNewPiece = function (gameState, color, x, y) {
 
     groupOfPlayedStone = groupOf(gs2, x, y);
     
-    gameState = withStone(gameState, color, x, y);
-    gameState = withoutDeadGroups(gameState);
+    gameState = withStone(gameState, color, x, y); // place move
+    gameState = withoutDeadGroups(gameState);      // remove all dead stones
 
-    groupOfPlayedStone.forEach(function (stone) {
+    groupOfPlayedStone.forEach(function (stone) {  // put back group of played stone
         gameState.stones[stone.x][stone.y] = { 'black': 1, 'white': 2 }[color];
     });
+
+    var repeatedOldPosition = false;
+    boardStateHistoryOf(oldGameState).forEach(function (boardState) {
+        var stones = boardState.stones;
+
+        if (prettyReprOfStones(stones) === prettyReprOfStones(gameState.stones)) {
+            repeatedOldPosition = true;
+        }
+    });
+
+    if (repeatedOldPosition) {
+        if (isNodejs()) console.log('illegal: positional superko');
+        return false;
+    }
 
     if (gameState.turn === 'white') {
         gameState.turn = 'black';
@@ -318,20 +376,27 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 
 }
 
-exports.applyMove = applyMove;
-exports.currentState = currentState;
+if (isNodejs()) {
+    exports.applyMove = applyMove;
+    exports.currentState = currentState;
 
-// exported for testing
+    // exported for testing
 
-exports.isInBounds = isInBounds;
-exports.libertiesOf = libertiesOf;
-exports.withoutDeadGroups = withoutDeadGroups;
-exports.colorOf = colorOf;
-exports.groupOf = groupOf;
-exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
-exports.isSuicide = isSuicide;
-exports.withNewPiece = withNewPiece;
+    exports.isInBounds = isInBounds;
+    exports.libertiesOf = libertiesOf;
+    exports.withoutDeadGroups = withoutDeadGroups;
+    exports.colorOf = colorOf;
+    exports.groupOf = groupOf;
+    exports.isAnyNeighbourDiffColorWithOnlyOneLiberty = isAnyNeighbourDiffColorWithOnlyOneLiberty;
+    exports.isSuicide = isSuicide;
+    exports.withNewPiece = withNewPiece;
+    exports.boardStateHistoryOf = boardStateHistoryOf;
+    exports.prettyReprOfStones = prettyReprOfStones;
+}
 
-// tests
+if (isBrowser()) {
+    window.isLegalMove = isLegalMove;
+    window.boardStateHistoryOf = boardStateHistoryOf;
+}
 
-
+})();

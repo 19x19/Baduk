@@ -16,8 +16,7 @@ setTimeout (function (){
   }
 }, 1000);
 
-window.onBoardClick = function (e) {
-
+var coordOfClick = function (e) {
     var mouseX = e.pageX;
     var mouseY = e.pageY;
 
@@ -37,11 +36,21 @@ window.onBoardClick = function (e) {
     var pieceCoordX = Math.round(mousePicPctX * 8);
     var pieceCoordY = Math.round(mousePicPctY * 8);
 
+    return {
+        x: pieceCoordX,
+        y: pieceCoordY
+    }
+}
+
+window.onBoardClick = function (e) {
+
+    var coordOfClickE = coordOfClick(e);
+
     var room = /[^/]*$/.exec(window.location.pathname)[0];
 
     socket.emit('post_new_piece', {
-        'row': pieceCoordX,
-        'col': pieceCoordY,
+        'row': coordOfClickE.x,
+        'col': coordOfClickE.y,
         'room': room
     });
 }
@@ -60,37 +69,23 @@ $('#resignBtn').click(function () {
     });
 });
 
-$('.board').mousemove(function (e){
+$(window).mousemove(function (e) {
 
-    var mouseX = e.pageX;
-    var mouseY = e.pageY;
+    if (typeof(window.your_color) === 'undefined') return;
 
-    var boardX = $(".board").offset().left;
-    var boardY = $(".board").offset().top;
+    var coordOfClickE = coordOfClick(e);
 
-    var mouseRelX = mouseX - boardX;
-    var mouseRelY = mouseY - boardY;
+    var pieceCoordX = coordOfClickE.x;
+    var pieceCoordY = coordOfClickE.y;
 
-    var mousePctX = mouseRelX / $(".board").width();
-    var mousePctY = mouseRelY / $(".board").height();
-
-    // 0.07 is empirical
-    var mousePicPctX = mousePctX - 0.07;
-    var mousePicPctY = mousePctY - 0.07;
-
-    var pieceCoordX = Math.round(mousePicPctX * 8);
-    var pieceCoordY = Math.round(mousePicPctY * 8);
-
-    var impX = 20; //Imperical addition to the top position
-    var impY = 67; //Imperical addition to the top position
-    if ($('.container').width() > 900) { // Because the margins change when the containers size changes
-        impY = 85;
-    }
     var stoneSize = $('.board').width() / 8;
     var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
     $('.ghostPiece').remove();
-    if (0 <= pieceCoordX && pieceCoordX < 9 && 0 <= pieceCoordY && pieceCoordY < 9) {
+    if (0 <= pieceCoordX && pieceCoordX < 9
+     && 0 <= pieceCoordY && pieceCoordY < 9
+     && isLegalMove(window.mostRecentGameState, window.your_color, pieceCoordX, pieceCoordY)
+    ) {
         var ghostPiece = $('<img>', {
             'class': 'ghostPiece',
             'src': '/img/black_circle.png',
@@ -108,27 +103,19 @@ $('.board').mousemove(function (e){
         $(".inner").prepend(ghostPiece);
     }
 
-    // var room = /[^/]*$/.exec(window.location.pathname)[0];
-
-    // socket.emit('isValid', {
-    //     'row': pieceCoordX,
-    //     'col': pieceCoordY,
-    //     'room': room
-    // });
-
 });
 
 $(window).resize(function () {
-     window.renderMostRecentGameState();
+     window.renderSelectedGameState();
 });
 
 window.drawDebug = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
 }
 
-window.renderMostRecentGameState = function () {
+window.renderSelectedGameState = function () {
     if (window.mostRecentGameState) {
-        render(window.mostRecentGameState);
+        render(window.mostRecentGameState, window.selectedMoveIdx);
     }
 }
 
@@ -146,7 +133,6 @@ socket.on('new_game_state', function (gameState) {
     var move_sound = new Audio("/sounds/move.wav");
     move_sound.play();
 
-    // Figure out where the piece goes
     if (gameState.result) {
         $("#gameState").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
     } else if (gameState.turn === 'white') {
@@ -167,18 +153,22 @@ socket.on('new_game_state', function (gameState) {
         }
     }
 
-    window.renderMostRecentGameState();
+    window.selectedMoveIdx = gameState.moves.length - 1;
+    window.renderSelectedGameState();
 });
 
 socket.on('move_is_illegal', function (msg) {
     window.notifyFromServer('Illegal move');
 });
 
-var render = function (gameState) {
+var render = function (gameState, selectedMoveIdx) {
     setBorder();
-    $('.inner').empty().append(imgOfAll(gameState.stones, gameState.size, gameState.moves.slice(-1)[0]));
 
-    $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState));
+    var selectedStones = boardStateHistoryOf(gameState)[selectedMoveIdx + 1].stones;
+    var selectedMove = gameState.moves[selectedMoveIdx];
+
+    $('.inner').empty().append(imgOfAll(selectedStones, gameState.size, selectedMove));
+    $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState, selectedMoveIdx));
 }
 
 var pairsOf = function (arr) {
@@ -186,9 +176,18 @@ var pairsOf = function (arr) {
     var ret = [];
     for (var i=0; i<arr.length; i+=2) {
         if (i+1 < arr.length) {
-            ret.push([arr[i], arr[i+1]]);
+            ret.push([{
+                'idx': i,
+                'elem': arr[i],
+            }, {
+                'idx': i+1,
+                'elem': arr[i+1],
+            }]);
         } else {
-            ret.push([arr[i]]);
+            ret.push([{
+                'idx': i,
+                'elem': arr[i],
+            }]);
         }
     }
     return ret;
@@ -206,16 +205,61 @@ var reprOfMove = function (move) {
     throw "unrecognized move action " + move.action;
 }
 
-var renderedMoveHistoryOf = function (gameState) {
+var renderedMoveHistoryOf = function (gameState, selectedMoveIdx) {
     return pairsOf(gameState.moves).map(function (moves) {
         if (moves.length === 2) {
-            return $('<div>', {
-                text: reprOfMove(moves[0]) + ' | ' + reprOfMove(moves[1]),
+
+            var container = $('<div>');
+
+            var move1 = $('<span>', {
+                text: reprOfMove(moves[0].elem),
             });
+            var move2 = $('<span>', {
+                text: reprOfMove(moves[1].elem),
+            });
+
+            if (moves[0].idx === selectedMoveIdx) {
+                move1.css('font-weight', 'bold');
+            } else if (moves[1].idx === selectedMoveIdx) {
+                move2.css('font-weight', 'bold');
+            }
+
+            move1.click(function () {
+                console.log('selected', moves[0].idx);
+                window.selectedMoveIdx = moves[0].idx;
+                window.renderSelectedGameState();
+            });
+            move2.click(function () {
+                console.log('selected', moves[1].idx);
+                window.selectedMoveIdx = moves[1].idx;
+                window.renderSelectedGameState();
+            });
+
+            container.append(move1);
+            container.append('|');
+            container.append(move2);
+
+
+
+            return container;
         } else {
-            return $('<div>', {
-                text: reprOfMove(moves[0]),
+            var container = $('<div>');
+            var move1 = $('<span>', {
+                text: reprOfMove(moves[0].elem),
             });
+
+            if (moves[0].idx === selectedMoveIdx) {
+                move1.css('font-weight', 'bold');
+            }
+
+            move1.click(function () {
+                console.log('selected', moves[0].idx);
+                window.selectedMoveIdx = moves[0].idx;
+                window.renderSelectedGameState();
+            });
+
+            container.append(move1);
+            return container;
         }
     });
 }

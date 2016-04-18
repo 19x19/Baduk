@@ -50,6 +50,7 @@ socket.on('your_name', function (msg) {
 });
 
 socket.on('your_color', function (msg) {
+    window.your_color = msg.color;
     $("#yourColor").text(msg.color);
 });
 
