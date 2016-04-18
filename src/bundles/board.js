@@ -88,7 +88,7 @@ $(window).mousemove(function (e) {
     ) {
         var ghostPiece = $('<img>', {
             'class': 'ghostPiece',
-            'src': '/img/black_circle.png',
+            'src': window.your_color === 'black' ? '/img/black_circle.png' : '/img/white_circle.png',
             'css': {
                 position: 'absolute',
                 opacity: 0.4,
