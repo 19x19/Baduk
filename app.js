@@ -11,16 +11,17 @@ var session = require("express-session")({
 var sharedsession = require("express-socket.io-session");
 
 // Setting up HTTPS variables
-var http;
-if(config.HTTPS) {
-    http = require('https');
-} else {
-    http = require('http').Server(app);
-}
+var http = require('http').Server(app);
+var https = require('https');
 
 // Third-party libraries
 var fs = require('fs');
-var io = require('socket.io')(http);
+var io;
+if(config.HTTPS) {
+    io = require('socket.io')(https);
+} else {
+    io = require('socket.io')(http);
+}
 var favicon = require('serve-favicon');
 // var Ddos = require('ddos');
 var xss = require('node-xss').clean;
@@ -66,15 +67,14 @@ app.enable('trust proxy');
 // http://expressjs.com/api#req.secure). This allows us
 // to know whether the request was via http or https.
 app.use (function (req, res, next) {
-        if (req.secure) {
-                // request was via https, so do no special handling
-                next();
-        } else {
-                // request was via http, so redirect to https
-                res.redirect('https://' + req.headers.host + req.url);
-        }
+    if (req.secure) {
+        // Request was via https, so do no special handling
+        next();
+    } else {
+        // Request was via http, so redirect to https
+        res.redirect('https://' + req.headers.host + req.url);
+    }
 });
-
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
@@ -241,7 +241,7 @@ if(config.HTTPS) {
         cert: fs.readFileSync('../SSL/baduk_ca.crt'),
         ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
     };
-    var server = http.createServer(options, app);
+    var server = https.createServer(options, app);
     server.listen(config.HTTPS_port, function(){
         logger.info('Listening on *:' + config.HTTPS_port);
     });
