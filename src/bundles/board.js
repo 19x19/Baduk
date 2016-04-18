@@ -158,7 +158,7 @@ socket.on('new_game_state', function (gameState) {
 });
 
 socket.on('move_is_illegal', function (msg) {
-    window.notifyFromServer('Illegal move');
+    console.log('illegal move');
 });
 
 var render = function (gameState, selectedMoveIdx) {
