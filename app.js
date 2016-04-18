@@ -135,6 +135,11 @@ app.get('/go/:id', function (req, res) {
     }
 });
 
+// 404 page will just redirect to homepage
+app.get('*', function (req, res) {
+    res.redirect('/');
+});
+
 io.use(sharedsession(session));
 io.on('connection', function (socket) {
     // If they don't already have a session, get one started

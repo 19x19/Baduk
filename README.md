@@ -17,7 +17,7 @@ npm install && bower install
 Run Baduk at localhost:3001:
 
 ```
-node ./app.js
+sudo node app.js
 ```
 
 ## For Developers
