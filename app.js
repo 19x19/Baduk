@@ -2,7 +2,6 @@
 var config = require('./config.js');
 var express = require('express');
 var app = express();
-var http = require('http').Server(app);
 var cookieParser = require('cookie-parser');
 var session = require("express-session")({
     secret: config.session_key,
@@ -11,8 +10,17 @@ var session = require("express-session")({
 });
 var sharedsession = require("express-socket.io-session");
 
+// Setting up HTTPS variables
+if(config.HTTPS) {
+    var https = require('https').Server(app);
+    var fs = require('fs');
+    var io = require('socket.io')(https);
+} else {
+    var http = require('http').Server(app);
+    var io = require('socket.io')(http);
+}
+
 // Third-party libraries
-var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 var xss = require('node-xss').clean;
@@ -20,9 +28,8 @@ var git = require('git-rev');
 var csurf = require('csurf');
 var ddos = new Ddos;
 var emoji = require('node-emoji');
-const https = require('https');
-const fs = require('fs');
 
+// Logging
 var winston = require('winston');
 var logger = new (winston.Logger)({
   transports: [
