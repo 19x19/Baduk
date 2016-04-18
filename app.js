@@ -215,7 +215,8 @@ io.on('connection', function (socket) {
 if(config.HTTPS) {
     const options = {
         key: fs.readFileSync('../SSL/baduk-key.pem'),
-        cert: fs.readFileSync('../SSL/baduk-cert.pem')
+        cert: fs.readFileSync('../SSL/baduk_ca.crt'),
+        ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
     };
     var server = http.createServer(options, app);
     server.listen(config.port, function(){
