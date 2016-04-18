@@ -3,7 +3,6 @@ var config = require('./config.js');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = config.port;
 var cookieParser = require('cookie-parser');
 var session = require("express-session")({
     secret: config.session_key,
@@ -21,6 +20,8 @@ var git = require('git-rev');
 var csurf = require('csurf');
 var ddos = new Ddos;
 var emoji = require('node-emoji');
+const https = require('https');
+const fs = require('fs');
 
 // Baduk modules
 var games = require('./src/modules/games.js');
@@ -174,6 +175,17 @@ io.on('connection', function (socket) {
     });
 });
 
-http.listen(port, function () {
-    console.log('Listening on *:' + port);
-});
+// Figure out if we want HTTPS or not
+if(config.HTTPS) {
+    const options = {
+        key: fs.readFileSync('../SSL/baduk-key.pem'),
+        cert: fs.readFileSync('../SSL/baduk-cert.pem')
+    };
+    https.createServer(options, (req, res) => {
+        console.log("Listening on *:" + config.port);
+    }).listen(config.port);
+} else {
+    http.listen(config.port, function () {
+        console.log('Listening on *:' + config.port);
+    });
+}

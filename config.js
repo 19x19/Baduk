@@ -1,5 +1,6 @@
 var config = {};
 config.port = 3001;
+config.HTTPS = false;
 
 // No Mr. Hacker, this secret key is not the same one as the production key. But
 // I really respect the efforts.
