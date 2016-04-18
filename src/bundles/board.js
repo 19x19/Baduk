@@ -282,11 +282,9 @@ imgOfAll = function (stones, boardSize, mostRecentMove) {
 
 posOf = function (row, col) {
     var stoneSize = $('.board').width() / 8;
-    var impX = 19;
-    var impY = $('.container').width() > 900 ? 85 : 67;
     return {
-        x: (row * stoneSize) + impX,
-        y: (col * stoneSize) + impY,
+        x: (row * stoneSize) + 18,
+        y: (col * stoneSize),
     };
 
 }
