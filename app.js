@@ -11,16 +11,16 @@ var session = require("express-session")({
 var sharedsession = require("express-socket.io-session");
 
 // Setting up HTTPS variables
+var http;
 if(config.HTTPS) {
-    var https = require('https').Server(app);
-    var fs = require('fs');
-    var io = require('socket.io')(https);
+    http = require('https');
 } else {
-    var http = require('http').Server(app);
-    var io = require('socket.io')(http);
+    http = require('http').Server(app);
 }
 
 // Third-party libraries
+var fs = require('fs');
+var io = require('socket.io')(http);
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 var xss = require('node-xss').clean;
@@ -217,9 +217,10 @@ if(config.HTTPS) {
         key: fs.readFileSync('../SSL/baduk-key.pem'),
         cert: fs.readFileSync('../SSL/baduk-cert.pem')
     };
-    https.createServer(options, (req, res) => {
-        logger.info("Listening on *:" + config.port);
-    }).listen(config.port);
+    var server = http.createServer(options, app);
+    server.listen(config.port, function(){
+        logger.info('Listening on *:' + config.port);
+    });
 } else {
     http.listen(config.port, function () {
         logger.info('Listening on *:' + config.port);
