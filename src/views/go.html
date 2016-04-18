@@ -9,6 +9,8 @@
 
     <title>Baduk</title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
+
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -57,9 +59,7 @@
 
             <div class="col-md-6">
                 <!-- Board -->
-                <img class="board img-responsive" src="/img/go_board_9*9.png" height="500px" width="500px" alt="error showing the image" style="background-image: url('/img/wood-texture.jpg')">
-                    <!-- The Class where all the stones would go -->
-                    <div class="inner"></div>
+                <div id="boardContainer">
                     <!-- User Wait Pop Up-->
                     <div class="modal fade" id="userWait" role="dialog" data-backdrop="static">
                         <div class="modal-dialog">
@@ -76,6 +76,7 @@
                         </div>
                     </div>
                  </img>
+                </div>
                 <div id="gameState"></div>
             </div>
 
