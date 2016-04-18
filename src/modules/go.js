@@ -79,7 +79,7 @@ var withMove = function (gameState, action) {
 
 }
 
-// utility 
+// utility
 
 var copy = function (obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -252,7 +252,7 @@ var withNewPiece = function (gameState, color, x, y) {
     gs2.stones[x][y] = { 'black': 1, 'white': 2 }[color];
 
     groupOfPlayedStone = groupOf(gs2, x, y);
-    
+
     gameState = withStone(gameState, color, x, y); // place move
     gameState = withoutDeadGroups(gameState);      // remove all dead stones
 
@@ -358,15 +358,15 @@ var libertiesOf = function (gameState, x, y, blacklist) {
                     ret.push({'x': x+dx, 'y': y+dy});
                 }
             } else if (otherColor === color) {
-                
+
                 var retConcat = libertiesOf(gameState, x+dx, y+dy, blacklist.concat([reprStone(x, y)]));
-                
+
                 retConcat.forEach(function (sc) {
                     if (ret.map(function (s) { return reprStone(s.x, s.y)}).indexOf(reprStone(sc.x, sc.y)) === -1) {
                         ret.push({'x': sc.x, 'y': sc.y});
                     }
                 });
-                
+
             }
 
         }
