@@ -23,11 +23,11 @@ if(config.HTTPS) {
     io = require('socket.io')(http);
 }
 var favicon = require('serve-favicon');
-// var Ddos = require('ddos');
+var Ddos = require('ddos');
 var xss = require('node-xss').clean;
 var git = require('git-rev');
 var csurf = require('csurf');
-// var ddos = new Ddos;
+var ddos = new Ddos;
 var emoji = require('node-emoji');
 
 // Logging
@@ -53,7 +53,7 @@ app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
-// app.use(ddos.express);
+app.use(ddos.express);
 app.use(session);
 app.disable('X-Powered-By');
 
