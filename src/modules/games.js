@@ -67,7 +67,7 @@ var remove_user = function(info, socket) {
 // Gets all ids of players in the given room
 var sockets_in_room = function(room) {
     return Object.keys(current_users).filter(function(id) {
-        return current_users[id][room] !== undefined;
+        return current_users[id][room] !== undefined && current_users[id][room]['instances'] > 0;
     });
 }
 
