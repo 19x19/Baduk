@@ -292,4 +292,9 @@ posOf = function (row, col) {
 
 }
 
+window.selectedMoveIdx = -1;
+window.mostRecentGameState = initialGameState();
+
+window.renderSelectedGameState();
+
 });
