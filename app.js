@@ -11,16 +11,25 @@ var session = require("express-session")({
 var sharedsession = require("express-socket.io-session");
 
 // Setting up HTTPS variables
-var http;
+var http = require('http').Server(app);
+var https = require('https');
+var fs = require('fs');
 if(config.HTTPS) {
-    http = require('https');
-} else {
-    http = require('http').Server(app);
+    const options = {
+        key: fs.readFileSync('../SSL/baduk_ca.key'),
+        cert: fs.readFileSync('../SSL/baduk_ca.crt'),
+        ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
+    };
+    var server = https.createServer(options, app);
 }
 
 // Third-party libraries
-var fs = require('fs');
-var io = require('socket.io')(http);
+var io;
+if(config.HTTPS) {
+    io = require('socket.io')(server);
+} else {
+    io = require('socket.io')(http);
+}
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
 var xss = require('node-xss').clean;
@@ -56,6 +65,27 @@ app.use(ddos.express);
 app.use(session);
 app.disable('X-Powered-By');
 
+// Enable reverse proxy support in Express. This causes the
+// the "X-Forwarded-Proto" header field to be trusted so its
+// value can be used to determine the protocol. See
+// http://expressjs.com/api#app-settings for more details.
+app.enable('trust proxy');
+
+// Add a handler to inspect the req.secure flag (see
+// http://expressjs.com/api#req.secure). This allows us
+// to know whether the request was via http or https.
+if(config.HTTPS) {
+    app.use(function (req, res, next) {
+        if (req.secure) {
+            // Request was via https, so do no special handling
+            next();
+        } else {
+            // Request was via http, so redirect to https
+            res.redirect('https://' + req.headers.host + req.url);
+        }
+    });
+}
+
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
     // General headers for security, ranging from clickjacking protection to
@@ -65,6 +95,9 @@ app.get('/*', function(req, res, next) {
     res.header('X-Robots-Tag', 'noindex');
     res.header('X-XSS-Protection', '1; mode=block');
     res.header('X-Content-Type-Options', 'nosniff');
+    if(config.HTTPS) {
+        res.header('Strict-Tranport-Security', 'max-age=31536000');
+    }
 
     next();
 });
@@ -100,6 +133,11 @@ app.get('/go/:id', function (req, res) {
     } else {
         res.redirect('/');
     }
+});
+
+// 404 page will just redirect to homepage
+app.get('*', function (req, res) {
+    res.redirect('/');
 });
 
 io.use(sharedsession(session));
@@ -213,17 +251,12 @@ io.on('connection', function (socket) {
 
 // Figure out if we want HTTPS or not
 if(config.HTTPS) {
-    const options = {
-        key: fs.readFileSync('../SSL/baduk-key.pem'),
-        cert: fs.readFileSync('../SSL/baduk-cert.pem'),
-        ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
-    };
-    var server = http.createServer(options, app);
-    server.listen(config.port, function(){
-        logger.info('Listening on *:' + config.port);
-    });
-} else {
-    http.listen(config.port, function () {
-        logger.info('Listening on *:' + config.port);
+    server.listen(config.HTTPS_port, function(){
+        logger.info('Listening on *:' + config.HTTPS_port);
     });
 }
+
+// Listen on the normal server too
+http.listen(config.HTTP_port, function () {
+    logger.info('Listening on *:' + config.HTTP_port);
+});

@@ -1,6 +1,7 @@
 var socket = io();
 var room = /[^/]*$/.exec(window.location.pathname)[0];
 var game_started = false;
+var muted = true;
 
 socket.emit('post_new_connect', {
     'room' : room,
@@ -72,6 +73,13 @@ $("#plus_one").on('click', function () {
         'message': ':+1:',
         'room': room,
     });
+});
+
+// Toggles the mute
+$("#toggleMute").on('click', function () {
+    muted = !muted;
+    $("#sound_display").toggleClass("fa-volume-off");
+    $("#sound_display").toggleClass("fa-volume-up");
 });
 
 var appendToChatHistory = function (color, username, message) {

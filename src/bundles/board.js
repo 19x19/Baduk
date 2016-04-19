@@ -1,15 +1,6 @@
-
-// Sets the Border to the board dynamically
-var setBorder = function () {
-    var boardPadding = ($('.board').width() / 17) + 3;
-    $('.board').css('padding', boardPadding).fadeTo(1, .99).fadeTo(1, 1);
-}
-
 $(document).ready(function (e) {
 $('[data-toggle="popover"]').popover();
 
-setBorder();
-setBorder();
 setTimeout (function (){
   if( $('#roommates > pre').length < 2) {
       $('#userWait').modal('show');
@@ -20,18 +11,17 @@ var coordOfClick = function (e) {
     var mouseX = e.pageX;
     var mouseY = e.pageY;
 
-    var boardX = $(".board").offset().left;
-    var boardY = $(".board").offset().top;
+    var boardX = $("#boardContainer svg").offset().left;
+    var boardY = $("#boardContainer svg").offset().top;
 
     var mouseRelX = mouseX - boardX;
     var mouseRelY = mouseY - boardY;
 
-    var mousePctX = mouseRelX / $(".board").width();
-    var mousePctY = mouseRelY / $(".board").height();
+    var mousePctX = mouseRelX / $("#boardContainer svg").width();
+    var mousePctY = mouseRelY / $("#boardContainer svg").height();
 
-    // 0.07 is empirical
-    var mousePicPctX = mousePctX - 0.07;
-    var mousePicPctY = mousePctY - 0.07;
+    var mousePicPctX = mousePctX;
+    var mousePicPctY = mousePctY;
 
     var pieceCoordX = Math.round(mousePicPctX * 8);
     var pieceCoordY = Math.round(mousePicPctY * 8);
@@ -46,6 +36,8 @@ window.onBoardClick = function (e) {
 
     var coordOfClickE = coordOfClick(e);
 
+    console.log(coordOfClickE);
+
     var room = /[^/]*$/.exec(window.location.pathname)[0];
 
     socket.emit('post_new_piece', {
@@ -55,7 +47,7 @@ window.onBoardClick = function (e) {
     });
 }
 
-$('.board').click(window.onBoardClick);
+$('#boardContainer').click(window.onBoardClick);
 
 $('#passBtn').click(function () {
     socket.emit('post_pass', {
@@ -78,29 +70,22 @@ $(window).mousemove(function (e) {
     var pieceCoordX = coordOfClickE.x;
     var pieceCoordY = coordOfClickE.y;
 
-    var stoneSize = $('.board').width() / 8;
+    var stoneSize = $('#boardContainer svg').width() / 8;
     var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
-    $('.ghostPiece').remove();
+    window.renderSelectedGameState();
+    window.ghost_piece = undefined;
+
     if (0 <= pieceCoordX && pieceCoordX < 9
      && 0 <= pieceCoordY && pieceCoordY < 9
      && isLegalMove(window.mostRecentGameState, window.your_color, pieceCoordX, pieceCoordY)
     ) {
-        var ghostPiece = $('<img>', {
-            'class': 'ghostPiece',
-            'src': window.your_color === 'black' ? '/img/black_circle.png' : '/img/white_circle.png',
-            'css': {
-                position: 'absolute',
-                opacity: 0.4,
-                left: posOfStone.x,
-                top: posOfStone.y,
-                width: stoneSize - 2,
-            }
-        });
-        ghostPiece.click(function (event) {
-            window.onBoardClick(event);
-        });
-        $(".inner").prepend(ghostPiece);
+
+        window.ghost_piece = {
+            x: pieceCoordX,
+            y: pieceCoordY,
+        }
+
     }
 
 });
@@ -115,7 +100,7 @@ window.drawDebug = function (gameState) {
 
 window.renderSelectedGameState = function () {
     if (window.mostRecentGameState) {
-        render(window.mostRecentGameState, window.selectedMoveIdx);
+        render(window.mostRecentGameState, window.selectedMoveIdx, window.ghost_piece);
     }
 }
 
@@ -130,8 +115,10 @@ var resultStringOf = function (color, advantage) {
 socket.on('new_game_state', function (gameState) {
 
     // Play the sound for a new piece
-    var move_sound = new Audio("/sounds/move.wav");
-    move_sound.play();
+    if(!muted) {
+        var move_sound = new Audio("/sounds/move.wav");
+        move_sound.play();
+    }
 
     if (gameState.result) {
         $("#gameState").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
@@ -161,14 +148,47 @@ socket.on('move_is_illegal', function (msg) {
     console.log('illegal move');
 });
 
-var render = function (gameState, selectedMoveIdx) {
-    setBorder();
+var render = function (gameState, selectedMoveIdx, ghost_piece) {
 
     var selectedStones = boardStateHistoryOf(gameState)[selectedMoveIdx + 1].stones;
     var selectedMove = gameState.moves[selectedMoveIdx];
 
-    $('.inner').empty().append(imgOfAll(selectedStones, gameState.size, selectedMove));
+    $('#boardContainer').empty().append(boardOf(selectedStones, gameState.size, selectedMove, ghost_piece));
+
     $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState, selectedMoveIdx));
+}
+
+var boardOf = function (selectedStones, boardSize, selectedMove, ghost_piece) {
+
+    var boardContainer = Snap(500, 500);
+
+    boardContainer.image("/img/wood-texture.jpg", 0, 0, 500, 500);
+    boardContainer.image("/img/go_board_9*9.png", 0, 0, 500, 500);
+
+    var stoneStride = 500 / 8;
+    var stoneSize = stoneStride - 2;
+
+    for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+        if (selectedStones[i][j] === 1) {
+            var posOfStone = posOf(i, j);
+            boardContainer.image("/img/black_circle.png", posOfStone.x - (stoneSize / 2), posOfStone.y - (stoneSize / 2), stoneSize, stoneSize);
+        } else if (selectedStones[i][j] === 2) {
+            var posOfStone = posOf(i, j);
+            boardContainer.image("/img/white_circle.png", posOfStone.x - (stoneSize / 2), posOfStone.y - (stoneSize / 2), stoneSize, stoneSize);
+
+        }
+    }
+
+    if (ghost_piece) {
+        console.log('draw ghost piece');
+        var posOfGhostPiece = posOf(ghost_piece.x, ghost_piece.y);
+        var ghostPiece = boardContainer.image("/img/" + window.your_color + "_circle.png", posOfGhostPiece.x - (stoneSize / 2), posOfGhostPiece.y - (stoneSize / 2), stoneSize, stoneSize);
+        ghostPiece.attr({
+            "opacity": 0.5,
+        });
+    }
+
+    return boardContainer.node;
 }
 
 var pairsOf = function (arr) {
@@ -239,8 +259,6 @@ var renderedMoveHistoryOf = function (gameState, selectedMoveIdx) {
             container.append('|');
             container.append(move2);
 
-
-
             return container;
         } else {
             var container = $('<div>');
@@ -265,53 +283,18 @@ var renderedMoveHistoryOf = function (gameState, selectedMoveIdx) {
 }
 
 
-imgOfAll = function (stones, boardSize, mostRecentMove) {
-
-    var ret = [];
-
-    for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
-        if (stones[i][j] === 1) {
-            ret.push(imgOf(i, j, 'black', mostRecentMove));
-        } else if (stones[i][j] === 2) {
-            ret.push(imgOf(i, j, 'white', mostRecentMove));
-        }
-    }
-
-    return ret;
-}
-
 posOf = function (row, col) {
-    var stoneSize = $('.board').width() / 8;
-    var impX = 19;
-    var impY = $('.container').width() > 900 ? 85 : 67;
+    var stoneSize = 500 / 8; // TODO: compute 500 dynamically. board size is not available at compute time though :'(
     return {
-        x: (row * stoneSize) + impX,
-        y: (col * stoneSize) + impY,
+        x: (row * stoneSize),
+        y: (col * stoneSize),
     };
 
 }
 
-imgOf = function (row, col, type, mostRecentMove) {
-    var filename = '/img/' + type + '_circle';
-    if (mostRecentMove.row === row && mostRecentMove.col === col) {
-        filename += '_recent'
-    }
-    filename += '.png';
+window.selectedMoveIdx = -1;
+window.mostRecentGameState = initialGameState();
 
-    var stoneSize = $('.board').width() / 8;
-    var posOfStone = posOf(row, col);
-
-    var css = {
-        'position': 'absolute',
-        'left': posOfStone.x,
-        'top': posOfStone.y,
-        'width': (stoneSize - 2)
-    };
-
-    return $("<img>", {
-        'src': filename,
-        'css': css
-    });
-}
+window.renderSelectedGameState();
 
 });

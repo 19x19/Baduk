@@ -9,6 +9,8 @@
 
     <title>Baduk</title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
+
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -31,14 +33,34 @@
     <!-- Page Content -->
     <div class="container" style="margin-top: 80px">
         <div class="row">
-            <div class="col-md-8">
 
-                <h2>Go</h2>
-                <!-- The board should go here -->
-                <div id="gameState"> Waiting for players to join... </div>
-                <img class="board img-responsive" src="/img/go_board_9*9.png" height="500px" width="500px" alt="error showing the image" style="background-image: url('/img/wood-texture.jpg')">
-                    <!-- The Class where all the stones would go -->
-                    <div class="inner"></div>
+            <div class="col-md-3">
+                <!-- Chat Well -->
+                <div class="well">
+                    <h5>Chat</h5>
+                    Your name is <b><span id="yourName"></span></b> and your color is <b><span id="yourColor"></span></b>
+                    <div id="history" class="chat"></div>
+                    <div class="chat-controls">
+                        <input id="message" class="form-control" />
+                        <button id="send" class="btn">Send</button>
+                        <button id="plus_one" class="btn">👍 </button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- pass / resign -->
+                <center>
+                    <button id="passBtn" class="btn">Pass</button>
+                    <button id="resignBtn" class="btn">Resign</button>
+                    <button id="toggleMute" class="btn"><i id="sound_display" class="fa fa-volume-off" aria-hidden="true"></i></button>
+                </center>
+
+            </div>
+
+            <div class="col-md-6">
+                <!-- Board -->
+                <div id="boardContainer">
                     <!-- User Wait Pop Up-->
                     <div class="modal fade" id="userWait" role="dialog" data-backdrop="static">
                         <div class="modal-dialog">
@@ -55,38 +77,26 @@
                         </div>
                     </div>
                  </img>
+                </div>
+                <div id="gameState"></div>
             </div>
 
-            <div class="col-md-4">
-                <!-- Chat Well -->
-                <div class="well">
-                    <h5>Chat</h5>
-                    Your name is <b><span id="yourName"></span></b> and your color is <b><span id="yourColor"></span></b>
-                    <div id="history" class="chat"></div>
-                    <div class=" col-xs-7">
-                        <input id="message" class="form-control" />
-                    </div>
-                    <button id="send" class="btn">Send</button>
-                    <button id="plus_one" class="btn">👍 </button>
-                </div>
-                <hr>
-                <!-- pass / resign -->
-                <center>
-                    <button id="passBtn" class="btn">Pass</button>
-                    <button id="resignBtn" class="btn">Resign</button>
-                </center>
-                <hr>
-                <div class="well">
-                <h5>Move history</h5>
-                <div id="moveHistory">
-                </div>
-                </div>
-                <!-- Roommate Well -->
-                <hr>
+            <div class="col-md-3">
+                <!-- Roommates -->
                 <div class="well">
                     <h5>Roommates</h5>
                     <div id="roommates"></div>
                 </div>
+
+                <hr>
+
+                <!-- Move history -->
+                <div class="well">
+                    <h5>Move History</h5>
+                    <div id="moveHistory">
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
