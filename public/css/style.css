@@ -31,6 +31,12 @@ pre {
 	background-color: #966F33;
 }
 
+.chat-controls {
+   display: -webkit-flex;
+   display: flex;
+   -webkit-flex-direction: row;
+   flex-direction: row;
+}
 
 .board {
 	border: 1px solid black;
