@@ -205,10 +205,11 @@ var Board = React.createClass({
             <circle cx={50} cy={50} r={10} fill="red" />
             <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={500} height={500} />
             <image xlinkHref="/img/go_board_9*9.png" width={500} height={500} />
-            {stones.map(function (stone) {
+            {stones.map(function (stone, i) {
                 var posOfStone = posOf(stone.x, stone.y);
                 if (stone.color === 'white') {
                     return <image 
+                        key={i}
                         xlinkHref="/img/white_circle.png"
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
@@ -216,6 +217,7 @@ var Board = React.createClass({
                         height={stoneSize} />           
                 } else if (stone.color === 'black') {
                     return <image 
+                        key={i}
                         xlinkHref={"/img/black_circle.png"}
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
