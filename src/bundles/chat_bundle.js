@@ -78,6 +78,8 @@ $("#plus_one").on('click', function () {
 // Toggles the mute
 $("#toggleMute").on('click', function () {
     muted = !muted;
+    $("#sound_display").toggleClass("fa-volume-off");
+    $("#sound_display").toggleClass("fa-volume-up");
 });
 
 var appendToChatHistory = function (color, username, message) {
