@@ -75,6 +75,11 @@ $("#plus_one").on('click', function () {
     });
 });
 
+// Toggles the mute
+$("#toggleMute").on('click', function () {
+    muted = !muted;
+});
+
 var appendToChatHistory = function (color, username, message) {
     $("#history").append(
         "<pre>" + wrapName(color, username) + ': ' + message + '</pre>'
