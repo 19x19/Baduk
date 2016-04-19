@@ -153,7 +153,9 @@ var render = function (gameState, selectedMoveIdx, ghost_piece) {
     var selectedStones = boardStateHistoryOf(gameState)[selectedMoveIdx + 1].stones;
     var selectedMove = gameState.moves[selectedMoveIdx];
 
-    $('#boardContainer').empty().append(boardOf(selectedStones, gameState.size, selectedMove, ghost_piece));
+    var rendered = boardOf(selectedStones, gameState.size, selectedMove, ghost_piece);
+    $('#boardContainer').append(rendered);
+    $('#boardContainer').children().first().remove();
 
     $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState, selectedMoveIdx));
 }
