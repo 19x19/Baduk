@@ -1,6 +1,7 @@
 var socket = io();
 var room = /[^/]*$/.exec(window.location.pathname)[0];
 var game_started = false;
+var muted = true;
 
 socket.emit('post_new_connect', {
     'room' : room,

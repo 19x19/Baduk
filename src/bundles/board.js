@@ -130,8 +130,10 @@ var resultStringOf = function (color, advantage) {
 socket.on('new_game_state', function (gameState) {
 
     // Play the sound for a new piece
-    var move_sound = new Audio("/sounds/move.wav");
-    move_sound.play();
+    if(!muted) {
+        var move_sound = new Audio("/sounds/move.wav");
+        move_sound.play();
+    }
 
     if (gameState.result) {
         $("#gameState").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
