@@ -209,7 +209,7 @@ var Board = React.createClass({
                 var posOfStone = posOf(stone.x, stone.y);
                 if (stone.color === 'white') {
                     return <image 
-                        key={i}
+                        key={"white-" + stone.x + "-" + stone.y}
                         xlinkHref="/img/white_circle.png"
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
@@ -217,7 +217,7 @@ var Board = React.createClass({
                         height={stoneSize} />           
                 } else if (stone.color === 'black') {
                     return <image 
-                        key={i}
+                        key={"black-" + stone.x + "-" + stone.y}
                         xlinkHref={"/img/black_circle.png"}
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
