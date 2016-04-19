@@ -11,14 +11,14 @@ var coordOfClick = function (e) {
     var mouseX = e.pageX;
     var mouseY = e.pageY;
 
-    var boardX = $("#boardContainer svg").offset().left;
-    var boardY = $("#boardContainer svg").offset().top;
+    var boardX = $(ReactDOM.findDOMNode(reactBoardElement)).offset().left;
+    var boardY = $(ReactDOM.findDOMNode(reactBoardElement)).offset().top;
 
     var mouseRelX = mouseX - boardX;
     var mouseRelY = mouseY - boardY;
 
-    var mousePctX = mouseRelX / $("#boardContainer svg").width();
-    var mousePctY = mouseRelY / $("#boardContainer svg").height();
+    var mousePctX = mouseRelX / 500;
+    var mousePctY = mouseRelY / 500;
 
     var mousePicPctX = mousePctX;
     var mousePicPctY = mousePctY;
@@ -47,8 +47,6 @@ window.onBoardClick = function (e) {
     });
 }
 
-$('#boardContainer').click(window.onBoardClick);
-
 $('#passBtn').click(function () {
     socket.emit('post_pass', {
         'room': room
@@ -70,10 +68,9 @@ $(window).mousemove(function (e) {
     var pieceCoordX = coordOfClickE.x;
     var pieceCoordY = coordOfClickE.y;
 
-    var stoneSize = $('#boardContainer svg').width() / 8;
+    var stoneSize = 500 / 8;
     var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
-    window.renderSelectedGameState();
     window.ghost_piece = undefined;
 
     if (0 <= pieceCoordX && pieceCoordX < 9
@@ -81,6 +78,12 @@ $(window).mousemove(function (e) {
      && isLegalMove(window.mostRecentGameState, window.your_color, pieceCoordX, pieceCoordY)
     ) {
 
+        window.reactBoardElement.setState({
+            'ghostPiece': {
+                x: pieceCoordX,
+                y: pieceCoordY
+            }
+        });
         window.ghost_piece = {
             x: pieceCoordX,
             y: pieceCoordY,
@@ -91,17 +94,11 @@ $(window).mousemove(function (e) {
 });
 
 $(window).resize(function () {
-     window.renderSelectedGameState();
+    // TBD
 });
 
 window.drawDebug = function (gameState) {
     $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
-}
-
-window.renderSelectedGameState = function () {
-    if (window.mostRecentGameState) {
-        render(window.mostRecentGameState, window.selectedMoveIdx, window.ghost_piece);
-    }
 }
 
 var resultStringOf = function (color, advantage) {
@@ -127,6 +124,9 @@ socket.on('new_game_state', function (gameState) {
     } else {
         $("#gameState").text('Black to play');
     }
+
+
+
     window.mostRecentGameState = gameState;
 
     if (gameState.moves.length > 0) {
@@ -141,57 +141,105 @@ socket.on('new_game_state', function (gameState) {
     }
 
     window.selectedMoveIdx = gameState.moves.length - 1;
-    window.renderSelectedGameState();
+
+    window.reactBoardElement.setState({
+        mostRecentGameState: gameState,
+        selectedMoveIdx: gameState.moves.length - 1,
+    });
 });
 
 socket.on('move_is_illegal', function (msg) {
     console.log('illegal move');
 });
 
-var render = function (gameState, selectedMoveIdx, ghost_piece) {
-
-    var selectedStones = boardStateHistoryOf(gameState)[selectedMoveIdx + 1].stones;
-    var selectedMove = gameState.moves[selectedMoveIdx];
-
-    var rendered = boardOf(selectedStones, gameState.size, selectedMove, ghost_piece);
-    $('#boardContainer').append(rendered);
-    $('#boardContainer').children().first().remove();
-
-    $('#moveHistory').empty().append(renderedMoveHistoryOf(gameState, selectedMoveIdx));
-}
-
-var boardOf = function (selectedStones, boardSize, selectedMove, ghost_piece) {
-
-    var boardContainer = Snap(500, 500);
-
-    boardContainer.image("/img/wood-texture.jpg", 0, 0, 500, 500);
-    boardContainer.image("/img/go_board_9*9.png", 0, 0, 500, 500);
-
-    var stoneStride = 500 / 8;
-    var stoneSize = stoneStride - 2;
-
-    for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
-        if (selectedStones[i][j] === 1) {
-            var posOfStone = posOf(i, j);
-            boardContainer.image("/img/black_circle.png", posOfStone.x - (stoneSize / 2), posOfStone.y - (stoneSize / 2), stoneSize, stoneSize);
-        } else if (selectedStones[i][j] === 2) {
-            var posOfStone = posOf(i, j);
-            boardContainer.image("/img/white_circle.png", posOfStone.x - (stoneSize / 2), posOfStone.y - (stoneSize / 2), stoneSize, stoneSize);
-
+var Board = React.createClass({
+    getInitialState: function () {
+        return {
+            mostRecentGameState: initialGameState(),
+            selectedMoveIdx: -1,
+            ghostPiece: null,
         }
-    }
+    },
+    handleClick: function (e) {
+        window.onBoardClick(e);
+    },
+    render: function () {
 
-    if (ghost_piece) {
-        console.log('draw ghost piece');
-        var posOfGhostPiece = posOf(ghost_piece.x, ghost_piece.y);
-        var ghostPiece = boardContainer.image("/img/" + window.your_color + "_circle.png", posOfGhostPiece.x - (stoneSize / 2), posOfGhostPiece.y - (stoneSize / 2), stoneSize, stoneSize);
-        ghostPiece.attr({
-            "opacity": 0.5,
-        });
-    }
+        var selectedStones = boardStateHistoryOf(this.state.mostRecentGameState)[this.state.selectedMoveIdx + 1].stones;
+        var selectedMove = this.state.mostRecentGameState.moves[this.state.selectedMoveIdx];
 
-    return boardContainer.node;
-}
+        var stones = [];
+        var boardSize = this.state.mostRecentGameState.size;
+
+        var stoneStride = 500 / 8;
+        var stoneSize = stoneStride - 2;
+
+        for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+            if (selectedStones[i][j] === 1) {
+                stones.push({
+                    x: i,
+                    y: j,
+                    color: 'black',
+                });
+            } else if (selectedStones[i][j] === 2) {
+                stones.push({
+                    x: i,
+                    y: j,
+                    color: 'white',
+                });
+            }
+        }
+
+        if (this.state.ghostPiece) {
+            // monads yo
+            var ghostPieces = [this.state.ghostPiece];
+        } else {
+            var ghostPieces = [];
+        }
+
+        return <svg 
+            height="500" 
+            width="500"
+            onClick={this.handleClick}
+        >
+            <circle cx={50} cy={50} r={10} fill="red" />
+            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={500} height={500} />
+            <image xlinkHref="/img/go_board_9*9.png" width={500} height={500} />
+            {stones.map(function (stone) {
+                var posOfStone = posOf(stone.x, stone.y);
+                if (stone.color === 'white') {
+                    return <image 
+                        xlinkHref="/img/white_circle.png"
+                        x={posOfStone.x - (stoneSize / 2)}
+                        y={posOfStone.y - (stoneSize / 2)}
+                        width={stoneSize}
+                        height={stoneSize} />           
+                } else if (stone.color === 'black') {
+                    return <image 
+                        xlinkHref={"/img/black_circle.png"}
+                        x={posOfStone.x - (stoneSize / 2)}
+                        y={posOfStone.y - (stoneSize / 2)}
+                        width={stoneSize}
+                        height={stoneSize} />  
+                }
+            })}
+            {ghostPieces.map(function (ghostPiece) {
+                var posOfStone = posOf(ghostPiece.x, ghostPiece.y);
+                return <image 
+                    xlinkHref={"/img/" + window.your_color + "_circle.png"}
+                    x={posOfStone.x - (stoneSize / 2)}
+                    y={posOfStone.y - (stoneSize / 2)}
+                    width={stoneSize}
+                    height={stoneSize}
+                    opacity={0.5} />
+            })}
+        </svg>
+    }
+});
+
+window.reactBoardElement = ReactDOM.render(
+  <Board />, document.getElementById('reactBoardContainer')
+);
 
 var pairsOf = function (arr) {
     // return array of pairs [[arr[0], arr[1]], [arr[2], arr[3]] ...]
@@ -285,7 +333,7 @@ var renderedMoveHistoryOf = function (gameState, selectedMoveIdx) {
 }
 
 
-posOf = function (row, col) {
+var posOf = function (row, col) {
     var stoneSize = 500 / 8; // TODO: compute 500 dynamically. board size is not available at compute time though :'(
     return {
         x: (row * stoneSize),
@@ -296,7 +344,5 @@ posOf = function (row, col) {
 
 window.selectedMoveIdx = -1;
 window.mostRecentGameState = initialGameState();
-
-window.renderSelectedGameState();
 
 });
