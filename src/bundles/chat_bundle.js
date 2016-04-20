@@ -33,6 +33,9 @@ var updateRoommates = function(roommates, exclude) {
 
 // Get a message when a new user connects
 socket.on('get_new_connect', function(info) {
+    if( $('#roommates > pre').length < 1) {
+        $('#userWait').modal('show');
+    }
     $("#history").append(
         "<pre><i>" + info.username + " has connected.</i></pre>"
     );
