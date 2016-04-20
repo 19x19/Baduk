@@ -3,12 +3,14 @@ var moniker = require('moniker');
 var schedule = require('node-schedule');
 
 /*
-    Javascript module for general games (NOT GO SPECIFIC!)
+    Javascript module for games.
 */
 
 var current_games = [];
 var current_users = {};
 
+// Generates the hash of the next game. Should probably increase the entropy
+// here at some point as it's limited by Math.random().
 var game_hash = function() {
     return function() {
         do {
@@ -20,21 +22,25 @@ var game_hash = function() {
 };
 var current_hash = game_hash();
 
+// Returns true if the given hash is a current game
 var game_exists = function(hash) {
-    return current_games.indexOf(hash) >= 0;
+    return current_games.indexOf(hash) > -1;
 };
 
 // Adds a user to the given room
 var add_user = function(info, socket) {
+    // If the user has no current session with sockets, create a new user
     if(current_users[socket.handshake.session.id] === undefined) {
         current_users[socket.handshake.session.id] = {};
         current_users[socket.handshake.session.id]['username'] = moniker.choose();
     }
+
+    // If the user hasn't been to this room, increment his instances
     if(current_users[socket.handshake.session.id][info.room] === undefined) {
         current_users[socket.handshake.session.id][info.room] = {};
         current_users[socket.handshake.session.id][info.room]['instances'] = 0;
 
-        // Determine the color randomly
+        // Assign the color of the player in this room
         var current_sockets = sockets_in_room(info.room);
         if(current_sockets.length == 0) {
             // If there are no players, randomly assign a color
@@ -44,16 +50,20 @@ var add_user = function(info, socket) {
             var other_color = current_users[current_sockets[0]][info.room]['color'];
             current_users[socket.handshake.session.id][info.room]['color'] = (other_color === 'white' ? 'black' : 'white');
         } else {
-            // If there is already two players in the room, no color
+            // If there are already two players in the room, no color
             current_users[socket.handshake.session.id][info.room]['color'] = 'Spectator';
         }
     }
 
+    // Increment the number of instances in this room for this user
     current_users[socket.handshake.session.id][info.room]['instances'] += 1;
+
+    // Tell the user their color
     socket.emit('your_color', {
         color: current_users[socket.handshake.session.id][info.room].color,
     });
 
+    // Add the user to the given Socket.IO room
     socket.room = info.room;
     socket.join(info.room);
 }
@@ -82,14 +92,15 @@ var players_in_room = function(room) {
 // Cleanse all rooms that are empty every 12 hours. Also cleanse the users who
 // have zero instances.
 var cleanse = schedule.scheduleJob('0 0 12 * * *', function() {
-    // First cleanse the rooms
+    // Cleanse the rooms
     for (var room in current_games) {
         if(players_in_room(room).length == 0) {
             var index = current_games.indexOf(room);
             delete players_in_room[index];
         }
     }
-    // Next, cleanse the users
+
+    // Cleanse the users
     for(var id in current_users) {
         var in_game = false;
         for(var room in current_users[i]) {
