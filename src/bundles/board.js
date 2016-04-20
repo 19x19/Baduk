@@ -77,19 +77,31 @@ var Board = React.createClass({
             selectedMoveIdx: -1,
             ghostPiece: null,
             boardSize: 500,
-            borderSize: 20,
+            borderSize: 60,
         }
+    },
+    gridSize: function () {
+        var boardSize = this.state.boardSize;
+        var borderSize = this.state.borderSize;
+        return boardSize - 2*borderSize;
+    },
+    posOf: function (row, col) {
+        var stoneSize = this.gridSize() / 8;
+        return {
+            x: this.state.borderSize + (row * stoneSize),
+            y: this.state.borderSize + (col * stoneSize),
+        };
     },
     coordOfClick: function (mouseX, mouseY) {
 
         var boardX = $(ReactDOM.findDOMNode(this)).offset().left;
         var boardY = $(ReactDOM.findDOMNode(this)).offset().top;
 
-        var mouseRelX = mouseX - boardX;
-        var mouseRelY = mouseY - boardY;
+        var mouseRelX = mouseX - boardX - this.state.borderSize;
+        var mouseRelY = mouseY - boardY - this.state.borderSize;
 
-        var mousePctX = mouseRelX / 500;
-        var mousePctY = mouseRelY / 500;
+        var mousePctX = mouseRelX / this.gridSize();
+        var mousePctY = mouseRelY / this.gridSize();
 
         var mousePicPctX = mousePctX;
         var mousePicPctY = mousePctY;
@@ -121,8 +133,8 @@ var Board = React.createClass({
         var pieceCoordX = coordOfClickE.x;
         var pieceCoordY = coordOfClickE.y;
 
-        var stoneSize = 500 / 8;
-        var posOfStone = posOf(pieceCoordX, pieceCoordY);
+        var stoneSize = this.gridSize() / 8;
+        var posOfStone = this.posOf(pieceCoordX, pieceCoordY);
 
         if (0 <= pieceCoordX && pieceCoordX < 9
          && 0 <= pieceCoordY && pieceCoordY < 9
@@ -145,7 +157,7 @@ var Board = React.createClass({
         var stones = [];
         var boardSize = this.state.mostRecentGameState.size;
 
-        var stoneStride = 500 / 8;
+        var stoneStride = this.gridSize() / 8;
         var stoneSize = stoneStride - 2;
 
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
@@ -173,16 +185,25 @@ var Board = React.createClass({
             var ghostPieces = [];
         }
 
+        var boardSize = this.state.boardSize;
+        var borderSize = this.state.borderSize;
+        var gridSize = boardSize - 2*borderSize;
+
+        var self = this;
+
         return <svg
-            height="500"
-            width="500"
+            height={this.state.boardSize}
+            width={this.state.boardSize}
             onClick={this.handleClick}
         >
-            <circle cx={50} cy={50} r={10} fill="red" />
-            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={500} height={500} />
-            <image xlinkHref="/img/go_board_9*9.png" width={500} height={500} />
+            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSize} height={boardSize} />
+            <image xlinkHref="/img/go_board_9*9.png" 
+                width={gridSize} 
+                height={gridSize} 
+                x={borderSize}
+                y={borderSize} />
             {stones.map(function (stone, i) {
-                var posOfStone = posOf(stone.x, stone.y);
+                var posOfStone = self.posOf(stone.x, stone.y);
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image
                         key={stone.color + "-" + stone.x + "-" + stone.y}
@@ -194,7 +215,7 @@ var Board = React.createClass({
                 }
             })}
             {ghostPieces.map(function (ghostPiece) {
-                var posOfStone = posOf(ghostPiece.x, ghostPiece.y);
+                var posOfStone = self.posOf(ghostPiece.x, ghostPiece.y);
                 return <image
                     key="ghostPiece"
                     xlinkHref={"/img/" + window.your_color + "_circle.png"}
@@ -244,15 +265,6 @@ var reprOfMove = function (move) {
     }
     if (move.action === undefined) throw "no action in " + JSON.stringify(move);
     throw "unrecognized move action " + move.action;
-}
-
-var posOf = function (row, col) {
-    var stoneSize = 500 / 8; // TODO: compute 500 dynamically. board size is not available at compute time though :'(
-    return {
-        x: (row * stoneSize),
-        y: (col * stoneSize),
-    };
-
 }
 
 });
