@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,9 +9,8 @@
     <title>Baduk</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
-    <!--NOTE: we cannot upgrade to react 15 until https://github.com/facebook/react/pull/6471 lands-->
+    <!-- NOTE: we cannot upgrade to react 15 until https://github.com/facebook/react/pull/6471 lands [zodiac] -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.6/react-with-addons.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.6/react-dom.js"></script>
 
@@ -23,6 +21,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="../bower_components/components-font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
+
     <!-- Google Analytics -->
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -39,7 +38,6 @@
     </script>
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
-    <!-- End Cookie Consent plugin -->
 </head>
 
 <body>
@@ -55,11 +53,7 @@
                 <div class="chat-controls">
                     <input id="message" class="form-control" />
                     <button id="send" class="btn"><i class="material-icons">&#xE163;</i></button>
-                    <!-- <button id="plus_one" class="btn"><i class="material-icons">&#xE815;</i></button> -->
                 </div>
-
-                <!-- pass / resign -->
-
             </div>
 
             <div class="col-md-6 go-board">
@@ -81,7 +75,6 @@
                             </div>
                         </div>
                     </div>
-                 </img>
                 </div>
                 <div id="gameState"></div>
                 <div class="buttons">
@@ -97,7 +90,6 @@
                     <h5>Roommates</h5>
                     <div id="roommates"></div>
                 </div>
-
 
                 <!-- Move history -->
                 <div class="well move-history">
