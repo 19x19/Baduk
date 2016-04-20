@@ -139,14 +139,16 @@ var Board = React.createClass({
         if (0 <= pieceCoordX && pieceCoordX < 9
          && 0 <= pieceCoordY && pieceCoordY < 9
         ) {
-
             window.reactBoardElement.setState({
                 'ghostPiece': {
                     x: pieceCoordX,
                     y: pieceCoordY
                 }
             });
-
+        } else {
+            window.reactBoardElement.setState({
+                'ghostPiece': null,
+            });
         }
     },
     render: function () {
