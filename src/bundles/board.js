@@ -40,9 +40,7 @@ $('#resignBtn').click(function () {
 });
 
 $(window).mousemove(function (e) {
-
     reactBoardElement.handleMouseMove(e);
-
 });
 
 $(window).resize(function () {
@@ -132,8 +130,6 @@ var Board = React.createClass({
         var stoneSize = 500 / 8;
         var posOfStone = posOf(pieceCoordX, pieceCoordY);
 
-        window.ghost_piece = undefined;
-
         if (0 <= pieceCoordX && pieceCoordX < 9
          && 0 <= pieceCoordY && pieceCoordY < 9
         ) {
@@ -144,10 +140,6 @@ var Board = React.createClass({
                     y: pieceCoordY
                 }
             });
-            window.ghost_piece = {
-                x: pieceCoordX,
-                y: pieceCoordY,
-            }
 
         }
     },
