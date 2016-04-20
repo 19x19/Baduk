@@ -79,12 +79,26 @@ var players_in_room = function(room) {
     });
 }
 
-// Cleanse all rooms that are empty every 12 hours
+// Cleanse all rooms that are empty every 12 hours. Also cleanse the users who
+// have zero instances.
 var cleanse = schedule.scheduleJob('0 0 12 * * *', function() {
+    // First cleanse the rooms
     for (var room in current_games) {
         if(players_in_room(room).length == 0) {
             var index = current_games.indexOf(room);
             delete players_in_room[index];
+        }
+    }
+    // Next, cleanse the users
+    for(var id in current_users) {
+        var in_game = false;
+        for(var room in current_users[i]) {
+            if(current_users[id][room]['instances'] > 0) {
+                in_game = true;
+            }
+        }
+        if(!in_game) {
+            delete current_users[id];
         }
     }
 });
