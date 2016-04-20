@@ -27,21 +27,6 @@ var coordOfClick = function (e) {
     }
 }
 
-window.onBoardClick = function (e) {
-
-    var coordOfClickE = coordOfClick(e);
-
-    console.log(coordOfClickE);
-
-    var room = /[^/]*$/.exec(window.location.pathname)[0];
-
-    socket.emit('post_new_piece', {
-        'row': coordOfClickE.x,
-        'col': coordOfClickE.y,
-        'room': room
-    });
-}
-
 $('#passBtn').click(function () {
     socket.emit('post_pass', {
         'room': room
@@ -56,34 +41,7 @@ $('#resignBtn').click(function () {
 
 $(window).mousemove(function (e) {
 
-    if (typeof(window.your_color) === 'undefined') return;
-
-    var coordOfClickE = coordOfClick(e);
-
-    var pieceCoordX = coordOfClickE.x;
-    var pieceCoordY = coordOfClickE.y;
-
-    var stoneSize = 500 / 8;
-    var posOfStone = posOf(pieceCoordX, pieceCoordY);
-
-    window.ghost_piece = undefined;
-
-    if (0 <= pieceCoordX && pieceCoordX < 9
-     && 0 <= pieceCoordY && pieceCoordY < 9
-    ) {
-
-        window.reactBoardElement.setState({
-            'ghostPiece': {
-                x: pieceCoordX,
-                y: pieceCoordY
-            }
-        });
-        window.ghost_piece = {
-            x: pieceCoordX,
-            y: pieceCoordY,
-        }
-
-    }
+    reactBoardElement.handleMouseMove(e);
 
 });
 
@@ -119,8 +77,6 @@ socket.on('new_game_state', function (gameState) {
         $("#gameState").text('Black to play');
     }
 
-
-
     window.mostRecentGameState = gameState;
 
     if (gameState.moves.length > 0) {
@@ -150,10 +106,50 @@ var Board = React.createClass({
             mostRecentGameState: initialGameState(),
             selectedMoveIdx: -1,
             ghostPiece: null,
+            boardSize: 500,
+            borderSize: 20,
         }
     },
     handleClick: function (e) {
-        window.onBoardClick(e);
+        var coordOfClickE = coordOfClick(e);
+
+        var room = /[^/]*$/.exec(window.location.pathname)[0];
+
+        socket.emit('post_new_piece', {
+            'row': coordOfClickE.x,
+            'col': coordOfClickE.y,
+            'room': room
+        });
+    },
+    handleMouseMove: function (e) {
+        if (typeof(window.your_color) === 'undefined') return;
+
+        var coordOfClickE = coordOfClick(e);
+
+        var pieceCoordX = coordOfClickE.x;
+        var pieceCoordY = coordOfClickE.y;
+
+        var stoneSize = 500 / 8;
+        var posOfStone = posOf(pieceCoordX, pieceCoordY);
+
+        window.ghost_piece = undefined;
+
+        if (0 <= pieceCoordX && pieceCoordX < 9
+         && 0 <= pieceCoordY && pieceCoordY < 9
+        ) {
+
+            window.reactBoardElement.setState({
+                'ghostPiece': {
+                    x: pieceCoordX,
+                    y: pieceCoordY
+                }
+            });
+            window.ghost_piece = {
+                x: pieceCoordX,
+                y: pieceCoordY,
+            }
+
+        }
     },
     render: function () {
 
