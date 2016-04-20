@@ -1,4 +1,28 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,700);
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 18px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
 *{
     font-family: "Lato";
     font-weight: 300;
@@ -147,4 +171,69 @@ section.header .main-header button:hover{
 }
 .info .info-content h4{
     font-weight: 700;
+}
+.go{
+    display: flex;
+}
+.go .well{
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+.go input{
+    box-shadow: none;
+    border-radius: 0;
+    border:1px solid #DA695B;
+    background:  #DA695B;
+    color: #fff;
+    transition: 0.3s all;
+    font-family: "Lato";
+}
+.go input:focus{
+    box-shadow: none;
+    border-radius: 0;
+    border:1px solid #DA695B;
+    background:  #B4485B;
+    color: #fff;
+    font-family: "Lato";
+}
+.go p{
+    font-size: 14px;
+}
+.go .buttons{
+    display: flex;
+}
+.go .chat{
+    flex-grow: 1;
+}
+.go .chat-controls button{
+    color: #DA695B;
+    background-color: #fff;
+    font-size: 10px;
+}
+.go .buttons button{
+    border-radius: 0;
+    background-color: #DA695B;
+    color:#fff;
+    transition: 0.1s all;
+    margin-right: 5px;
+    flex: 1;
+}
+.go .buttons button:hover{
+    background:  #B4485B;
+}
+.go .buttons button:nth-last-child(1){
+    flex: none;
+}
+.go .move-history{
+    margin-top: 20px;
+}
+.go .go-board{
+    width: 535px;
+}
+.go .sidebar-right{
+    flex:1;
 }
