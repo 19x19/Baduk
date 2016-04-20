@@ -201,22 +201,14 @@ var Board = React.createClass({
             <image xlinkHref="/img/go_board_9*9.png" width={500} height={500} />
             {stones.map(function (stone, i) {
                 var posOfStone = posOf(stone.x, stone.y);
-                if (stone.color === 'white') {
+                if (stone.color === 'white' || stone.color === 'black') {
                     return <image 
-                        key={"white-" + stone.x + "-" + stone.y}
-                        xlinkHref="/img/white_circle.png"
+                        key={stone.color + "-" + stone.x + "-" + stone.y}
+                        xlinkHref={"/img/" + stone.color + "_circle.png"}
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
                         width={stoneSize}
                         height={stoneSize} />           
-                } else if (stone.color === 'black') {
-                    return <image 
-                        key={"black-" + stone.x + "-" + stone.y}
-                        xlinkHref={"/img/black_circle.png"}
-                        x={posOfStone.x - (stoneSize / 2)}
-                        y={posOfStone.y - (stoneSize / 2)}
-                        width={stoneSize}
-                        height={stoneSize} />  
                 }
             })}
             {ghostPieces.map(function (ghostPiece) {
