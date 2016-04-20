@@ -1,32 +1,6 @@
 $(document).ready(function (e) {
 $('[data-toggle="popover"]').popover();
 
-
-var coordOfClick = function (e) {
-    var mouseX = e.pageX;
-    var mouseY = e.pageY;
-
-    var boardX = $(ReactDOM.findDOMNode(reactBoardElement)).offset().left;
-    var boardY = $(ReactDOM.findDOMNode(reactBoardElement)).offset().top;
-
-    var mouseRelX = mouseX - boardX;
-    var mouseRelY = mouseY - boardY;
-
-    var mousePctX = mouseRelX / 500;
-    var mousePctY = mouseRelY / 500;
-
-    var mousePicPctX = mousePctX;
-    var mousePicPctY = mousePctY;
-
-    var pieceCoordX = Math.round(mousePicPctX * 8);
-    var pieceCoordY = Math.round(mousePicPctY * 8);
-
-    return {
-        x: pieceCoordX,
-        y: pieceCoordY
-    }
-}
-
 $('#passBtn').click(function () {
     socket.emit('post_pass', {
         'room': room
@@ -106,8 +80,30 @@ var Board = React.createClass({
             borderSize: 20,
         }
     },
+    coordOfClick: function (mouseX, mouseY) {
+
+        var boardX = $(ReactDOM.findDOMNode(this)).offset().left;
+        var boardY = $(ReactDOM.findDOMNode(this)).offset().top;
+
+        var mouseRelX = mouseX - boardX;
+        var mouseRelY = mouseY - boardY;
+
+        var mousePctX = mouseRelX / 500;
+        var mousePctY = mouseRelY / 500;
+
+        var mousePicPctX = mousePctX;
+        var mousePicPctY = mousePctY;
+
+        var pieceCoordX = Math.round(mousePicPctX * 8);
+        var pieceCoordY = Math.round(mousePicPctY * 8);
+
+        return {
+            x: pieceCoordX,
+            y: pieceCoordY
+        }
+    },
     handleClick: function (e) {
-        var coordOfClickE = coordOfClick(e);
+        var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
 
         var room = /[^/]*$/.exec(window.location.pathname)[0];
 
@@ -120,7 +116,7 @@ var Board = React.createClass({
     handleMouseMove: function (e) {
         if (typeof(window.your_color) === 'undefined') return;
 
-        var coordOfClickE = coordOfClick(e);
+        var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
 
         var pieceCoordX = coordOfClickE.x;
         var pieceCoordY = coordOfClickE.y;
@@ -200,6 +196,7 @@ var Board = React.createClass({
             {ghostPieces.map(function (ghostPiece) {
                 var posOfStone = posOf(ghostPiece.x, ghostPiece.y);
                 return <image
+                    key="ghostPiece"
                     xlinkHref={"/img/" + window.your_color + "_circle.png"}
                     x={posOfStone.x - (stoneSize / 2)}
                     y={posOfStone.y - (stoneSize / 2)}
