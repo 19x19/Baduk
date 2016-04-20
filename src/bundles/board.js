@@ -183,7 +183,7 @@ var Board = React.createClass({
         }
 
 
-        if (this.state.ghostPiece && 
+        if (this.state.ghostPiece &&
             isLegalMove(this.state.mostRecentGameState, window.your_color, this.state.ghostPiece.x, this.state.ghostPiece.y)) {
             // monads yo
             var ghostPieces = [this.state.ghostPiece];
@@ -191,8 +191,8 @@ var Board = React.createClass({
             var ghostPieces = [];
         }
 
-        return <svg 
-            height="500" 
+        return <svg
+            height="500"
             width="500"
             onClick={this.handleClick}
         >
@@ -202,18 +202,18 @@ var Board = React.createClass({
             {stones.map(function (stone, i) {
                 var posOfStone = posOf(stone.x, stone.y);
                 if (stone.color === 'white' || stone.color === 'black') {
-                    return <image 
+                    return <image
                         key={stone.color + "-" + stone.x + "-" + stone.y}
                         xlinkHref={"/img/" + stone.color + "_circle.png"}
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
                         width={stoneSize}
-                        height={stoneSize} />           
+                        height={stoneSize} />
                 }
             })}
             {ghostPieces.map(function (ghostPiece) {
                 var posOfStone = posOf(ghostPiece.x, ghostPiece.y);
-                return <image 
+                return <image
                     xlinkHref={"/img/" + window.your_color + "_circle.png"}
                     x={posOfStone.x - (stoneSize / 2)}
                     y={posOfStone.y - (stoneSize / 2)}
