@@ -70,7 +70,6 @@ $(window).mousemove(function (e) {
 
     if (0 <= pieceCoordX && pieceCoordX < 9
      && 0 <= pieceCoordY && pieceCoordY < 9
-     && isLegalMove(window.mostRecentGameState, window.your_color, pieceCoordX, pieceCoordY)
     ) {
 
         window.reactBoardElement.setState({
@@ -135,8 +134,6 @@ socket.on('new_game_state', function (gameState) {
         }
     }
 
-    window.selectedMoveIdx = gameState.moves.length - 1;
-
     window.reactBoardElement.setState({
         mostRecentGameState: gameState,
         selectedMoveIdx: gameState.moves.length - 1,
@@ -185,7 +182,9 @@ var Board = React.createClass({
             }
         }
 
-        if (this.state.ghostPiece) {
+
+        if (this.state.ghostPiece && 
+            isLegalMove(this.state.mostRecentGameState, window.your_color, this.state.ghostPiece.x, this.state.ghostPiece.y)) {
             // monads yo
             var ghostPieces = [this.state.ghostPiece];
         } else {
@@ -272,64 +271,6 @@ var reprOfMove = function (move) {
     throw "unrecognized move action " + move.action;
 }
 
-var renderedMoveHistoryOf = function (gameState, selectedMoveIdx) {
-    return pairsOf(gameState.moves).map(function (moves) {
-        if (moves.length === 2) {
-
-            var container = $('<div>');
-
-            var move1 = $('<span>', {
-                text: reprOfMove(moves[0].elem),
-            });
-            var move2 = $('<span>', {
-                text: reprOfMove(moves[1].elem),
-            });
-
-            if (moves[0].idx === selectedMoveIdx) {
-                move1.css('font-weight', 'bold');
-            } else if (moves[1].idx === selectedMoveIdx) {
-                move2.css('font-weight', 'bold');
-            }
-
-            move1.click(function () {
-                console.log('selected', moves[0].idx);
-                window.selectedMoveIdx = moves[0].idx;
-                window.renderSelectedGameState();
-            });
-            move2.click(function () {
-                console.log('selected', moves[1].idx);
-                window.selectedMoveIdx = moves[1].idx;
-                window.renderSelectedGameState();
-            });
-
-            container.append(move1);
-            container.append('|');
-            container.append(move2);
-
-            return container;
-        } else {
-            var container = $('<div>');
-            var move1 = $('<span>', {
-                text: reprOfMove(moves[0].elem),
-            });
-
-            if (moves[0].idx === selectedMoveIdx) {
-                move1.css('font-weight', 'bold');
-            }
-
-            move1.click(function () {
-                console.log('selected', moves[0].idx);
-                window.selectedMoveIdx = moves[0].idx;
-                window.renderSelectedGameState();
-            });
-
-            container.append(move1);
-            return container;
-        }
-    });
-}
-
-
 var posOf = function (row, col) {
     var stoneSize = 500 / 8; // TODO: compute 500 dynamically. board size is not available at compute time though :'(
     return {
@@ -339,7 +280,6 @@ var posOf = function (row, col) {
 
 }
 
-window.selectedMoveIdx = -1;
 window.mostRecentGameState = initialGameState();
 
 });
