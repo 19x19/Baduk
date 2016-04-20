@@ -75,8 +75,6 @@ socket.on('new_game_state', function (gameState) {
         $("#gameState").text('Black to play');
     }
 
-    window.mostRecentGameState = gameState;
-
     if (gameState.moves.length > 0) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
         if (mostRecentMove.action === 'pass') {
@@ -259,7 +257,5 @@ var posOf = function (row, col) {
     };
 
 }
-
-window.mostRecentGameState = initialGameState();
 
 });
