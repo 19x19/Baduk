@@ -1,11 +1,6 @@
 $(document).ready(function (e) {
 $('[data-toggle="popover"]').popover();
 
-setTimeout (function (){
-  if( $('#roommates > pre').length < 2) {
-      $('#userWait').modal('show');
-  }
-}, 1000);
 
 var coordOfClick = function (e) {
     var mouseX = e.pageX;
