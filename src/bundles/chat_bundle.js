@@ -35,9 +35,7 @@ socket.on('get_new_connect', function(info) {
     if( $('#roommates > pre').length < 1) {
         $('#userWait').modal('show');
     }
-    $("#history").append(
-        "<pre><i>" + info.username + " has connected.</i></pre>"
-    );
+    window.appElement.notifyFromServer(info.username + " has connected");
     updateRoommates(info.roommates);
     if( $('#roommates > pre').length >= 2) {
         $('#userWait').modal('hide');
@@ -58,18 +56,6 @@ socket.on('your_color', function (msg) {
 });
 
 // Send a new message to the room
-$("#send").on('click', function () {
-    var message = $("#message").val();
-    if(message !== '') {
-        $("#message").val('');
-        socket.emit('post_new_message', {
-            'message': message,
-            'room': room,
-        });
-    }
-});
-
-// Send a new message to the room
 $("#plus_one").on('click', function () {
     socket.emit('post_new_message', {
         'message': ':+1:',
@@ -77,24 +63,10 @@ $("#plus_one").on('click', function () {
     });
 });
 
-var appendToChatHistory = function (color, username, message) {
-    $("#history").append(
-        "<pre>" + wrapName(color, username) + ': ' + message + '</pre>'
-    );
-    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 0);
-}
-
 // Gets a new message from the server
 socket.on('get_new_message', function (info) {
-    appendToChatHistory(info.color, info.username, info.message);
+    window.appElement.notifyNewChatMessage(info.color, info.username, info.message);
 });
-
-window.notifyFromServer = function (message) {
-    $("#history").append(
-        "<pre><i>" + message + "</i></pre>"
-    );
-    $("#history").animate({ scrollTop: $("#history")[0].scrollHeight}, 0);
-}
 
 // Tell the server before the user leaves
 jQuery(window).bind('beforeunload', function (e) {
@@ -105,9 +77,7 @@ jQuery(window).bind('beforeunload', function (e) {
 
 // Get any disconnects from the server
 socket.on('get_new_disconnect', function(info) {
-    $("#history").append(
-        "<pre><i>" + info.username + " has disconnected.</i></pre>"
-    );
+    window.appElement.notifyFromServer(info.username + " has disconnected");
     updateRoommates(info.roommates, info.username);
 });
 
@@ -133,11 +103,4 @@ function success_cpy() {
         }, 2000);
     }
 };
-
-// Allows you to press "Enter" to send text when input selected
-$("#message").keyup(function(event){
-    if(event.keyCode == 13){
-        $("#send").click();
-    }
-});
 

@@ -55,7 +55,25 @@ var App = React.createClass({
             boardSize: 500,
             borderSize: 60,
             muted: false,
+            chatHistory: [],
         }
+    },
+    notifyNewChatMessage: function (color, username, message) {
+        this.setState(({
+            chatHistory: this.state.chatHistory.concat({
+                color: color,
+                username: username,
+                message: message,
+            }),
+        }));
+    },
+    notifyFromServer: function (message) {
+        this.setState({
+            chatHistory: this.state.chatHistory.concat({
+                color: 'admin',
+                message: message
+            }),
+        });
     },
     notifyNewGameState: function () {
         if (!this.state.muted) {
@@ -96,8 +114,8 @@ var App = React.createClass({
     },
     coordOfClick: function (mouseX, mouseY) {
 
-        var boardX = $(ReactDOM.findDOMNode(this)).offset().left;
-        var boardY = $(ReactDOM.findDOMNode(this)).offset().top;
+        var boardX = $(ReactDOM.findDOMNode(this.refs.gameBoard)).offset().left;
+        var boardY = $(ReactDOM.findDOMNode(this.refs.gameBoard)).offset().top;
 
         var mouseRelX = mouseX - boardX - this.state.borderSize;
         var mouseRelY = mouseY - boardY - this.state.borderSize;
@@ -152,23 +170,91 @@ var App = React.createClass({
         });
     },
     render: function () {
-        return <div>
-            <Board
-                mostRecentGameState={this.state.mostRecentGameState}
-                selectedMoveIdx={this.state.selectedMoveIdx}
-                ghostPiece={this.state.ghostPiece}
-                boardSize={this.state.boardSize}
-                borderSize={this.state.borderSize}
-                handleClick={this.handleBoardClick}
-                gridSize={this.gridSize()}
-                playerColor={window.your_color} />
-            <GameStatusDisplay gameState={this.state.mostRecentGameState} />
-            <div className="buttons">
-                <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
-                <button className="btn" onClick={this.handleResignBtnClick}>Resign</button>
-                <button className="btn" onClick={this.handleMuteBtnClick}>
-                    <i id="sound_display" className={this.state.muted ? "fa fa-volume-up" : "fa fa-volume-off"} aria-hidden="true"></i>
-                    </button>
+        return <div className="row go">
+            <ChatBox chatHistory={this.state.chatHistory} />
+            <div className="col-md-6 go-board">
+                <Board
+                    ref="gameBoard"
+                    mostRecentGameState={this.state.mostRecentGameState}
+                    selectedMoveIdx={this.state.selectedMoveIdx}
+                    ghostPiece={this.state.ghostPiece}
+                    boardSize={this.state.boardSize}
+                    borderSize={this.state.borderSize}
+                    handleClick={this.handleBoardClick}
+                    gridSize={this.gridSize()}
+                    playerColor={window.your_color} />
+                <GameStatusDisplay gameState={this.state.mostRecentGameState} />
+                <div className="buttons">
+                    <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
+                    <button className="btn" onClick={this.handleResignBtnClick}>Resign</button>
+                    <button className="btn" onClick={this.handleMuteBtnClick}>
+                        <i id="sound_display" className={this.state.muted ? "fa fa-volume-up" : "fa fa-volume-off"} aria-hidden="true"></i>
+                        </button>
+                </div>
+            </div>
+            <div className="col-md-3 sidebar-right">
+                <div className="well">
+                    <h5>Roommates</h5>
+                    <div id="roommates"></div>
+                </div>
+
+                <div className="well move-history">
+                    <h5>Move History</h5>
+                    <div id="moveHistory">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
+});
+
+var faClassNameOf = function (color) {
+    if (color === 'white') return 'circle-thin';
+    if (color === 'black') return 'circle';
+    return 'eye';
+}
+
+var ChatBox = React.createClass({
+    handleSend: function () {
+        socket.emit('post_new_message', {
+            'message': $(this.refs.chatInput).val(),
+            'room': room,
+        });
+        $(this.refs.chatInput).val('');
+    },
+    handleKeyUp: function (e) {
+        if (e.keyCode == 13){
+            this.handleSend();
+        }
+    },
+    render: function () {
+        var self = this;
+        return <div className="col-md-3 well">
+            <h5>Chat</h5>
+            <center>
+                Your name is <span id="yourName" className="strong"></span><br />
+                Your color is <span id="yourColor" className="strong"></span>
+            </center>
+            <div className="chat">{this.props.chatHistory.map(function (entry, i) {
+                if (entry.color === 'admin') {
+                    return <pre key={i}>
+                        <i>{entry.message}</i>
+                    </pre>
+                } else {
+                    return <pre key={i}>
+                        <i className={"fa fa-" + faClassNameOf(entry.color)}></i>
+                        <span>{entry.username + ": " + entry.message}</span>
+                    </pre>                    
+                }
+            })}</div>
+
+            <div className="chat-controls">
+                <input 
+                    ref="chatInput"
+                    onKeyUp={this.handleKeyUp}
+                    className="form-control" />
+                <button id="send" onClick={this.handleSend} className="btn"><i className="material-icons">&#xE163;</i></button>
             </div>
         </div>
     }
