@@ -29,7 +29,7 @@ var game_exists = function(hash) {
 
 // Returns true if the given user exists
 var user_exists = function(id) {
-    return current_users[id] === undefined;
+    return current_users[id] !== undefined;
 };
 
 // Adds a user to the given room
