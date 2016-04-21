@@ -147,42 +147,28 @@ io.on('connection', function (socket) {
         socket.handshake.session.save();
     }
 
-    // Receives some information when a new user joins
     socket.on('post_new_connect', function (info) {
         sockets.post_new_connect(socket, info, io);
     });
 
-    // Removes a user from the room
     socket.on('post_new_disconnect', function (info) {
         sockets.post_new_disconnect(socket, info, io);
     });
 
-    // Posts a new message to the room
     socket.on('post_new_message', function (info) {
         sockets.post_new_message(socket, info, io);
     });
 
-    // Add a piece at the given position
     socket.on('post_new_piece', function (info) {
         sockets.post_new_piece(socket, info, io);
     });
 
-    // Adds a new pass move from the given user
     socket.on('post_pass', function (info) {
-        sockets.post_new_pass(socket, info, io);
+        sockets.post_pass(socket, info, io);
     });
 
     socket.on('post_resign', function (info) {
-
-        logger.verbose('post_resign', info);
-
-        var color = games.current_users[socket.handshake.session.id][info.room]['color'];
-        var newState = go.applyMove(info.room, {
-            'action': 'resign',
-            'player_color': color
-        });
-
-        io.to(info.room).emit('new_game_state', newState);
+        sockets.post_resign(socket, info, io);
     });
 });
 

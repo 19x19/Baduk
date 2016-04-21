@@ -98,8 +98,20 @@ var post_pass = function(socket, info, io) {
     }
 }
 
+// Adds a new resign from the given user
+var post_resign = function(socket, info, io) {
+    logger.verbose('post_resign', info);
+    var color = games.current_users[socket.handshake.session.id][info.room]['color'];
+    var newState = go.applyMove(info.room, {
+        'action': 'resign',
+        'player_color': color
+    });
+    io.to(info.room).emit('new_game_state', newState);
+}
+
 exports.post_new_connect = post_new_connect;
 exports.post_new_disconnect = post_new_disconnect;
 exports.post_new_message = post_new_message;
 exports.post_new_piece = post_new_piece;
 exports.post_pass = post_pass;
+exports.post_resign = post_resign;
