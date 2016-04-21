@@ -53,21 +53,6 @@ if(config.env == "PROD") {
 // http://expressjs.com/api#app-settings for more details.
 app.enable('trust proxy');
 
-// Add a handler to inspect the req.secure flag (see
-// http://expressjs.com/api#req.secure). This allows us
-// to know whether the request was via http or https.
-if(config.HTTPS) {
-    app.use(function (req, res, next) {
-        if (req.secure) {
-            // Request was via https, so do no special handling
-            next();
-        } else {
-            // Request was via http, so redirect to https
-            res.redirect('https://' + req.headers.host + req.url);
-        }
-    });
-}
-
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
     // General headers for security, ranging from clickjacking protection to
