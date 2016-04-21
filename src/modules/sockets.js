@@ -1,14 +1,14 @@
 // NPM libraries
-var xss = require('node-xss').clean;
-var emoji = require('node-emoji');
+const xss = require('node-xss').clean;
+const emoji = require('node-emoji');
 
 // Baduk libraries
-var games = require('./games.js');
-var go = require('./go.js');
+const games = require('./games.js');
+const go = require('./go.js');
 
 // Sets up a logger for all socket stuff
-var winston = require('winston');
-var logger = new (winston.Logger)({
+const winston = require('winston');
+const logger = new (winston.Logger)({
   transports: [
     new (winston.transports.Console)({
         level: 'info',
@@ -24,17 +24,18 @@ var logger = new (winston.Logger)({
 var post_new_connect = function(socket, info, io) {
     logger.verbose('post_new_connect', info);
     games.add_user(info, socket);
-    if(games.current_users[socket.handshake.session.id][info.room]['instances'] == 1) {
+    const user_id = socket.handshake.session.id;
+    if(games.current_users[user_id][info.room]['instances'] == 1) {
         io.to(info.room).emit('get_new_connect', {
-            'username' : games.current_users[socket.handshake.session.id].username,
+            'username' : games.current_users[user_id].username,
             'roommates' : games.players_in_room(info.room),
         });
     }
     socket.emit('your_name', {
-        'username': games.current_users[socket.handshake.session.id].username,
+        'username': games.current_users[user_id].username,
         'roommates' : games.players_in_room(info.room),
     });
-    var current_state = go.currentState(info.room);
+    const current_state = go.currentState(info.room);
     if(current_state !== undefined) {
         socket.emit('new_game_state', go.currentState(info.room));
     }
@@ -43,11 +44,12 @@ var post_new_connect = function(socket, info, io) {
 // Reacts to new disconnections
 var post_new_disconnect = function(socket, info, io) {
     logger.verbose('post_new_disconnect', info);
-    if(games.user_exists(socket.handshake.session.id)) {
+    const user_id = socket.handshake.session.id;
+    if(games.user_exists(user_id)) {
         games.remove_user(info, socket);
-        if(games.current_users[socket.handshake.session.id][info.room]['instances'] === 0) {
+        if(games.current_users[user_id][info.room]['instances'] === 0) {
             io.to(info.room).emit('get_new_disconnect', {
-                'username' : games.current_users[socket.handshake.session.id]['username'],
+                'username' : games.current_users[user_id]['username'],
                 'roommates' : games.players_in_room(info.room),
             });
         }
@@ -57,18 +59,20 @@ var post_new_disconnect = function(socket, info, io) {
 // Sends a new message to the room
 var post_new_message = function(socket, info, io) {
     logger.verbose('post_new_message', info);
+    const user_id = socket.handshake.session.id;
     io.to(info.room).emit('get_new_message', xss({
         'message' : emoji.emojify(info.message),
-        'username' : games.current_users[socket.handshake.session.id]['username'],
-        'color' : games.current_users[socket.handshake.session.id][info.room]['color'],
+        'username' : games.current_users[user_id]['username'],
+        'color' : games.current_users[user_id][info.room]['color'],
     }));
 }
 
 // Adds a new piece to the board
 var post_new_piece = function(socket, info, io) {
     logger.verbose('post_new_piece', info);
-    var color = games.current_users[socket.handshake.session.id][info.room]['color'];
-    var newState = go.applyMove(info.room, {
+    const user_id = socket.handshake.session.id;
+    const color = games.current_users[user_id][info.room]['color'];
+    const newState = go.applyMove(info.room, {
         'action': 'new_piece',
         'row': info.row,
         'col': info.col,
@@ -85,8 +89,9 @@ var post_new_piece = function(socket, info, io) {
 // Adds a new pass from the given user
 var post_pass = function(socket, info, io) {
     logger.verbose('post_pass', info);
-    var color = games.current_users[socket.handshake.session.id][info.room]['color'];
-    var newState = go.applyMove(info.room, {
+    const user_id = socket.handshake.session.id;
+    const color = games.current_users[user_id][info.room]['color'];
+    const newState = go.applyMove(info.room, {
         'action': 'pass',
         'player_color': color
     });
@@ -101,8 +106,9 @@ var post_pass = function(socket, info, io) {
 // Adds a new resign from the given user
 var post_resign = function(socket, info, io) {
     logger.verbose('post_resign', info);
-    var color = games.current_users[socket.handshake.session.id][info.room]['color'];
-    var newState = go.applyMove(info.room, {
+    const user_id = socket.handshake.session.id;
+    const color = games.current_users[user_id][info.room]['color'];
+    const newState = go.applyMove(info.room, {
         'action': 'resign',
         'player_color': color
     });
