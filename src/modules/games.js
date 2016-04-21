@@ -27,10 +27,15 @@ var game_exists = function(hash) {
     return current_games.indexOf(hash) > -1;
 };
 
+// Returns true if the given user exists
+var user_exists = function(id) {
+    return current_users[id] === undefined;
+};
+
 // Adds a user to the given room
 var add_user = function(info, socket) {
     // If the user has no current session with sockets, create a new user
-    if(current_users[socket.handshake.session.id] === undefined) {
+    if(!user_exists(socket.handshake.session.id)) {
         current_users[socket.handshake.session.id] = {};
         current_users[socket.handshake.session.id]['username'] = moniker.choose();
     }
@@ -116,6 +121,7 @@ var cleanse = schedule.scheduleJob('0 0 12 * * *', function() {
 
 exports.current_hash = current_hash;
 exports.game_exists = game_exists;
+exports.user_exists = user_exists;
 exports.add_user = add_user;
 exports.remove_user = remove_user;
 exports.players_in_room = players_in_room;
