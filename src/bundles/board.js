@@ -245,12 +245,12 @@ var ChatBox = React.createClass({
                     return <pre key={i}>
                         <i className={"fa fa-" + faClassNameOf(entry.color)}></i>
                         <span>{entry.username + ": " + entry.message}</span>
-                    </pre>                    
+                    </pre>
                 }
             })}</div>
 
             <div className="chat-controls">
-                <input 
+                <input
                     ref="chatInput"
                     onKeyUp={this.handleKeyUp}
                     className="form-control" />
@@ -273,7 +273,7 @@ var GameStatusDisplay = React.createClass({
 });
 
 var Board = React.createClass({
-    // props: 
+    // props:
     // mostRecentGameState
     // selectedMoveIdx
     // ghostPiece
@@ -343,9 +343,9 @@ var Board = React.createClass({
             onClick={this.props.handleClick}
         >
             <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSize} height={boardSize} />
-            <image xlinkHref="/img/go_board_9*9.png" 
-                width={gridSize} 
-                height={gridSize} 
+            <image xlinkHref="/img/go_board_9*9.png"
+                width={gridSize}
+                height={gridSize}
                 x={borderSize}
                 y={borderSize} />
             {stones.map(function (stone, i) {
