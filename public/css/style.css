@@ -23,16 +23,20 @@
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
+
 *{
     font-family: "Lato";
     font-weight: 300;
 }
+
 footer {
     margin: 50px 0;
 }
+
 p {
     font-size: 20px;
 }
+
 hr {
   border : 0;
   height: 1px;
@@ -49,6 +53,7 @@ pre {
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
     margin: 0 0 0 0;
     padding: 2px 2px 2px 2px;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 .wood-color {
