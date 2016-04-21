@@ -167,22 +167,9 @@ io.on('connection', function (socket) {
         sockets.post_new_piece(socket, info, io);
     });
 
+    // Adds a new pass move from the given user
     socket.on('post_pass', function (info) {
-
-        logger.verbose('post_pass', info);
-
-        var color = games.current_users[socket.handshake.session.id][info.room]['color'];
-        var newState = go.applyMove(info.room, {
-            'action': 'pass',
-            'player_color': color
-        });
-
-        if (newState !== false) {
-            io.to(info.room).emit('new_game_state', newState);
-        } else {
-            socket.emit('move_is_illegal', {});
-            logger.info('illegal move');
-        }
+        sockets.post_new_pass(socket, info, io);
     });
 
     socket.on('post_resign', function (info) {

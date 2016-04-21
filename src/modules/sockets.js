@@ -82,7 +82,24 @@ var post_new_piece = function(socket, info, io) {
     }
 }
 
+// Adds a new pass from the given user
+var post_pass = function(socket, info, io) {
+    logger.verbose('post_pass', info);
+    var color = games.current_users[socket.handshake.session.id][info.room]['color'];
+    var newState = go.applyMove(info.room, {
+        'action': 'pass',
+        'player_color': color
+    });
+    if (newState !== false) {
+        io.to(info.room).emit('new_game_state', newState);
+    } else {
+        socket.emit('move_is_illegal', {});
+        logger.info('illegal move');
+    }
+}
+
 exports.post_new_connect = post_new_connect;
 exports.post_new_disconnect = post_new_disconnect;
 exports.post_new_message = post_new_message;
 exports.post_new_piece = post_new_piece;
+exports.post_pass = post_pass;
