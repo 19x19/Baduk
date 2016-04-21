@@ -1,18 +1,6 @@
 $(document).ready(function (e) {
 $('[data-toggle="popover"]').popover();
 
-$('#passBtn').click(function () {
-    socket.emit('post_pass', {
-        'room': room
-    });
-});
-
-$('#resignBtn').click(function () {
-    socket.emit('post_resign', {
-        'room': room
-    });
-});
-
 $(window).mousemove(function (e) {
     appElement.handleMouseMove(e);
 });
@@ -36,18 +24,14 @@ var resultStringOf = function (color, advantage) {
 socket.on('new_game_state', function (gameState) {
 
     // Play the sound for a new piece
-    if(!muted) {
-        var move_sound = new Audio("/sounds/move.wav");
-        move_sound.play();
-    }
+    window.appElement.notifyNewGameState();
 
     if (gameState.moves.length > 0) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
+        var color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
         if (mostRecentMove.action === 'pass') {
-            color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
             window.notifyFromServer(color + ' passed');
         } else if (mostRecentMove.action === 'resign') {
-            color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
             window.notifyFromServer(color + ' resigned');
         }
     }
@@ -70,6 +54,13 @@ var App = React.createClass({
             ghostPiece: null,
             boardSize: 500,
             borderSize: 60,
+            muted: false,
+        }
+    },
+    notifyNewGameState: function () {
+        if (!this.state.muted) {
+            var move_sound = new Audio("/sounds/move.wav");
+            move_sound.play();
         }
     },
     gridSize: function () {
@@ -145,6 +136,21 @@ var App = React.createClass({
             'room': room
         });
     },
+    handlePassBtnClick: function () {
+        socket.emit('post_pass', {
+            'room': room
+        });
+    },
+    handleResignBtnClick: function () {
+        socket.emit('post_resign', {
+            'room': room
+        });
+    },
+    handleMuteBtnClick: function () {
+        this.setState({
+            muted: !this.state.muted,
+        });
+    },
     render: function () {
         return <div>
             <Board
@@ -157,6 +163,13 @@ var App = React.createClass({
                 gridSize={this.gridSize()}
                 playerColor={window.your_color} />
             <GameStatusDisplay gameState={this.state.mostRecentGameState} />
+            <div className="buttons">
+                <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
+                <button className="btn" onClick={this.handleResignBtnClick}>Resign</button>
+                <button className="btn" onClick={this.handleMuteBtnClick}>
+                    <i id="sound_display" className={this.state.muted ? "fa fa-volume-up" : "fa fa-volume-off"} aria-hidden="true"></i>
+                    </button>
+            </div>
         </div>
     }
 });
@@ -164,7 +177,7 @@ var App = React.createClass({
 var GameStatusDisplay = React.createClass({
     render: function () {
         if (this.props.gameState.result) {
-            return <div>{resultStringOf(this.props.gameState.result.winner, this.mostRecentGameState.result.advantage)}</div>
+            return <div>{resultStringOf(this.props.gameState.result.winner, this.props.gameState.result.advantage)}</div>
         } else if (this.props.gameState.turn === 'white') {
             return <div>White to play</div>
         } else {
@@ -277,7 +290,7 @@ var Board = React.createClass({
 });
 
 window.appElement = ReactDOM.render(
-  <App />, document.getElementById('reactBoardContainer')
+  <App />, document.getElementById('reactAppContainer')
 );
 
 var pairsOf = function (arr) {
