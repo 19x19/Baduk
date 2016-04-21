@@ -67,6 +67,11 @@ if(config.HTTPS) {
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {
+    // Redirect www. -> non www.
+    if (req.headers.host.match(/^www/) !== null) {
+        res.redirect(req.headers.host.replace(/^www\./, '') + req.url);
+    }
+
     // General headers for security, ranging from clickjacking protection to
     // anti-crawler protection. Note that the XSS protection only applies to
     // IE8+ and Chrome, so still sanitize all input.
