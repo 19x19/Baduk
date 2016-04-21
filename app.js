@@ -47,6 +47,21 @@ if(config.env == "PROD") {
     app.all('*', require('express-force-domain')('https://baduk.ca'));
 }
 
+// Add a handler to inspect the req.secure flag (see
+// http://expressjs.com/api#req.secure). This allows us
+// to know whether the request was via http or https.
+if(config.HTTPS) {
+    app.use(function (req, res, next) {
+        if (req.secure) {
+            // Request was via https, so do no special handling
+            next();
+        } else {
+            // Request was via http, so redirect to https
+            res.redirect('https://' + req.headers.host + req.url);
+        }
+    });
+}
+
 // Enable reverse proxy support in Express. This causes the
 // the "X-Forwarded-Proto" header field to be trusted so its
 // value can be used to determine the protocol. See
