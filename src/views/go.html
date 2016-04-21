@@ -41,6 +41,23 @@
 </head>
 
 <body>
+
+    <!-- User Wait Pop Up-->
+    <div class="modal fade" id="userWait" role="dialog" data-backdrop="static">
+        <div class="modal-dialog" style="margin-top: 120px">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Waiting for another player to join...</h4>
+                    Send your friend the link to the room below to get started.
+                </div>
+                <div class="modal-body">
+                    <button id="roomLink" data-toggle="popover" data-placement="right" class="btn">Copy Room Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Page Content -->
     <div class="container" style="margin-top: 80px">
         <div class="row go">
@@ -60,21 +77,6 @@
                 <div id="reactBoardContainer"></div>
                 <!-- Board -->
                 <div id="boardContainer">
-                    <!-- User Wait Pop Up-->
-                    <div class="modal fade" id="userWait" role="dialog" data-backdrop="static">
-                        <div class="modal-dialog">
-                            <!-- Modal content-->
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title">Waiting for another player to join...</h4>
-                                    Send your friend the link to the room below to get started.
-                                </div>
-                                <div class="modal-body">
-                                    <button id="roomLink" data-toggle="popover" data-placement="right" class="btn">Copy Room Link</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div id="gameState"></div>
                 <div class="buttons">
