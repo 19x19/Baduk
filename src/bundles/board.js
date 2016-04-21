@@ -41,14 +41,6 @@ socket.on('new_game_state', function (gameState) {
         move_sound.play();
     }
 
-    if (gameState.result) {
-        $("#gameStatus").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
-    } else if (gameState.turn === 'white') {
-        $("#gameStatus").text('White to play');
-    } else {
-        $("#gameStatus").text('Black to play');
-    }
-
     if (gameState.moves.length > 0) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
         if (mostRecentMove.action === 'pass') {
@@ -154,31 +146,50 @@ var App = React.createClass({
         });
     },
     render: function () {
-        return <Board
-            mostRecentGameState={this.state.mostRecentGameState}
-            selectedMoveIdx={this.state.selectedMoveIdx}
-            ghostPiece={this.state.ghostPiece}
-            boardSize={this.state.boardSize}
-            borderSize={this.state.borderSize}
-            handleClick={this.handleBoardClick} />
+        return <div>
+            <Board
+                mostRecentGameState={this.state.mostRecentGameState}
+                selectedMoveIdx={this.state.selectedMoveIdx}
+                ghostPiece={this.state.ghostPiece}
+                boardSize={this.state.boardSize}
+                borderSize={this.state.borderSize}
+                handleClick={this.handleBoardClick}
+                gridSize={this.gridSize()}
+                playerColor={window.your_color} />
+            <GameStatusDisplay gameState={this.state.mostRecentGameState} />
+        </div>
     }
-})
+});
+
+var GameStatusDisplay = React.createClass({
+    render: function () {
+        if (this.props.gameState.result) {
+            return <div>{resultStringOf(this.props.gameState.result.winner, this.mostRecentGameState.result.advantage)}</div>
+        } else if (this.props.gameState.turn === 'white') {
+            return <div>White to play</div>
+        } else {
+            return <div>Black to play</div>
+        }
+    }
+});
 
 var Board = React.createClass({
-    gridSize: function () {
-        var boardSize = this.props.boardSize;
-        var borderSize = this.props.borderSize;
-        return boardSize - 2*borderSize;
-    },
+    // props: 
+    // mostRecentGameState
+    // selectedMoveIdx
+    // ghostPiece
+    // boardSize
+    // borderSize
+    // handleClick
+    // gridSize
+    // playerColor
+    // todo: reduce
     posOf: function (row, col) {
-        var stoneSize = this.gridSize() / 8;
+        var stoneSize = this.props.gridSize / 8;
         return {
             x: this.props.borderSize + (row * stoneSize),
             y: this.props.borderSize + (col * stoneSize),
         };
-    },
-    handleClick: function (e) {
-        this.props.handleClick(e);
     },
     render: function () {
 
@@ -194,7 +205,7 @@ var Board = React.createClass({
         var stones = [];
         var boardSize = this.props.mostRecentGameState.size;
 
-        var stoneStride = this.gridSize() / 8;
+        var stoneStride = this.props.gridSize / 8;
         var stoneSize = stoneStride - 2;
 
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
@@ -213,9 +224,8 @@ var Board = React.createClass({
             }
         }
 
-
         if (this.props.ghostPiece &&
-            isLegalMove(this.props.mostRecentGameState, window.your_color, this.props.ghostPiece.x, this.props.ghostPiece.y)) {
+            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.ghostPiece.x, this.props.ghostPiece.y)) {
             // monads yo
             var ghostPieces = [this.props.ghostPiece];
         } else {
@@ -231,7 +241,7 @@ var Board = React.createClass({
         return <svg
             height={this.props.boardSize}
             width={this.props.boardSize}
-            onClick={this.handleClick}
+            onClick={this.props.handleClick}
         >
             <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSize} height={boardSize} />
             <image xlinkHref="/img/go_board_9*9.png" 
@@ -255,7 +265,7 @@ var Board = React.createClass({
                 var posOfStone = self.posOf(ghostPiece.x, ghostPiece.y);
                 return <image
                     key="ghostPiece"
-                    xlinkHref={"/img/" + window.your_color + "_circle.png"}
+                    xlinkHref={"/img/" + self.props.playerColor + "_circle.png"}
                     x={posOfStone.x - (stoneSize / 2)}
                     y={posOfStone.y - (stoneSize / 2)}
                     width={stoneSize}
