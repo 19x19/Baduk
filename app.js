@@ -32,11 +32,9 @@ if(config.HTTPS) {
 }
 var favicon = require('serve-favicon');
 var Ddos = require('ddos');
-var xss = require('node-xss').clean;
 var git = require('git-rev');
 var csurf = require('csurf');
 var ddos = new Ddos;
-var emoji = require('node-emoji');
 
 // Logging
 var winston = require('winston');
@@ -161,35 +159,12 @@ io.on('connection', function (socket) {
 
     // Posts a new message to the room
     socket.on('post_new_message', function (info) {
-
-        logger.verbose('post_new_message', info);
-
-        io.to(info.room).emit('get_new_message', xss({
-            'message' : emoji.emojify(info.message),
-            'username' : games.current_users[socket.handshake.session.id]['username'],
-            'color' : games.current_users[socket.handshake.session.id][info.room]['color'],
-        }));
+        sockets.post_new_message(socket, info, io);
     });
 
     // Add a piece at the given position
     socket.on('post_new_piece', function (info) {
-
-        logger.verbose('post_new_piece', info);
-
-        var color = games.current_users[socket.handshake.session.id][info.room]['color'];
-        var newState = go.applyMove(info.room, {
-            'action': 'new_piece',
-            'row': info.row,
-            'col': info.col,
-            'player_color': color
-        });
-
-        if (newState !== false) {
-            io.to(info.room).emit('new_game_state', newState);
-        } else {
-            socket.emit('move_is_illegal', {}); // FIXME: this is a race condition
-        }
-
+        sockets.post_new_piece(socket, info, io);
     });
 
     socket.on('post_pass', function (info) {

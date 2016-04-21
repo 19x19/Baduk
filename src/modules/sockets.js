@@ -1,3 +1,8 @@
+// NPM libraries
+var xss = require('node-xss').clean;
+var emoji = require('node-emoji');
+
+// Baduk libraries
 var games = require('./games.js');
 var go = require('./go.js');
 
@@ -49,5 +54,35 @@ var post_new_disconnect = function(socket, info, io) {
     }
 }
 
+// Sends a new message to the room
+var post_new_message = function(socket, info, io) {
+    logger.verbose('post_new_message', info);
+    io.to(info.room).emit('get_new_message', xss({
+        'message' : emoji.emojify(info.message),
+        'username' : games.current_users[socket.handshake.session.id]['username'],
+        'color' : games.current_users[socket.handshake.session.id][info.room]['color'],
+    }));
+}
+
+// Adds a new piece to the board
+var post_new_piece = function(socket, info, io) {
+    logger.verbose('post_new_piece', info);
+    var color = games.current_users[socket.handshake.session.id][info.room]['color'];
+    var newState = go.applyMove(info.room, {
+        'action': 'new_piece',
+        'row': info.row,
+        'col': info.col,
+        'player_color': color
+    });
+    if (newState !== false) {
+        io.to(info.room).emit('new_game_state', newState);
+    } else {
+        // TODO: This is a race condition [zodiac]
+        socket.emit('move_is_illegal', {});
+    }
+}
+
 exports.post_new_connect = post_new_connect;
 exports.post_new_disconnect = post_new_disconnect;
+exports.post_new_message = post_new_message;
+exports.post_new_piece = post_new_piece;
