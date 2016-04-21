@@ -24,7 +24,7 @@
   font-feature-settings: 'liga';
 }
 
-*{
+* {
     font-family: "Lato";
     font-weight: 300;
 }
@@ -71,7 +71,6 @@ pre {
 	border: 1px solid black;
     position: relative;
 }
-
 
 .chat {
     height: 30vh;
@@ -241,4 +240,8 @@ section.header .main-header button:hover{
 }
 .go .sidebar-right{
     flex:1;
+}
+
+.strong {
+    font-weight: 700;
 }
