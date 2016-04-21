@@ -206,9 +206,9 @@ var Board = React.createClass({
     },
     render: function () {
 
-        if (this.props.mostRecentGameState.moves.length === this.props.selectedMoveIdx) {
+        if (this.props.mostRecentGameState.moves.length === this.props.selectedMoveIdx + 1) {
             // fast path optimization, not strictly necessary
-            var selectStones = this.props.mostRecentGameState.stones;
+            var selectedStones = this.props.mostRecentGameState.stones;
         } else {
             var selectedStones = boardStateHistoryOf(this.props.mostRecentGameState)[this.props.selectedMoveIdx + 1].stones;
         }
