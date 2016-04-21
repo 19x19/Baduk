@@ -14,7 +14,7 @@ $('#resignBtn').click(function () {
 });
 
 $(window).mousemove(function (e) {
-    reactBoardElement.handleMouseMove(e);
+    appElement.handleMouseMove(e);
 });
 
 $(window).resize(function () {
@@ -41,14 +41,6 @@ socket.on('new_game_state', function (gameState) {
         move_sound.play();
     }
 
-    if (gameState.result) {
-        $("#gameStatus").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
-    } else if (gameState.turn === 'white') {
-        $("#gameStatus").text('White to play');
-    } else {
-        $("#gameStatus").text('Black to play');
-    }
-
     if (gameState.moves.length > 0) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
         if (mostRecentMove.action === 'pass') {
@@ -60,7 +52,7 @@ socket.on('new_game_state', function (gameState) {
         }
     }
 
-    window.reactBoardElement.setState({
+    window.appElement.setState({
         mostRecentGameState: gameState,
         selectedMoveIdx: gameState.moves.length - 1,
     });
@@ -70,7 +62,7 @@ socket.on('move_is_illegal', function (msg) {
     console.log('illegal move');
 });
 
-var Board = React.createClass({
+var App = React.createClass({
     getInitialState: function () {
         return {
             mostRecentGameState: initialGameState(),
@@ -84,46 +76,6 @@ var Board = React.createClass({
         var boardSize = this.state.boardSize;
         var borderSize = this.state.borderSize;
         return boardSize - 2*borderSize;
-    },
-    posOf: function (row, col) {
-        var stoneSize = this.gridSize() / 8;
-        return {
-            x: this.state.borderSize + (row * stoneSize),
-            y: this.state.borderSize + (col * stoneSize),
-        };
-    },
-    coordOfClick: function (mouseX, mouseY) {
-
-        var boardX = $(ReactDOM.findDOMNode(this)).offset().left;
-        var boardY = $(ReactDOM.findDOMNode(this)).offset().top;
-
-        var mouseRelX = mouseX - boardX - this.state.borderSize;
-        var mouseRelY = mouseY - boardY - this.state.borderSize;
-
-        var mousePctX = mouseRelX / this.gridSize();
-        var mousePctY = mouseRelY / this.gridSize();
-
-        var mousePicPctX = mousePctX;
-        var mousePicPctY = mousePctY;
-
-        var pieceCoordX = Math.round(mousePicPctX * 8);
-        var pieceCoordY = Math.round(mousePicPctY * 8);
-
-        return {
-            x: pieceCoordX,
-            y: pieceCoordY
-        }
-    },
-    handleClick: function (e) {
-        var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
-
-        var room = /[^/]*$/.exec(window.location.pathname)[0];
-
-        socket.emit('post_new_piece', {
-            'row': coordOfClickE.x,
-            'col': coordOfClickE.y,
-            'room': room
-        });
     },
     handleMouseMove: function (e) {
         if (typeof(window.your_color) === 'undefined') return;
@@ -139,33 +91,121 @@ var Board = React.createClass({
         if (0 <= pieceCoordX && pieceCoordX < 9
          && 0 <= pieceCoordY && pieceCoordY < 9
         ) {
-            window.reactBoardElement.setState({
+            this.setState({
                 'ghostPiece': {
                     x: pieceCoordX,
                     y: pieceCoordY
                 }
             });
         } else {
-            window.reactBoardElement.setState({
+            this.setState({
                 'ghostPiece': null,
             });
         }
     },
+    coordOfClick: function (mouseX, mouseY) {
+
+        var boardX = $(ReactDOM.findDOMNode(this)).offset().left;
+        var boardY = $(ReactDOM.findDOMNode(this)).offset().top;
+
+        var mouseRelX = mouseX - boardX - this.state.borderSize;
+        var mouseRelY = mouseY - boardY - this.state.borderSize;
+
+        var mousePctX = mouseRelX / this.gridSize();
+        var mousePctY = mouseRelY / this.gridSize();
+
+        var pieceCoordX = Math.round(mousePctX * 8);
+        var pieceCoordY = Math.round(mousePctY * 8);
+
+        return {
+            x: pieceCoordX,
+            y: pieceCoordY
+        }
+    },
+    posOf: function (row, col) {
+        var stoneSize = this.gridSize() / 8;
+        return {
+            x: this.state.borderSize + (row * stoneSize),
+            y: this.state.borderSize + (col * stoneSize),
+        };
+    },
+    handleBoardClick: function (e) {
+
+        console.log('handleBoardClick', e.pageX);
+
+        var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
+
+        var room = /[^/]*$/.exec(window.location.pathname)[0];
+
+        console.log('handleBoardClick', coordOfClickE);
+
+        socket.emit('post_new_piece', {
+            'row': coordOfClickE.x,
+            'col': coordOfClickE.y,
+            'room': room
+        });
+    },
+    render: function () {
+        return <div>
+            <Board
+                mostRecentGameState={this.state.mostRecentGameState}
+                selectedMoveIdx={this.state.selectedMoveIdx}
+                ghostPiece={this.state.ghostPiece}
+                boardSize={this.state.boardSize}
+                borderSize={this.state.borderSize}
+                handleClick={this.handleBoardClick}
+                gridSize={this.gridSize()}
+                playerColor={window.your_color} />
+            <GameStatusDisplay gameState={this.state.mostRecentGameState} />
+        </div>
+    }
+});
+
+var GameStatusDisplay = React.createClass({
+    render: function () {
+        if (this.props.gameState.result) {
+            return <div>{resultStringOf(this.props.gameState.result.winner, this.mostRecentGameState.result.advantage)}</div>
+        } else if (this.props.gameState.turn === 'white') {
+            return <div>White to play</div>
+        } else {
+            return <div>Black to play</div>
+        }
+    }
+});
+
+var Board = React.createClass({
+    // props: 
+    // mostRecentGameState
+    // selectedMoveIdx
+    // ghostPiece
+    // boardSize
+    // borderSize
+    // handleClick
+    // gridSize
+    // playerColor
+    // todo: reduce
+    posOf: function (row, col) {
+        var stoneSize = this.props.gridSize / 8;
+        return {
+            x: this.props.borderSize + (row * stoneSize),
+            y: this.props.borderSize + (col * stoneSize),
+        };
+    },
     render: function () {
 
-        if (this.state.mostRecentGameState.moves.length === this.state.selectedMoveIdx) {
+        if (this.props.mostRecentGameState.moves.length === this.props.selectedMoveIdx) {
             // fast path optimization, not strictly necessary
-            var selectStones = this.state.mostRecentGameState.stones;
+            var selectStones = this.props.mostRecentGameState.stones;
         } else {
-            var selectedStones = boardStateHistoryOf(this.state.mostRecentGameState)[this.state.selectedMoveIdx + 1].stones;
+            var selectedStones = boardStateHistoryOf(this.props.mostRecentGameState)[this.props.selectedMoveIdx + 1].stones;
         }
 
-        var selectedMove = this.state.mostRecentGameState.moves[this.state.selectedMoveIdx];
+        var selectedMove = this.props.mostRecentGameState.moves[this.props.selectedMoveIdx];
 
         var stones = [];
-        var boardSize = this.state.mostRecentGameState.size;
+        var boardSize = this.props.mostRecentGameState.size;
 
-        var stoneStride = this.gridSize() / 8;
+        var stoneStride = this.props.gridSize / 8;
         var stoneSize = stoneStride - 2;
 
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
@@ -184,25 +224,24 @@ var Board = React.createClass({
             }
         }
 
-
-        if (this.state.ghostPiece &&
-            isLegalMove(this.state.mostRecentGameState, window.your_color, this.state.ghostPiece.x, this.state.ghostPiece.y)) {
+        if (this.props.ghostPiece &&
+            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.ghostPiece.x, this.props.ghostPiece.y)) {
             // monads yo
-            var ghostPieces = [this.state.ghostPiece];
+            var ghostPieces = [this.props.ghostPiece];
         } else {
             var ghostPieces = [];
         }
 
-        var boardSize = this.state.boardSize;
-        var borderSize = this.state.borderSize;
+        var boardSize = this.props.boardSize;
+        var borderSize = this.props.borderSize;
         var gridSize = boardSize - 2*borderSize;
 
         var self = this;
 
         return <svg
-            height={this.state.boardSize}
-            width={this.state.boardSize}
-            onClick={this.handleClick}
+            height={this.props.boardSize}
+            width={this.props.boardSize}
+            onClick={this.props.handleClick}
         >
             <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSize} height={boardSize} />
             <image xlinkHref="/img/go_board_9*9.png" 
@@ -226,7 +265,7 @@ var Board = React.createClass({
                 var posOfStone = self.posOf(ghostPiece.x, ghostPiece.y);
                 return <image
                     key="ghostPiece"
-                    xlinkHref={"/img/" + window.your_color + "_circle.png"}
+                    xlinkHref={"/img/" + self.props.playerColor + "_circle.png"}
                     x={posOfStone.x - (stoneSize / 2)}
                     y={posOfStone.y - (stoneSize / 2)}
                     width={stoneSize}
@@ -237,8 +276,8 @@ var Board = React.createClass({
     }
 });
 
-window.reactBoardElement = ReactDOM.render(
-  <Board />, document.getElementById('reactBoardContainer')
+window.appElement = ReactDOM.render(
+  <App />, document.getElementById('reactBoardContainer')
 );
 
 var pairsOf = function (arr) {
