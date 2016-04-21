@@ -1,44 +1,39 @@
 // Node.js and ExpressDB related
-var config = require('./config.js');
-var express = require('express');
-var app = express();
-var cookieParser = require('cookie-parser');
-var session = require("express-session")({
+const config = require('./config.js');
+const express = require('express');
+const app = express();
+const cookieParser = require('cookie-parser');
+const session = require("express-session")({
     secret: config.session_key,
     resave: true,
     saveUninitialized: true
 });
-var sharedsession = require("express-socket.io-session");
+const sharedsession = require("express-socket.io-session");
 
 // Setting up HTTPS variables
-var http = require('http').Server(app);
-var https = require('https');
-var fs = require('fs');
+const http = require('http').Server(app);
+const https = require('https');
+const fs = require('fs');
 if(config.HTTPS) {
     const options = {
         key: fs.readFileSync('../SSL/baduk_ca.key'),
         cert: fs.readFileSync('../SSL/baduk_ca.crt'),
         ca: fs.readFileSync('../SSL/baduk_ca.ca-bundle'),
     };
-    var server = https.createServer(options, app);
+    const server = https.createServer(options, app);
 }
 
-// Third-party libraries
-var io;
-if(config.HTTPS) {
-    io = require('socket.io')(server);
-} else {
-    io = require('socket.io')(http);
-}
-var favicon = require('serve-favicon');
-var Ddos = require('ddos');
-var git = require('git-rev');
-var csurf = require('csurf');
-var ddos = new Ddos;
+// Third-party NPM libraries
+const io = (config.HTTPS) ? require('socket.io')(server) :require('socket.io')(http);
+const favicon = require('serve-favicon');
+const Ddos = require('ddos');
+const git = require('git-rev');
+const csurf = require('csurf');
+const ddos = new Ddos;
 
 // Baduk modules
-var games = require('./src/modules/games.js');
-var sockets = require('./src/modules/sockets.js');
+const games = require('./src/modules/games.js');
+const sockets = require('./src/modules/sockets.js');
 
 // What to use, what not to use, that is the question
 app.use(express.static('public'));
