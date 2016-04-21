@@ -36,23 +36,8 @@ var git = require('git-rev');
 var csurf = require('csurf');
 var ddos = new Ddos;
 
-// Logging
-var winston = require('winston');
-var logger = new (winston.Logger)({
-  transports: [
-    new (winston.transports.Console)({
-        level: 'info',
-    }),
-    new winston.transports.File({
-        filename: '/var/log/baduk.log',
-        level: 'verbose',
-    })
-  ]
-});
-
 // Baduk modules
 var games = require('./src/modules/games.js');
-var go = require('./src/modules/go.js');
 var sockets = require('./src/modules/sockets.js');
 
 // What to use, what not to use, that is the question
@@ -174,12 +159,8 @@ io.on('connection', function (socket) {
 
 // Figure out if we want HTTPS or not
 if(config.HTTPS) {
-    server.listen(config.HTTPS_port, function(){
-        logger.info('Listening on *:' + config.HTTPS_port);
-    });
+    server.listen(config.HTTPS_port);
 }
 
 // Listen on the normal server too
-http.listen(config.HTTP_port, function () {
-    logger.info('Listening on *:' + config.HTTP_port);
-});
+http.listen(config.HTTP_port);
