@@ -42,11 +42,11 @@ socket.on('new_game_state', function (gameState) {
     }
 
     if (gameState.result) {
-        $("#gameState").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
+        $("#gameStatus").text(resultStringOf(gameState.result.winner, gameState.result.advantage));
     } else if (gameState.turn === 'white') {
-        $("#gameState").text('White to play');
+        $("#gameStatus").text('White to play');
     } else {
-        $("#gameState").text('Black to play');
+        $("#gameStatus").text('Black to play');
     }
 
     if (gameState.moves.length > 0) {
