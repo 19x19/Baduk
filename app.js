@@ -43,27 +43,15 @@ app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
 app.use(session);
 app.disable('X-Powered-By');
+if(config.env == "PROD") {
+    app.all('*', require('express-force-domain')('https://baduk.ca'));
+}
 
 // Enable reverse proxy support in Express. This causes the
 // the "X-Forwarded-Proto" header field to be trusted so its
 // value can be used to determine the protocol. See
 // http://expressjs.com/api#app-settings for more details.
 app.enable('trust proxy');
-
-// Add a handler to inspect the req.secure flag (see
-// http://expressjs.com/api#req.secure). This allows us
-// to know whether the request was via http or https.
-if(config.HTTPS) {
-    app.use(function (req, res, next) {
-        if (req.secure) {
-            // Request was via https, so do no special handling
-            next();
-        } else {
-            // Request was via http, so redirect to https
-            res.redirect('https://' + req.headers.host + req.url);
-        }
-    });
-}
 
 // Global controller. Basically being used as middleware.
 app.get('/*', function(req, res, next) {

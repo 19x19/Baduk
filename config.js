@@ -2,6 +2,7 @@ var config = {};
 config.HTTP_port = 3001;
 config.HTTPS_port = null;
 config.HTTPS = false;
+config.env = "DEV";
 
 // No Mr. Hacker, this secret key is not the same one as the production key. But
 // I really respect the efforts.
