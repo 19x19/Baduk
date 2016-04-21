@@ -1,6 +1,6 @@
-var sha1 = require('sha1');
 var moniker = require('moniker');
 var schedule = require('node-schedule');
+var cryptohat = require('cryptohat');
 
 /*
     Javascript module for games.
@@ -14,7 +14,7 @@ var current_users = {};
 var game_hash = function() {
     return function() {
         do {
-            var new_hash = sha1(Math.random());
+            var new_hash = cryptohat();
         } while(current_games.indexOf(new_hash) > -1);
         current_games.push(new_hash);
         return new_hash;
