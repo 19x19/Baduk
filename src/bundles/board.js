@@ -94,7 +94,6 @@ var App = React.createClass({
         var pieceCoordY = coordOfClickE.y;
 
         var stoneSize = this.gridSize() / 8;
-        var posOfStone = this.posOf(pieceCoordX, pieceCoordY);
 
         if (0 <= pieceCoordX && pieceCoordX < 9
          && 0 <= pieceCoordY && pieceCoordY < 9
@@ -190,7 +189,7 @@ var App = React.createClass({
                     borderSize={this.state.borderSize}
                     handleClick={this.handleBoardClick}
                     gridSize={this.gridSize()}
-                    playerColor={window.your_color} />
+                    playerColor={this.state.playerColor} />
                 <GameStatusDisplay gameState={this.state.mostRecentGameState} />
                 <div className="buttons">
                     <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
