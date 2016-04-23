@@ -30,9 +30,9 @@ socket.on('new_game_state', function (gameState) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
         var color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
         if (mostRecentMove.action === 'pass') {
-            window.notifyFromServer(color + ' passed');
+            window.appElement.notifyFromServer(color + ' passed');
         } else if (mostRecentMove.action === 'resign') {
-            window.notifyFromServer(color + ' resigned');
+            window.appElement.notifyFromServer(color + ' resigned');
         }
     }
 
@@ -244,7 +244,8 @@ var ChatBox = React.createClass({
                 } else {
                     return <pre key={i}>
                         <i className={"fa fa-" + faClassNameOf(entry.color)}></i>
-                        <span>{entry.username + ": " + entry.message}</span>
+                        <b style={{marginLeft: 4}}>{entry.username + ": "}</b>
+                        <span>{entry.message}</span>
                     </pre>
                 }
             })}</div>
