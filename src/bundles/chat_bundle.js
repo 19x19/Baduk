@@ -6,26 +6,11 @@ socket.emit('post_new_connect', {
     'room' : room,
 });
 
-var faClassNameOf = function (color) {
-    if (color === 'white') return 'circle-thin';
-    if (color === 'black') return 'circle';
-    return 'eye';
-}
-
-// Wraps a name with the appropriate image
-var wrapName = function (color, name) {
-    var player = faClassNameOf(color);
-    return "<i class=\"fa fa-" + faClassNameOf(color) + "\"></i> " + name;
-}
-
 // Updates the list of roommates
 var updateRoommates = function(roommates) {
-    $("#roommates").empty();
-    for (var name in roommates) {
-        $("#roommates").append(
-            "<pre>" + wrapName(roommates[name].color, roommates[name].name) + "</pre>"
-        );
-    }
+    window.appElement.setState({
+        roommates: roommates,
+    });
 }
 
 // Get a message when a new user connects
@@ -34,9 +19,9 @@ socket.on('get_new_connect', function(info) {
     window.appElement.notifyFromServer(info.username + " has connected");
     updateRoommates(info.roommates);
 
-    if ($('#roommates > pre').length >= 2) {
+    if (info.roommates.length >= 2) {
         $('#userWait').modal('hide');
-    } else if ($('#roommates > pre').length <= 1) {
+    } else if (info.roommates.length <= 1) {
         $('#userWait').modal('show');
     }
 
@@ -49,7 +34,7 @@ socket.on('your_name', function (msg) {
     window.appElement.setState({
         playerName: msg.username,
     })
-    updateRoommates(msg.roommates); // todo remove
+    updateRoommates(msg.roommates);
 });
 
 socket.on('your_color', function (msg) {

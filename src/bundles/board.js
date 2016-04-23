@@ -58,6 +58,7 @@ var App = React.createClass({
             chatHistory: [],
             playerName: null,
             playerColor: null,
+            roommates: [],
         }
     },
     notifyNewChatMessage: function (color, username, message) {
@@ -200,7 +201,9 @@ var App = React.createClass({
             <div className="col-md-3 sidebar-right">
                 <div className="well">
                     <h5>Roommates</h5>
-                    <div id="roommates"></div>
+                    <div id="roommates">{this.state.roommates.map(function (roommate) {
+                        return <pre><i className={"fa fa-" + faClassNameOf(roommate.color)}></i>{roommate.name}</pre>
+                    })}</div>
                 </div>
 
                 <div className="well move-history">
