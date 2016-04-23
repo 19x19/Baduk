@@ -195,14 +195,7 @@ var App = React.createClass({
                 </div>
             </div>
             <div className="col-md-3 sidebar-right">
-                <div className="well">
-                    <h5>Roommates</h5>
-                    <div id="roommates">{this.state.roommates.map(function (roommate) {
-                        return <pre key={roommate.name}><i 
-                            className={"fa fa-" + faClassNameOf(roommate.color)} 
-                            style={{ marginRight: 7 }} />{roommate.name}</pre>
-                    })}</div>
-                </div>
+                <RoommatesBox roommates={this.state.roommates} />
 
                 <div className="well move-history">
                     <h5>Move History</h5>
@@ -215,11 +208,18 @@ var App = React.createClass({
     }
 });
 
-var faClassNameOf = function (color) {
-    if (color === 'white') return 'circle-thin';
-    if (color === 'black') return 'circle';
-    return 'eye';
-}
+var RoommatesBox = React.createClass({
+    render: function () {
+        return <div className="well">
+            <h5>Roommates</h5>
+            <div id="roommates">{this.props.roommates.map(function (roommate) {
+                return <pre key={roommate.name}><i
+                    className={"fa fa-" + faClassNameOf(roommate.color)}
+                    style={{ marginRight: 7 }} />{roommate.name}</pre>
+            })}</div>
+        </div>
+    }
+});
 
 var ChatBox = React.createClass({
     handleSend: function () {
@@ -380,39 +380,5 @@ var Board = React.createClass({
 window.appElement = ReactDOM.render(
   <App />, document.getElementById('reactAppContainer')
 );
-
-var pairsOf = function (arr) {
-    // return array of pairs [[arr[0], arr[1]], [arr[2], arr[3]] ...]
-    var ret = [];
-    for (var i=0; i<arr.length; i+=2) {
-        if (i+1 < arr.length) {
-            ret.push([{
-                'idx': i,
-                'elem': arr[i],
-            }, {
-                'idx': i+1,
-                'elem': arr[i+1],
-            }]);
-        } else {
-            ret.push([{
-                'idx': i,
-                'elem': arr[i],
-            }]);
-        }
-    }
-    return ret;
-}
-
-// return modified european coordinates of a move
-// top left = A1, bottom right = T19 (I is skipped)
-var reprOfMove = function (move) {
-    if (move.action === 'pass') return 'pass';
-    if (move.action === 'resign') return 'resign';
-    if (move.action === 'new_piece') {
-        return 'ABCDEFGHJKLMNOPQRST'[move.row] + (move.col + 1).toString();
-    }
-    if (move.action === undefined) throw "no action in " + JSON.stringify(move);
-    throw "unrecognized move action " + move.action;
-}
 
 });
