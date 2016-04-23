@@ -173,7 +173,13 @@ var App = React.createClass({
             <ChatBox 
                 chatHistory={this.state.chatHistory}
                 playerName={this.state.playerName}
-                playerColor={this.state.playerColor} />
+                playerColor={this.state.playerColor}
+                onSendMessage={function (msg) {
+                    socket.emit('post_new_message', {
+                        'message': msg,
+                        'room': room,
+                    });
+                }} />
             <div className="col-md-6 go-board">
                 <Board
                     ref="gameBoard"
@@ -210,10 +216,7 @@ var App = React.createClass({
 
 var ChatBox = React.createClass({
     handleSend: function () {
-        socket.emit('post_new_message', {
-            'message': $(this.refs.chatInput).val(),
-            'room': room,
-        });
+        this.props.onSendMessage($(this.refs.chatInput).val());
         $(this.refs.chatInput).val('');
     },
     handleKeyUp: function (e) {
