@@ -168,6 +168,7 @@ var App = React.createClass({
         });
     },
     render: function () {
+        var self = this;
         return <div className="row go">
             <ChatBox 
                 chatHistory={this.state.chatHistory}
@@ -204,8 +205,20 @@ var App = React.createClass({
 
                 <div className="well move-history">
                     <h5>Move History</h5>
-                    <div id="moveHistory">
-                    </div>
+                    <div id="moveHistory">{pairsOf(this.state.mostRecentGameState.moves).map(function (pair, i) {
+
+                        if (pair.length === 2) {
+                            return <div>
+                                <MoveEntry move={pair[0].elem} isSelected={pair[0].idx === self.state.selectedMoveIdx} />
+                                |
+                                <MoveEntry move={pair[1].elem} isSelected={pair[1].idx === self.state.selectedMoveIdx} />
+                            </div>
+                        } else {
+                            return <div>
+                                <MoveEntry move={pair[0].elem} isSelected={pair[0].idx === self.state.selectedMoveIdx} />
+                            </div>
+                        }
+                    })}</div>
                 </div>
 
             </div>
