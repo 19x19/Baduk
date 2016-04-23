@@ -309,17 +309,12 @@ var Board = React.createClass({
         var stoneSize = stoneStride - 2;
 
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
-            if (selectedStones[i][j] === 1) {
+            if (selectedStones[i][j] === 1 || selectedStones[i][j] === 2) {
                 stones.push({
                     x: i,
                     y: j,
-                    color: 'black',
-                });
-            } else if (selectedStones[i][j] === 2) {
-                stones.push({
-                    x: i,
-                    y: j,
-                    color: 'white',
+                    color: {1: 'black', 2: 'white'}[selectedStones[i][j]],
+                    isSelectedMove: selectedMove.row === i && selectedMove.col === j
                 });
             }
         }
@@ -354,7 +349,7 @@ var Board = React.createClass({
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image
                         key={stone.color + "-" + stone.x + "-" + stone.y}
-                        xlinkHref={"/img/" + stone.color + "_circle.png"}
+                        xlinkHref={"/img/" + stone.color + "_circle" + (stone.isSelectedMove ? "_recent" : "" ) + ".png"}
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
                         width={stoneSize}
