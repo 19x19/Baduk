@@ -9,10 +9,6 @@ $(window).resize(function () {
     // TBD
 });
 
-window.drawDebug = function (gameState) {
-    $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
-}
-
 var resultStringOf = function (color, advantage) {
     if (advantage === 'resign') {
         return color[0].toUpperCase() + '+R';
@@ -202,7 +198,9 @@ var App = React.createClass({
                 <div className="well">
                     <h5>Roommates</h5>
                     <div id="roommates">{this.state.roommates.map(function (roommate) {
-                        return <pre><i className={"fa fa-" + faClassNameOf(roommate.color)}></i>{roommate.name}</pre>
+                        return <pre key={roommate.name}><i 
+                            className={"fa fa-" + faClassNameOf(roommate.color)} 
+                            style={{ marginRight: 7 }} />{roommate.name}</pre>
                     })}</div>
                 </div>
 

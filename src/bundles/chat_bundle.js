@@ -63,15 +63,8 @@ socket.on('get_new_disconnect', function(info) {
 
 // Links the button to copy the URL. Currently doesn't use the callbacks
 // *** This button does not work with Safari ***
-var cpb = clipboardButton('#roomLink', success_cpy);
-$(roomLink).attr("data-clipboard-text", window.location.href);
-
-var isCurrentBrowserSafari = function() {
-    return Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-}
-
-function success_cpy() {
-    if(isCurrentBrowserSafari()) {
+clipboardButton('#roomLink', function () {
+    if (isCurrentBrowserSafari()) {
         $('#roomLink').attr('data-content', 'Press ⌘ +C to copy');
         setTimeout (function () {
             $('.popover').fadeOut(300, function() { $(this).remove(); });
@@ -82,5 +75,9 @@ function success_cpy() {
             $('.popover').fadeOut(300, function() { $(this).remove(); });
         }, 2000);
     }
-};
+});
+$(roomLink).attr("data-clipboard-text", window.location.href);
 
+var isCurrentBrowserSafari = function() {
+    return Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+}
