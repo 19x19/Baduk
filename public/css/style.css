@@ -33,6 +33,10 @@ footer {
     margin: 50px 0;
 }
 
+.moveEntry:hover {
+    background-color: lightgrey;
+}
+
 p {
     font-size: 20px;
 }

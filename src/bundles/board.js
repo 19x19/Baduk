@@ -207,15 +207,27 @@ var App = React.createClass({
                     <h5>Move History</h5>
                     <div id="moveHistory">{pairsOf(this.state.mostRecentGameState.moves).map(function (pair, i) {
 
+                        var moveEntries = pair.map(function (obj) {
+                            return <MoveEntry 
+                                    move={obj.elem} 
+                                    isSelected={obj.idx === self.state.selectedMoveIdx}
+                                    onClick={function () {
+                                        self.setState({
+                                            selectedMoveIdx: obj.idx,
+                                        });
+                                    }} />
+                        });
+
                         if (pair.length === 2) {
-                            return <div>
-                                <MoveEntry move={pair[0].elem} isSelected={pair[0].idx === self.state.selectedMoveIdx} />
-                                |
-                                <MoveEntry move={pair[1].elem} isSelected={pair[1].idx === self.state.selectedMoveIdx} />
+                            return <div key={i} style={{margin: 0, padding: 0}}>
+                                <div style={{display: 'inline-block', paddingLeft: 10, paddingRight: 10, backgroundColor: 'lightgrey'}}>{i}</div>
+                                {moveEntries[0]}
+                                {moveEntries[1]}
                             </div>
                         } else {
-                            return <div>
-                                <MoveEntry move={pair[0].elem} isSelected={pair[0].idx === self.state.selectedMoveIdx} />
+                            return <div key={i} style={{margin: 0, padding: 0}}>
+                                <div style={{display: 'inline-block', paddingLeft: 10, paddingRight: 10, backgroundColor: 'lightgrey'}}>{i}</div>
+                                {moveEntries[0]}
                             </div>
                         }
                     })}</div>

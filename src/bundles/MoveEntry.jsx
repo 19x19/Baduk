@@ -1,9 +1,13 @@
 window.MoveEntry = React.createClass({
 	render: function () {
-		return <span
+		return <div className="moveEntry"
 			style={{
-				fontWeight: this.props.isSelected ? 'bold' : 'lighter'
+				fontWeight: this.props.isSelected ? 'bold' : 'lighter',
+				width: '40%',
+				display: 'inline-block',
+				paddingLeft: 5,
 			}}
-		>{reprOfMove(this.props.move)}</span>
+			onClick={this.props.onClick}
+		>{reprOfMove(this.props.move)}</div>
 	}
 });
