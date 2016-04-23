@@ -208,19 +208,6 @@ var App = React.createClass({
     }
 });
 
-var RoommatesBox = React.createClass({
-    render: function () {
-        return <div className="well">
-            <h5>Roommates</h5>
-            <div id="roommates">{this.props.roommates.map(function (roommate) {
-                return <pre key={roommate.name}><i
-                    className={"fa fa-" + faClassNameOf(roommate.color)}
-                    style={{ marginRight: 7 }} />{roommate.name}</pre>
-            })}</div>
-        </div>
-    }
-});
-
 var ChatBox = React.createClass({
     handleSend: function () {
         socket.emit('post_new_message', {
@@ -264,18 +251,6 @@ var ChatBox = React.createClass({
                 <button id="send" onClick={this.handleSend} className="btn"><i className="material-icons">&#xE163;</i></button>
             </div>
         </div>
-    }
-});
-
-var GameStatusDisplay = React.createClass({
-    render: function () {
-        if (this.props.gameState.result) {
-            return <div>{resultStringOf(this.props.gameState.result.winner, this.props.gameState.result.advantage)}</div>
-        } else if (this.props.gameState.turn === 'white') {
-            return <div>White to play</div>
-        } else {
-            return <div>Black to play</div>
-        }
     }
 });
 
