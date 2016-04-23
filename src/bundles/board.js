@@ -56,6 +56,7 @@ var App = React.createClass({
             borderSize: 60,
             muted: false,
             chatHistory: [],
+            playerName: null,
         }
     },
     notifyNewChatMessage: function (color, username, message) {
@@ -171,7 +172,9 @@ var App = React.createClass({
     },
     render: function () {
         return <div className="row go">
-            <ChatBox chatHistory={this.state.chatHistory} />
+            <ChatBox 
+                chatHistory={this.state.chatHistory}
+                playerName={this.state.playerName} />
             <div className="col-md-6 go-board">
                 <Board
                     ref="gameBoard"
@@ -233,7 +236,7 @@ var ChatBox = React.createClass({
         return <div className="col-md-3 well">
             <h5>Chat</h5>
             <center>
-                Your name is <span id="yourName" className="strong"></span><br />
+                Your name is <span className="strong">{this.props.playerName}</span><br />
                 Your color is <span id="yourColor" className="strong"></span>
             </center>
             <div className="chat">{this.props.chatHistory.map(function (entry, i) {

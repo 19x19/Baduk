@@ -46,21 +46,15 @@ socket.on('get_new_connect', function(info) {
 });
 
 socket.on('your_name', function (msg) {
-    $("#yourName").text(msg.username);
-    updateRoommates(msg.roommates);
+    window.appElement.setState({
+        playerName: msg.username,
+    })
+    updateRoommates(msg.roommates); // todo remove
 });
 
 socket.on('your_color', function (msg) {
     window.your_color = msg.color;
     $("#yourColor").text(msg.color);
-});
-
-// Send a new message to the room
-$("#plus_one").on('click', function () {
-    socket.emit('post_new_message', {
-        'message': ':+1:',
-        'room': room,
-    });
 });
 
 // Gets a new message from the server
