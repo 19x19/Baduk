@@ -19,28 +19,28 @@ var wrapName = function (color, name) {
 }
 
 // Updates the list of roommates
-var updateRoommates = function(roommates, exclude) {
+var updateRoommates = function(roommates) {
     $("#roommates").empty();
-    for(var name in roommates) {
-        if(exclude !== roommates[name].name) {
-            $("#roommates").append(
-                "<pre>" + wrapName(roommates[name].color, roommates[name].name) + "</pre>"
-            );
-        }
+    for (var name in roommates) {
+        $("#roommates").append(
+            "<pre>" + wrapName(roommates[name].color, roommates[name].name) + "</pre>"
+        );
     }
 }
 
 // Get a message when a new user connects
 socket.on('get_new_connect', function(info) {
-    if( $('#roommates > pre').length < 1) {
-        $('#userWait').modal('show');
-    }
+    
     window.appElement.notifyFromServer(info.username + " has connected");
     updateRoommates(info.roommates);
-    if( $('#roommates > pre').length >= 2) {
+
+    if ($('#roommates > pre').length >= 2) {
         $('#userWait').modal('hide');
+    } else if ($('#roommates > pre').length <= 1) {
+        $('#userWait').modal('show');
     }
-    if(info.roommates.length > 1 && !game_started) {
+
+    if (info.roommates.length > 1 && !game_started) {
         $("#gameState").text("Black to play");
     }
 });
@@ -53,8 +53,9 @@ socket.on('your_name', function (msg) {
 });
 
 socket.on('your_color', function (msg) {
-    window.your_color = msg.color;
-    $("#yourColor").text(msg.color);
+    window.appElement.setState({
+        playerColor: msg.color,
+    });
 });
 
 // Gets a new message from the server
@@ -72,7 +73,7 @@ jQuery(window).bind('beforeunload', function (e) {
 // Get any disconnects from the server
 socket.on('get_new_disconnect', function(info) {
     window.appElement.notifyFromServer(info.username + " has disconnected");
-    updateRoommates(info.roommates, info.username);
+    updateRoommates(info.roommates);
 });
 
 // Links the button to copy the URL. Currently doesn't use the callbacks

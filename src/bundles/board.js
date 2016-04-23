@@ -57,6 +57,7 @@ var App = React.createClass({
             muted: false,
             chatHistory: [],
             playerName: null,
+            playerColor: null,
         }
     },
     notifyNewChatMessage: function (color, username, message) {
@@ -88,7 +89,7 @@ var App = React.createClass({
         return boardSize - 2*borderSize;
     },
     handleMouseMove: function (e) {
-        if (typeof(window.your_color) === 'undefined') return;
+        if (this.state.playerColor === null) return;
 
         var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
 
@@ -174,7 +175,8 @@ var App = React.createClass({
         return <div className="row go">
             <ChatBox 
                 chatHistory={this.state.chatHistory}
-                playerName={this.state.playerName} />
+                playerName={this.state.playerName}
+                playerColor={this.state.playerColor} />
             <div className="col-md-6 go-board">
                 <Board
                     ref="gameBoard"
@@ -237,7 +239,7 @@ var ChatBox = React.createClass({
             <h5>Chat</h5>
             <center>
                 Your name is <span className="strong">{this.props.playerName}</span><br />
-                Your color is <span id="yourColor" className="strong"></span>
+                Your color is <span className="strong">{this.props.playerColor}</span>
             </center>
             <div className="chat">{this.props.chatHistory.map(function (entry, i) {
                 if (entry.color === 'admin') {
