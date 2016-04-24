@@ -14,10 +14,6 @@ var applyMove = function (roomId, action) {
     return false and do nothing else if it is an illegal move
     */
 
-    if (current_games[roomId] === undefined) {
-        current_games[roomId] = initialGameState();
-    }
-
     var newState = withMove(current_games[roomId], action);
     if (newState === false) return false;
 
@@ -28,7 +24,10 @@ var applyMove = function (roomId, action) {
 }
 
 var currentGameState = function(roomId) {
-    // Return the current game state of the given room
+    if (current_games[roomId] === undefined) {
+        current_games[roomId] = initialGameState();
+    }
+
     return current_games[roomId];
 }
 
