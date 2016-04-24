@@ -1,34 +1,43 @@
 /*
-    Go game rules
+    Go game rules, and a bit of turn-taking logic
+
+    statesOfRoom maps roomId to gameState, takebackState and deadGroupResolutionState
 */
 
 (function () {
 
-var current_games = {};
+var statesOfRoom = {};
 
 // public API
 
 var applyMove = function (roomId, action) {
     /*
-    update current_games[roomId] with action
+    update statesOfRoom[roomId] with action
     return false and do nothing else if it is an illegal move
     */
 
-    var newState = withMove(current_games[roomId], action);
-    if (newState === false) return false;
+    var newGameState = withMove(currentGameState(roomId), action);
+    if (newGameState === false) return false;
 
-    newState.moves.push(action);
+    newGameState.moves.push(action);
 
-    current_games[roomId] = newState;
-    return newState;
+    statesOfRoom[roomId].gameState = newGameState;
+    return newGameState;
+}
+
+var getStatesOfRoom = function (roomId) {
+    if (statesOfRoom[roomId] === undefined) {
+        statesOfRoom[roomId] = {};
+    }
+    return statesOfRoom[roomId];
 }
 
 var currentGameState = function(roomId) {
-    if (current_games[roomId] === undefined) {
-        current_games[roomId] = initialGameState();
+    if (getStatesOfRoom(roomId).gameState === undefined) {
+        statesOfRoom[roomId].gameState = initialGameState();
     }
 
-    return current_games[roomId];
+    return getStatesOfRoom(roomId).gameState;
 }
 
 // turn-taking logic
