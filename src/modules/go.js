@@ -20,7 +20,7 @@ var applyMove = function (roomId, action) {
     if (newState.gameStatus === 'illegal_move') {
         return false;
     }
-    var newGameState = newState;
+    var newGameState = newState.gameState;
     if (newGameState === false) return false;
 
     newGameState.moves.push(action);
@@ -61,7 +61,10 @@ var withMove = function (gameState, action) {
             'winner': oppositeColor(action.player_color),
             'advantage': 'resign',
         };
-        return newGameState;
+        return {
+            gameStatus: 'playing',
+            gameState: newGameState,
+        };
     }
 
     if (action.player_color !== gameState.turn) {
@@ -83,16 +86,24 @@ var withMove = function (gameState, action) {
             newGameState.turn = 'white';
         }
 
-        return newGameState;
+        return {
+            gameStatus: 'playing',
+            gameState: newGameState,
+        };
 
     }
 
     if (action['action'] === 'new_piece') {
         var newGameState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
-        if (newGameState === false) return {
-            gameStatus: 'illegal_move',
+        if (newGameState === false) {
+            return {
+                gameStatus: 'illegal_move',
+            };
+        }
+        return {
+            gameStatus: 'playing',
+            gameState: newGameState,
         };
-        return newGameState;
     }
 
 }
@@ -231,7 +242,7 @@ var boardStateHistoryOf = function (gameState) {
     var bs = initialGameState();
     var ret = [bs];
     gameState.moves.forEach(function (move) {
-        bs = withMove(bs, move);
+        bs = withMove(bs, move).gameState;
         ret.push(bs);
     });
     return ret;
