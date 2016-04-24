@@ -11,6 +11,11 @@ $(window).resize(function () {
 
 socket.on('new_game_state', function (gameState) {
 
+    if (gameState === false) {
+        console.log('WARN: gameState is false, this should never happen. Please contact @zodiac');
+        return;
+    }
+
     // Play the sound for a new piece
     window.appElement.notifyNewGameState();
 
