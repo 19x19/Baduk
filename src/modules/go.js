@@ -17,16 +17,20 @@ var applyMove = function (roomId, action) {
     */
 
     var newState = withMove(currentGameState(roomId), action);
+
     if (newState.gameStatus === 'illegal_move') {
         return false;
+    } else if (newState.gameStatus === 'playing') {
+        var newGameState = newState.gameState;
+        if (newGameState === false) return false;
+
+        newGameState.moves.push(action);
+
+        statesOfRoom[roomId].gameState = newGameState;
+        return newGameState;
+    } else {
+        console.log('unrecognized gameStatus', newState.gameStatus);
     }
-    var newGameState = newState.gameState;
-    if (newGameState === false) return false;
-
-    newGameState.moves.push(action);
-
-    statesOfRoom[roomId].gameState = newGameState;
-    return newGameState;
 }
 
 var getStatesOfRoom = function (roomId) {
