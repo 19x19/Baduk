@@ -50,7 +50,7 @@ var App = React.createClass({
             ghostPiece: null,
             boardSize: 500,
             borderSize: 60,
-            muted: false,
+            muted: true,
             chatHistory: [],
             playerName: null,
             playerColor: null,
@@ -196,7 +196,7 @@ var App = React.createClass({
                     <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
                     <button className="btn" onClick={this.handleResignBtnClick}>Resign</button>
                     <button className="btn" onClick={this.handleMuteBtnClick}>
-                        <i id="sound_display" className={this.state.muted ? "fa fa-volume-up" : "fa fa-volume-off"} aria-hidden="true"></i>
+                        <i id="sound_display" className={this.state.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
                         </button>
                 </div>
             </div>
