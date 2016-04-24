@@ -22,8 +22,6 @@ var applyMove = function (roomId, action) {
         return false;
     } else if (newState.gameStatus === 'playing') {
         var newGameState = newState.gameState;
-        if (newGameState === false) return false; // todo: remove
-
         newGameState.moves.push(action);
 
         statesOfRoom[roomId].gameState = newGameState;
@@ -346,7 +344,7 @@ var withoutDeadGroups = function (gameState) {
 
 }
 
-var groupOf = function (gameState, x, y, blacklist) { // todo: duplicates?
+var groupOf = function (gameState, x, y, blacklist) {
     blacklist = blacklist || [];
 
     if (blacklist.indexOf(reprStone(x, y)) !== -1) return [];
