@@ -24,12 +24,14 @@ var applyMove = function (roomId, action) {
         var newGameState = newState.gameState;
         newGameState.moves.push(action);
         statesOfRoom[roomId].gameState = newGameState;
+        statesOfRoom[roomId].gameStatus = newState.gameStatus;
         return newState;
     } else if (newState.gameStatus === 'resolving_dead_groups') {
         var newGameState = newState.gameState;
         newGameState.moves.push(action);
         statesOfRoom[roomId].gameState = newGameState;
         statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+        statesOfRoom[roomId].gameStatus = newState.gameStatus;
         return newState;
     } else if (newState.gameStatus === undefined) {
         console.log('undefined gameStatus on gameState ', newState);
@@ -45,12 +47,20 @@ var getStatesOfRoom = function (roomId) {
     return statesOfRoom[roomId];
 }
 
-var currentGameState = function(roomId) {
+var currentGameState = function (roomId) {
     if (getStatesOfRoom(roomId).gameState === undefined) {
         statesOfRoom[roomId].gameState = initialGameState();
     }
 
     return getStatesOfRoom(roomId).gameState;
+}
+
+var currentGameStatus = function (roomId) {
+    if (getStatesOfRoom(roomId).gameState === undefined) {
+        statesOfRoom[roomId].gameState = 'playing';
+    }
+
+    return getStatesOfRoom(roomId).gameStatus;
 }
 
 // turn-taking logic
@@ -426,6 +436,7 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 if (isNodejs()) {
     exports.applyMove = applyMove;
     exports.currentGameState = currentGameState;
+    exports.currentGameStatus = currentGameStatus;
 
     // exported for testing
 
