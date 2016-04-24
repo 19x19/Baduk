@@ -72,10 +72,10 @@ var handleMove = function (socket, info, io, move, move_name) {
     const newState = go.applyMove(info.room, Object.assign(move, {
         'player_color': color,
     }));
-    if (newState !== false) {
-        io.to(info.room).emit('new_game_state', newState);
-    } else {
+    if (newState.gameStatus === 'illegal_move') {
         socket.emit('move_is_illegal', {});
+    } else {
+        io.to(info.room).emit('new_game_state', newState.gameState);
     }
 
 }

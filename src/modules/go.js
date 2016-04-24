@@ -19,19 +19,18 @@ var applyMove = function (roomId, action) {
     var newState = withMove(currentGameState(roomId), action);
 
     if (newState.gameStatus === 'illegal_move') {
-        return false;
+        return newState;
     } else if (newState.gameStatus === 'playing') {
         var newGameState = newState.gameState;
         newGameState.moves.push(action);
-
         statesOfRoom[roomId].gameState = newGameState;
-        return newGameState;
+        return newState;
     } else if (newState.gameStatus === 'resolving_dead_groups') {
         var newGameState = newState.gameState;
         newGameState.moves.push(action);
         statesOfRoom[roomId].gameState = newGameState;
         statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
-        return newGameState; // todo: signal enter dead group resolution
+        return newState;
     } else if (newState.gameStatus === undefined) {
         console.log('undefined gameStatus on gameState ', newState);
     } else {
