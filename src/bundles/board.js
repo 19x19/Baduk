@@ -9,14 +9,6 @@ $(window).resize(function () {
     // TBD
 });
 
-var resultStringOf = function (color, advantage) {
-    if (advantage === 'resign') {
-        return color[0].toUpperCase() + '+R';
-    } else {
-        return color[0].toUpperCase() + advantage.toString();
-    }
-}
-
 socket.on('new_game_state', function (gameState) {
 
     // Play the sound for a new piece
