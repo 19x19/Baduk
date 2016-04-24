@@ -27,7 +27,7 @@ var applyMove = function (roomId, action) {
     return newState;
 }
 
-var currentState = function(roomId) {
+var currentGameState = function(roomId) {
     // Return the current game state of the given room
     return current_games[roomId];
 }
@@ -378,7 +378,7 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 
 if (isNodejs()) {
     exports.applyMove = applyMove;
-    exports.currentState = currentState;
+    exports.currentGameState = currentGameState;
 
     // exported for testing
 
