@@ -35,7 +35,7 @@ var post_new_connect = function(socket, info, io) {
         'username': games.current_users[user_id].username,
         'roommates' : games.players_in_room(info.room),
     });
-    socket.emit(go.currentGameState(info.room));
+    socket.emit('new_game_state', go.currentGameState(info.room));
 }
 
 // Reacts to new disconnections
