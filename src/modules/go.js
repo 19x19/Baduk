@@ -22,12 +22,20 @@ var applyMove = function (roomId, action) {
         return false;
     } else if (newState.gameStatus === 'playing') {
         var newGameState = newState.gameState;
-        if (newGameState === false) return false;
+        if (newGameState === false) return false; // todo: remove
 
         newGameState.moves.push(action);
 
         statesOfRoom[roomId].gameState = newGameState;
         return newGameState;
+    } else if (newState.gameStatus === 'resolving_dead_groups') {
+        var newGameState = newState.gameState;
+        newGameState.moves.push(action);
+        statesOfRoom[roomId].gameState = newGameState;
+        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+        return newGameState; // todo: signal enter dead group resolution
+    } else if (newState.gameStatus === undefined) {
+        console.log('undefined gameStatus on gameState ', newState);
     } else {
         console.log('unrecognized gameStatus', newState.gameStatus);
     }
@@ -82,12 +90,18 @@ var withMove = function (gameState, action) {
 
         var newGameState = copy(gameState);
 
-        // TODO: enter scoring mode if 2 passes in a row
-
         if (newGameState.turn === 'white') {
             newGameState.turn = 'black';
         } else {
             newGameState.turn = 'white';
+        }
+
+        if (gameState.moves.length > 0 && gameState.moves.slice(-1)[0].action === 'pass') {
+            return {
+                gameStatus: 'resolving_dead_groups',
+                gameState: newGameState,
+                deadGroupResolutionState: [],
+            }
         }
 
         return {
