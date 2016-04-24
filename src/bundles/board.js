@@ -39,6 +39,12 @@ socket.on('move_is_illegal', function (msg) {
     console.log('illegal move');
 });
 
+socket.on('new_game_status', function (msg) {
+    window.appElement.setState({
+        gameStatus: msg,
+    });
+});
+
 var App = React.createClass({
     getInitialState: function () {
         return {
@@ -52,6 +58,7 @@ var App = React.createClass({
             playerName: null,
             playerColor: null,
             roommates: [],
+            gameStatus: null,
         }
     },
     notifyNewChatMessage: function (color, username, message) {
@@ -174,6 +181,7 @@ var App = React.createClass({
                     });
                 }} />
             <div className="col-md-6 go-board">
+                <pre>{JSON.stringify(this.state.gameStatus)}</pre>
                 <Board
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}
