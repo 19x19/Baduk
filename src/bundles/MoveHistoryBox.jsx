@@ -3,7 +3,6 @@ window.MoveHistoryBox = React.createClass({
         if (oldProps && this.props && oldProps.moves.length === this.props.moves.length) {
             return;
         }
-        console.log(oldProps, this.props);
         var s = $(ReactDOM.findDOMNode(this.refs.scroll));
         s.scrollTop(s.prop("scrollHeight"));
     },

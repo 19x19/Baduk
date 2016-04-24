@@ -135,13 +135,9 @@ var App = React.createClass({
     },
     handleBoardClick: function (e) {
 
-        console.log('handleBoardClick', e.pageX);
-
         var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
 
         var room = /[^/]*$/.exec(window.location.pathname)[0];
-
-        console.log('handleBoardClick', coordOfClickE);
 
         socket.emit('post_new_piece', {
             'row': coordOfClickE.x,

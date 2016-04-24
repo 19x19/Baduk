@@ -17,7 +17,7 @@ var applyMove = function (roomId, action) {
     */
 
     var newState = withMove(currentGameState(roomId), action);
-    if (newState === false || newState.gameStatus === 'illegal_move') {
+    if (newState.gameStatus === 'illegal_move') {
         return false;
     }
     var newGameState = newState;
@@ -66,7 +66,9 @@ var withMove = function (gameState, action) {
 
     if (action.player_color !== gameState.turn) {
         if (isNodejs()) console.log('illegal move: not your turn');
-        return false;
+        return {
+            gameStatus: 'illegal_move',
+        };
     }
 
     if (action['action'] === 'pass') {
@@ -246,7 +248,6 @@ var isLegalMove = function (gameState, color, x, y) {
         row: x,
         col: y
     });
-    if (newState === false) return false;
     if (newState.gameStatus === 'illegal_move') return false;
     return true;
 }
