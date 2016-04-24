@@ -16,7 +16,11 @@ var applyMove = function (roomId, action) {
     return false and do nothing else if it is an illegal move
     */
 
-    var newGameState = withMove(currentGameState(roomId), action);
+    var newState = withMove(currentGameState(roomId), action);
+    if (newState === false || newState.gameStatus === 'illegal_move') {
+        return false;
+    }
+    var newGameState = newState;
     if (newGameState === false) return false;
 
     newGameState.moves.push(action);
@@ -46,16 +50,18 @@ var withMove = function (gameState, action) {
 
     if (gameState.result) {
         if (isNodejs()) console.log('illegal move: game is over');
-        return false;
+        return {
+            gameStatus: 'illegal_move',
+        };
     }
 
     if (action['action'] === 'resign') {
-        var newState = copy(gameState);
-        newState.result = {
+        var newGameState = copy(gameState);
+        newGameState.result = {
             'winner': oppositeColor(action.player_color),
             'advantage': 'resign',
         };
-        return newState;
+        return newGameState;
     }
 
     if (action.player_color !== gameState.turn) {
@@ -65,24 +71,26 @@ var withMove = function (gameState, action) {
 
     if (action['action'] === 'pass') {
 
-        var newState = copy(gameState);
+        var newGameState = copy(gameState);
 
         // TODO: enter scoring mode if 2 passes in a row
 
-        if (newState.turn === 'white') {
-            newState.turn = 'black';
+        if (newGameState.turn === 'white') {
+            newGameState.turn = 'black';
         } else {
-            newState.turn = 'white';
+            newGameState.turn = 'white';
         }
 
-        return newState;
+        return newGameState;
 
     }
 
     if (action['action'] === 'new_piece') {
-        var newState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
-        if (newState === false) return false;
-        return newState;
+        var newGameState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
+        if (newGameState === false) return {
+            gameStatus: 'illegal_move',
+        };
+        return newGameState;
     }
 
 }
@@ -231,12 +239,16 @@ var boardStateHistoryOf = function (gameState) {
 // exported to browser
 
 var isLegalMove = function (gameState, color, x, y) {
-    return gameState && withMove(gameState, {
+    if (!gameState) return false;
+    var newState = withMove(gameState, {
         player_color: color,
         action: 'new_piece',
         row: x,
         col: y
-    }) !== false;
+    });
+    if (newState === false) return false;
+    if (newState.gameStatus === 'illegal_move') return false;
+    return true;
 }
 
 // go-specific logic
