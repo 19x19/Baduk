@@ -112,7 +112,12 @@ var post_resign = function(socket, info, io) {
         'action': 'resign',
         'player_color': color
     });
-    io.to(info.room).emit('new_game_state', newState);
+    if (newState !== false) {
+        io.to(info.room).emit('new_game_state', newState);
+    } else {
+        socket.emit('move_is_illegal', {});
+        logger.info('illegal move');
+    }
 }
 
 exports.post_new_connect = post_new_connect;
