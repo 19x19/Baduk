@@ -170,7 +170,7 @@ var App = React.createClass({
     render: function () {
         var self = this;
         return <div className="row go">
-            <ChatBox 
+            <ChatBox
                 chatHistory={this.state.chatHistory}
                 playerName={this.state.playerName}
                 playerColor={this.state.playerColor}
@@ -202,36 +202,14 @@ var App = React.createClass({
             </div>
             <div className="col-md-3 sidebar-right">
                 <RoommatesBox roommates={this.state.roommates} />
-
-                <div className="well move-history">
-                    <h5>Move History</h5>
-                    <div id="moveHistory">{pairsOf(this.state.mostRecentGameState.moves).map(function (pair, i) {
-
-                        var moveEntries = pair.map(function (obj) {
-                            return <MoveEntry 
-                                    move={obj.elem} 
-                                    isSelected={obj.idx === self.state.selectedMoveIdx}
-                                    onClick={function () {
-                                        self.setState({
-                                            selectedMoveIdx: obj.idx,
-                                        });
-                                    }} />
+                <MoveHistoryBox
+                    moves={this.state.mostRecentGameState.moves}
+                    selectedMoveIdx={this.state.selectedMoveIdx}
+                    onSelectMove={function (selectedMoveIdx) {
+                        self.setState({
+                            selectedMoveIdx: selectedMoveIdx,
                         });
-
-                        if (pair.length === 2) {
-                            return <div key={i} style={{margin: 0, padding: 0}}>
-                                <div style={{display: 'inline-block', paddingLeft: 10, paddingRight: 10, backgroundColor: 'lightgrey'}}>{i}</div>
-                                {moveEntries[0]}
-                                {moveEntries[1]}
-                            </div>
-                        } else {
-                            return <div key={i} style={{margin: 0, padding: 0}}>
-                                <div style={{display: 'inline-block', paddingLeft: 10, paddingRight: 10, backgroundColor: 'lightgrey'}}>{i}</div>
-                                {moveEntries[0]}
-                            </div>
-                        }
-                    })}</div>
-                </div>
+                    }}/>
 
             </div>
         </div>

@@ -35,6 +35,7 @@ footer {
 
 .moveEntry:hover {
     background-color: lightgrey;
+    cursor: pointer;
 }
 
 p {
