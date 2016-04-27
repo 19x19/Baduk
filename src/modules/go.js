@@ -20,6 +20,13 @@ var applyMove = function (roomId, action) {
     return if move was legal
     */
 
+    const VALID_GAME_STATUSES = [
+        'game_over',
+        'illegal_move',
+        'resolving_dead_groups',
+        'playing',
+    ];
+
     if (currentGameStatus(roomId) === 'game_over') {
         if (isNodejs()) console.log('illegal move: game is over');
         return false;
@@ -27,32 +34,30 @@ var applyMove = function (roomId, action) {
 
     var newState = withMove(currentGameState(roomId), action);
 
+    if (newState.gameStatus === undefined) {
+        console.log('undefined gameStatus on gameState ', newState);
+        return;
+    }
+
+    if (VALID_GAME_STATUSES.indexOf(newState.gameStatus) === -1) {
+        console.log('unrecognized gameStatus', newState.gameStatus);
+        return;
+    }
+
     if (newState.gameStatus === 'illegal_move') {
         return false;
-    } else if (newState.gameStatus === 'playing') {
-        var newGameState = newState.gameState;
-        newGameState.moves.push(action);
-        statesOfRoom[roomId].gameState = newGameState;
-        statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return true;
-    } else if (newState.gameStatus === 'resolving_dead_groups') {
-        var newGameState = newState.gameState;
-        newGameState.moves.push(action);
-        statesOfRoom[roomId].gameState = newGameState;
-        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
-        statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return true;
-    } else if (newState.gameStatus === 'game_over') {
-        var newGameState = newState.gameState;
-        newGameState.moves.push(action);
-        statesOfRoom[roomId].gameState = newGameState;
-        statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return true;
-    } else if (newState.gameStatus === undefined) {
-        console.log('undefined gameStatus on gameState ', newState);
-    } else {
-        console.log('unrecognized gameStatus', newState.gameStatus);
     }
+
+    var newGameState = newState.gameState;
+    newGameState.moves.push(action);
+    statesOfRoom[roomId].gameState = newGameState;
+    statesOfRoom[roomId].gameStatus = newState.gameStatus;
+
+    if (newState.gameStatus === 'resolving_dead_groups') {
+        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+    }
+
+    return true;
 }
 
 var getStatesOfRoom = function (roomId) {
