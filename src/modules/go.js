@@ -67,7 +67,11 @@ var applyMove = function (roomId, action) {
     statesOfRoom[roomId].gameStatus = newState.gameStatus;
 
     if (newState.gameStatus === 'resolving_dead_groups') {
-        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+        statesOfRoom[roomId].deadGroupResolutionState = {
+            'stones': newState.deadGroupResolutionState,
+            'white_committed': false,
+            'black_committed': false,
+        };
     }
 
     return true;
