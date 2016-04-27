@@ -113,17 +113,19 @@ Baduk is not for profit. We don't have ads and we don't collect your information
     $("#playGame_top").on("click", function() {
         $("#createGame").modal('show');
     });
+
     $("#playGame_bot").on("click", function() {
         $("#createGame").modal('show');
     });
+
     $("#startGame").on("click", function() {
         $.ajax({
             type: "POST",
             url: "/go",
             data: {
             },
-            success: function() {
-                alert("lol");
+            success: function(url) {
+                window.location.href = url;
             },
         });
     });
