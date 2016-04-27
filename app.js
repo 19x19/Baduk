@@ -29,7 +29,7 @@ const favicon = require('serve-favicon');
 const Ddos = require('ddos');
 const git = require('git-rev');
 const csurf = require('csurf');
-const ddos = new Ddos;
+const ddos = new Ddos({'silentStart' : true});
 
 // Baduk modules
 const games = require('./src/modules/games.js');
