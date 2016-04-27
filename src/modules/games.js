@@ -35,22 +35,22 @@ var user_exists = function(id) {
 // Adds a user to the given room
 var add_user = function(info, socket) {
     // If the user has no current session with sockets, create a new user
-    if(!user_exists(socket.handshake.session.id)) {
+    if (!user_exists(socket.handshake.session.id)) {
         current_users[socket.handshake.session.id] = {};
         current_users[socket.handshake.session.id]['username'] = moniker.choose();
     }
 
     // If the user hasn't been to this room, increment his instances
-    if(current_users[socket.handshake.session.id][info.room] === undefined) {
+    if (current_users[socket.handshake.session.id][info.room] === undefined) {
         current_users[socket.handshake.session.id][info.room] = {};
         current_users[socket.handshake.session.id][info.room]['instances'] = 0;
 
         // Assign the color of the player in this room
         var current_sockets = sockets_in_room(info.room);
-        if(current_sockets.length == 0) {
+        if (current_sockets.length == 0) {
             // If there are no players, randomly assign a color
             current_users[socket.handshake.session.id][info.room].color = (Math.random() < 0.5 ? 'white' : 'black');
-        } else if(current_sockets.length == 1) {
+        } else if (current_sockets.length == 1) {
             // If there is one player, get the opposite of his color
             var other_color = current_users[current_sockets[0]][info.room]['color'];
             current_users[socket.handshake.session.id][info.room]['color'] = (other_color === 'white' ? 'black' : 'white');

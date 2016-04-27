@@ -94,13 +94,13 @@ console.log(isSuicide(gs4, 'black', 0, 0));
 
 // regression
 
-var gs5 = { whiteStones: 
+var gs5 = { whiteStones:
    [ { x: 6, y: 7 },
      { x: 6, y: 8 },
      { x: 7, y: 6 },
      { x: 6, y: 6 },
      { x: 8, y: 6 } ],
-  blackStones: 
+  blackStones:
    [ { x: 7, y: 7 },
      { x: 7, y: 8 },
      { x: 8, y: 7 },
@@ -147,7 +147,8 @@ var gs6 = {
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     turn: "white",
-    size: 9
+    size: 9,
+    moves: [],
 };
 
 var gs7 = withNewPiece(gs6, 'white', 0, 1);

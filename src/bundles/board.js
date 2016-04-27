@@ -9,19 +9,12 @@ $(window).resize(function () {
     // TBD
 });
 
-window.drawDebug = function (gameState) {
-    $('.inner').empty().append(imgOfAll(gameState.blackStones, gameState.whiteStones, {}));
-}
-
-var resultStringOf = function (color, advantage) {
-    if (advantage === 'resign') {
-        return color[0].toUpperCase() + '+R';
-    } else {
-        return color[0].toUpperCase() + advantage.toString();
-    }
-}
-
 socket.on('new_game_state', function (gameState) {
+
+    if (gameState === false) {
+        console.log('WARN: gameState is false, this should never happen. Please contact @zodiac');
+        return;
+    }
 
     // Play the sound for a new piece
     window.appElement.notifyNewGameState();
@@ -30,9 +23,9 @@ socket.on('new_game_state', function (gameState) {
         var mostRecentMove = gameState.moves.slice(-1)[0];
         var color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
         if (mostRecentMove.action === 'pass') {
-            window.notifyFromServer(color + ' passed');
+            window.appElement.notifyFromServer(color + ' passed');
         } else if (mostRecentMove.action === 'resign') {
-            window.notifyFromServer(color + ' resigned');
+            window.appElement.notifyFromServer(color + ' resigned');
         }
     }
 
@@ -46,6 +39,12 @@ socket.on('move_is_illegal', function (msg) {
     console.log('illegal move');
 });
 
+socket.on('new_game_status', function (msg) {
+    window.appElement.setState({
+        gameStatus: msg,
+    });
+});
+
 var App = React.createClass({
     getInitialState: function () {
         return {
@@ -54,8 +53,12 @@ var App = React.createClass({
             ghostPiece: null,
             boardSize: 500,
             borderSize: 60,
-            muted: false,
+            muted: true,
             chatHistory: [],
+            playerName: null,
+            playerColor: null,
+            roommates: [],
+            gameStatus: null,
         }
     },
     notifyNewChatMessage: function (color, username, message) {
@@ -87,7 +90,7 @@ var App = React.createClass({
         return boardSize - 2*borderSize;
     },
     handleMouseMove: function (e) {
-        if (typeof(window.your_color) === 'undefined') return;
+        if (this.state.playerColor === null) return;
 
         var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
 
@@ -95,7 +98,6 @@ var App = React.createClass({
         var pieceCoordY = coordOfClickE.y;
 
         var stoneSize = this.gridSize() / 8;
-        var posOfStone = this.posOf(pieceCoordX, pieceCoordY);
 
         if (0 <= pieceCoordX && pieceCoordX < 9
          && 0 <= pieceCoordY && pieceCoordY < 9
@@ -140,13 +142,9 @@ var App = React.createClass({
     },
     handleBoardClick: function (e) {
 
-        console.log('handleBoardClick', e.pageX);
-
         var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
 
         var room = /[^/]*$/.exec(window.location.pathname)[0];
-
-        console.log('handleBoardClick', coordOfClickE);
 
         socket.emit('post_new_piece', {
             'row': coordOfClickE.x,
@@ -170,9 +168,20 @@ var App = React.createClass({
         });
     },
     render: function () {
+        var self = this;
         return <div className="row go">
-            <ChatBox chatHistory={this.state.chatHistory} />
+            <ChatBox
+                chatHistory={this.state.chatHistory}
+                playerName={this.state.playerName}
+                playerColor={this.state.playerColor}
+                onSendMessage={function (msg) {
+                    socket.emit('post_new_message', {
+                        'message': msg,
+                        'room': room,
+                    });
+                }} />
             <div className="col-md-6 go-board">
+                <pre>{JSON.stringify(this.state.gameStatus)}</pre>
                 <Board
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}
@@ -182,93 +191,29 @@ var App = React.createClass({
                     borderSize={this.state.borderSize}
                     handleClick={this.handleBoardClick}
                     gridSize={this.gridSize()}
-                    playerColor={window.your_color} />
+                    playerColor={this.state.playerColor} />
                 <GameStatusDisplay gameState={this.state.mostRecentGameState} />
                 <div className="buttons">
                     <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
                     <button className="btn" onClick={this.handleResignBtnClick}>Resign</button>
                     <button className="btn" onClick={this.handleMuteBtnClick}>
-                        <i id="sound_display" className={this.state.muted ? "fa fa-volume-up" : "fa fa-volume-off"} aria-hidden="true"></i>
+                        <i id="sound_display" className={this.state.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
                         </button>
                 </div>
             </div>
             <div className="col-md-3 sidebar-right">
-                <div className="well">
-                    <h5>Roommates</h5>
-                    <div id="roommates"></div>
-                </div>
-
-                <div className="well move-history">
-                    <h5>Move History</h5>
-                    <div id="moveHistory">
-                    </div>
-                </div>
+                <RoommatesBox roommates={this.state.roommates} />
+                <MoveHistoryBox
+                    moves={this.state.mostRecentGameState.moves}
+                    selectedMoveIdx={this.state.selectedMoveIdx}
+                    onSelectMove={function (selectedMoveIdx) {
+                        self.setState({
+                            selectedMoveIdx: selectedMoveIdx,
+                        });
+                    }}/>
 
             </div>
         </div>
-    }
-});
-
-var faClassNameOf = function (color) {
-    if (color === 'white') return 'circle-thin';
-    if (color === 'black') return 'circle';
-    return 'eye';
-}
-
-var ChatBox = React.createClass({
-    handleSend: function () {
-        socket.emit('post_new_message', {
-            'message': $(this.refs.chatInput).val(),
-            'room': room,
-        });
-        $(this.refs.chatInput).val('');
-    },
-    handleKeyUp: function (e) {
-        if (e.keyCode == 13){
-            this.handleSend();
-        }
-    },
-    render: function () {
-        var self = this;
-        return <div className="col-md-3 well">
-            <h5>Chat</h5>
-            <center>
-                Your name is <span id="yourName" className="strong"></span><br />
-                Your color is <span id="yourColor" className="strong"></span>
-            </center>
-            <div className="chat">{this.props.chatHistory.map(function (entry, i) {
-                if (entry.color === 'admin') {
-                    return <pre key={i}>
-                        <i>{entry.message}</i>
-                    </pre>
-                } else {
-                    return <pre key={i}>
-                        <i className={"fa fa-" + faClassNameOf(entry.color)}></i>
-                        <span>{entry.username + ": " + entry.message}</span>
-                    </pre>
-                }
-            })}</div>
-
-            <div className="chat-controls">
-                <input
-                    ref="chatInput"
-                    onKeyUp={this.handleKeyUp}
-                    className="form-control" />
-                <button id="send" onClick={this.handleSend} className="btn"><i className="material-icons">&#xE163;</i></button>
-            </div>
-        </div>
-    }
-});
-
-var GameStatusDisplay = React.createClass({
-    render: function () {
-        if (this.props.gameState.result) {
-            return <div>{resultStringOf(this.props.gameState.result.winner, this.props.gameState.result.advantage)}</div>
-        } else if (this.props.gameState.turn === 'white') {
-            return <div>White to play</div>
-        } else {
-            return <div>Black to play</div>
-        }
     }
 });
 
@@ -308,17 +253,12 @@ var Board = React.createClass({
         var stoneSize = stoneStride - 2;
 
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
-            if (selectedStones[i][j] === 1) {
+            if (selectedStones[i][j] === 1 || selectedStones[i][j] === 2) {
                 stones.push({
                     x: i,
                     y: j,
-                    color: 'black',
-                });
-            } else if (selectedStones[i][j] === 2) {
-                stones.push({
-                    x: i,
-                    y: j,
-                    color: 'white',
+                    color: {1: 'black', 2: 'white'}[selectedStones[i][j]],
+                    isSelectedMove: selectedMove.row === i && selectedMove.col === j
                 });
             }
         }
@@ -353,7 +293,7 @@ var Board = React.createClass({
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image
                         key={stone.color + "-" + stone.x + "-" + stone.y}
-                        xlinkHref={"/img/" + stone.color + "_circle.png"}
+                        xlinkHref={"/img/" + stone.color + "_circle" + (stone.isSelectedMove ? "_recent" : "" ) + ".png"}
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
                         width={stoneSize}
@@ -378,39 +318,5 @@ var Board = React.createClass({
 window.appElement = ReactDOM.render(
   <App />, document.getElementById('reactAppContainer')
 );
-
-var pairsOf = function (arr) {
-    // return array of pairs [[arr[0], arr[1]], [arr[2], arr[3]] ...]
-    var ret = [];
-    for (var i=0; i<arr.length; i+=2) {
-        if (i+1 < arr.length) {
-            ret.push([{
-                'idx': i,
-                'elem': arr[i],
-            }, {
-                'idx': i+1,
-                'elem': arr[i+1],
-            }]);
-        } else {
-            ret.push([{
-                'idx': i,
-                'elem': arr[i],
-            }]);
-        }
-    }
-    return ret;
-}
-
-// return modified european coordinates of a move
-// top left = A1, bottom right = T19 (I is skipped)
-var reprOfMove = function (move) {
-    if (move.action === 'pass') return 'pass';
-    if (move.action === 'resign') return 'resign';
-    if (move.action === 'new_piece') {
-        return 'ABCDEFGHJKLMNOPQRST'[move.row] + (move.col + 1).toString();
-    }
-    if (move.action === undefined) throw "no action in " + JSON.stringify(move);
-    throw "unrecognized move action " + move.action;
-}
 
 });

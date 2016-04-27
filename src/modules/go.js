@@ -1,35 +1,66 @@
 /*
-    Go game rules
+    Go game rules, and a bit of turn-taking logic
+
+    statesOfRoom maps roomId to gameState, takebackState and deadGroupResolutionState
 */
 
 (function () {
 
-var current_games = {};
+var statesOfRoom = {};
 
 // public API
 
 var applyMove = function (roomId, action) {
     /*
-    update current_games[roomId] with action
+    update statesOfRoom[roomId] with action
     return false and do nothing else if it is an illegal move
     */
 
-    if (current_games[roomId] === undefined) {
-        current_games[roomId] = initialGameState();
+    var newState = withMove(currentGameState(roomId), action);
+
+    if (newState.gameStatus === 'illegal_move') {
+        return newState;
+    } else if (newState.gameStatus === 'playing') {
+        var newGameState = newState.gameState;
+        newGameState.moves.push(action);
+        statesOfRoom[roomId].gameState = newGameState;
+        statesOfRoom[roomId].gameStatus = newState.gameStatus;
+        return newState;
+    } else if (newState.gameStatus === 'resolving_dead_groups') {
+        var newGameState = newState.gameState;
+        newGameState.moves.push(action);
+        statesOfRoom[roomId].gameState = newGameState;
+        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+        statesOfRoom[roomId].gameStatus = newState.gameStatus;
+        return newState;
+    } else if (newState.gameStatus === undefined) {
+        console.log('undefined gameStatus on gameState ', newState);
+    } else {
+        console.log('unrecognized gameStatus', newState.gameStatus);
     }
-
-    var newState = withMove(current_games[roomId], action);
-    if (newState === false) return false;
-
-    newState.moves.push(action);
-
-    current_games[roomId] = newState;
-    return newState;
 }
 
-var currentState = function(roomId) {
-    // Return the current game state of the given room
-    return current_games[roomId];
+var getStatesOfRoom = function (roomId) {
+    if (statesOfRoom[roomId] === undefined) {
+        statesOfRoom[roomId] = {};
+    }
+    return statesOfRoom[roomId];
+}
+
+var currentGameState = function (roomId) {
+    if (getStatesOfRoom(roomId).gameState === undefined) {
+        statesOfRoom[roomId].gameState = initialGameState();
+    }
+
+    return getStatesOfRoom(roomId).gameState;
+}
+
+var currentGameStatus = function (roomId) {
+    if (getStatesOfRoom(roomId).gameState === undefined) {
+        statesOfRoom[roomId].gameState = 'playing';
+    }
+
+    return getStatesOfRoom(roomId).gameStatus;
 }
 
 // turn-taking logic
@@ -38,43 +69,66 @@ var withMove = function (gameState, action) {
 
     if (gameState.result) {
         if (isNodejs()) console.log('illegal move: game is over');
-        return false;
+        return {
+            gameStatus: 'illegal_move',
+        };
     }
 
     if (action['action'] === 'resign') {
-        var newState = copy(gameState);
-        newState.result = {
+        var newGameState = copy(gameState);
+        newGameState.result = {
             'winner': oppositeColor(action.player_color),
             'advantage': 'resign',
         };
-        return newState;
+        return {
+            gameStatus: 'playing',
+            gameState: newGameState,
+        };
     }
 
     if (action.player_color !== gameState.turn) {
         if (isNodejs()) console.log('illegal move: not your turn');
-        return false;
+        return {
+            gameStatus: 'illegal_move',
+        };
     }
 
     if (action['action'] === 'pass') {
 
-        var newState = copy(gameState);
+        var newGameState = copy(gameState);
 
-        // TODO: enter scoring mode if 2 passes in a row
-
-        if (newState.turn === 'white') {
-            newState.turn = 'black';
+        if (newGameState.turn === 'white') {
+            newGameState.turn = 'black';
         } else {
-            newState.turn = 'white';
+            newGameState.turn = 'white';
         }
 
-        return newState;
+        if (gameState.moves.length > 0 && gameState.moves.slice(-1)[0].action === 'pass') {
+            return {
+                gameStatus: 'resolving_dead_groups',
+                gameState: newGameState,
+                deadGroupResolutionState: [],
+            }
+        }
+
+        return {
+            gameStatus: 'playing',
+            gameState: newGameState,
+        };
 
     }
 
     if (action['action'] === 'new_piece') {
-        var newState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
-        if (newState === false) return false;
-        return newState;
+        var newGameState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
+        if (newGameState === false) {
+            return {
+                gameStatus: 'illegal_move',
+            };
+        }
+        return {
+            gameStatus: 'playing',
+            gameState: newGameState,
+        };
     }
 
 }
@@ -213,7 +267,7 @@ var boardStateHistoryOf = function (gameState) {
     var bs = initialGameState();
     var ret = [bs];
     gameState.moves.forEach(function (move) {
-        bs = withMove(bs, move);
+        bs = withMove(bs, move).gameState;
         ret.push(bs);
     });
     return ret;
@@ -223,12 +277,15 @@ var boardStateHistoryOf = function (gameState) {
 // exported to browser
 
 var isLegalMove = function (gameState, color, x, y) {
-    return gameState && withMove(gameState, {
+    if (!gameState) return false;
+    var newState = withMove(gameState, {
         player_color: color,
         action: 'new_piece',
         row: x,
         col: y
-    }) !== false;
+    });
+    if (newState.gameStatus === 'illegal_move') return false;
+    return true;
 }
 
 // go-specific logic
@@ -296,7 +353,7 @@ var withoutDeadGroups = function (gameState) {
 
 }
 
-var groupOf = function (gameState, x, y, blacklist) { // todo: duplicates?
+var groupOf = function (gameState, x, y, blacklist) {
     blacklist = blacklist || [];
 
     if (blacklist.indexOf(reprStone(x, y)) !== -1) return [];
@@ -378,7 +435,8 @@ var libertiesOf = function (gameState, x, y, blacklist) {
 
 if (isNodejs()) {
     exports.applyMove = applyMove;
-    exports.currentState = currentState;
+    exports.currentGameState = currentGameState;
+    exports.currentGameStatus = currentGameStatus;
 
     // exported for testing
 
