@@ -1,7 +1,11 @@
 /*
     Go game rules, and a bit of turn-taking logic
 
-    statesOfRoom maps roomId to gameState, takebackState and deadGroupResolutionState
+    statesOfRoom maps roomId to
+        - gameState,
+        - takebackState,
+        - deadGroupResolutionState
+        - gameResult
 */
 
 (function () {
@@ -13,31 +17,60 @@ var statesOfRoom = {};
 var applyMove = function (roomId, action) {
     /*
     update statesOfRoom[roomId] with action
-    return false and do nothing else if it is an illegal move
+    return if move was legal
     */
+
+    const VALID_GAME_STATUSES = [
+        'game_over',
+        'illegal_move',
+        'resolving_dead_groups',
+        'playing',
+        'retract_pass'
+    ];
+
+    if (currentGameStatus(roomId) === 'game_over') {
+        if (isNodejs()) console.log('illegal move: game is over');
+        return false;
+    }
+
+    if (action['action'] === 'retract_pass') {
+        console.log('retract_pass');
+        if (currentGameStatus(roomId) === 'resolving_dead_groups') {
+            statesOfRoom[roomId].gameStatus = 'playing';
+            // todo: revert a previous pass
+            return true;
+        } else {
+            if (isNodejs()) console.log('illegal move: cannot retract_pass unless status is resolving_dead_groups');
+            return false;
+        }
+    }
 
     var newState = withMove(currentGameState(roomId), action);
 
-    if (newState.gameStatus === 'illegal_move') {
-        return newState;
-    } else if (newState.gameStatus === 'playing') {
-        var newGameState = newState.gameState;
-        newGameState.moves.push(action);
-        statesOfRoom[roomId].gameState = newGameState;
-        statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return newState;
-    } else if (newState.gameStatus === 'resolving_dead_groups') {
-        var newGameState = newState.gameState;
-        newGameState.moves.push(action);
-        statesOfRoom[roomId].gameState = newGameState;
-        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
-        statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return newState;
-    } else if (newState.gameStatus === undefined) {
+    if (newState.gameStatus === undefined) {
         console.log('undefined gameStatus on gameState ', newState);
-    } else {
-        console.log('unrecognized gameStatus', newState.gameStatus);
+        return;
     }
+
+    if (VALID_GAME_STATUSES.indexOf(newState.gameStatus) === -1) {
+        console.log('unrecognized gameStatus', newState.gameStatus);
+        return;
+    }
+
+    if (newState.gameStatus === 'illegal_move') {
+        return false;
+    }
+
+    var newGameState = newState.gameState;
+    newGameState.moves.push(action);
+    statesOfRoom[roomId].gameState = newGameState;
+    statesOfRoom[roomId].gameStatus = newState.gameStatus;
+
+    if (newState.gameStatus === 'resolving_dead_groups') {
+        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+    }
+
+    return true;
 }
 
 var getStatesOfRoom = function (roomId) {
@@ -55,6 +88,14 @@ var currentGameState = function (roomId) {
     return getStatesOfRoom(roomId).gameState;
 }
 
+var currentDeadGroupResolutionState = function (roomId) {
+    if (getStatesOfRoom(roomId).gameState === undefined) {
+        statesOfRoom[roomId].gameState = initialGameState();
+    }
+
+    return getStatesOfRoom(roomId).deadGroupResolutionState;
+}
+
 var currentGameStatus = function (roomId) {
     if (getStatesOfRoom(roomId).gameState === undefined) {
         statesOfRoom[roomId].gameState = 'playing';
@@ -63,7 +104,8 @@ var currentGameStatus = function (roomId) {
     return getStatesOfRoom(roomId).gameStatus;
 }
 
-// turn-taking logic
+// turn-taking logic - resign, pass, and new piece (delegated to other function)
+// returns a subset of { gameStatus, gameState, deadGroupResolutionState }
 
 var withMove = function (gameState, action) {
 
@@ -81,7 +123,7 @@ var withMove = function (gameState, action) {
             'advantage': 'resign',
         };
         return {
-            gameStatus: 'playing',
+            gameStatus: 'game_over',
             gameState: newGameState,
         };
     }
@@ -107,7 +149,7 @@ var withMove = function (gameState, action) {
             return {
                 gameStatus: 'resolving_dead_groups',
                 gameState: newGameState,
-                deadGroupResolutionState: [],
+                deadGroupResolutionState: copy(gameState.stones),
             }
         }
 
@@ -192,6 +234,8 @@ var initialGameState = function () {
     // 0 - empty
     // 1 - black
     // 2 - white
+    // 3 - black ghost
+    // 4 - white ghost
 
     var stones = [];
     for (var i=0; i<9; i++) {
@@ -437,6 +481,7 @@ if (isNodejs()) {
     exports.applyMove = applyMove;
     exports.currentGameState = currentGameState;
     exports.currentGameStatus = currentGameStatus;
+    exports.currentDeadGroupResolutionState = currentDeadGroupResolutionState;
 
     // exported for testing
 

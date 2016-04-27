@@ -150,6 +150,11 @@ io.on('connection', function (socket) {
         sockets.post_pass(socket, info, io);
     });
 
+    socket.on('post_retract_pass', function (info) {
+        console.log('received post_retract_pass');
+        sockets.post_retract_pass(socket, info, io);
+    });
+
     socket.on('post_resign', function (info) {
         sockets.post_resign(socket, info, io);
     });

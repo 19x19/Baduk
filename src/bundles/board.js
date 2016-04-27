@@ -35,6 +35,10 @@ socket.on('new_game_state', function (gameState) {
     });
 });
 
+socket.on('new_dead_group_resolution_state', function (msg) {
+    console.log(msg);
+});
+
 socket.on('move_is_illegal', function (msg) {
     console.log('illegal move');
 });
@@ -50,7 +54,7 @@ var App = React.createClass({
         return {
             mostRecentGameState: initialGameState(),
             selectedMoveIdx: -1,
-            ghostPiece: null,
+            hoverPiece: null,
             boardSize: 500,
             borderSize: 60,
             muted: true,
@@ -103,14 +107,14 @@ var App = React.createClass({
          && 0 <= pieceCoordY && pieceCoordY < 9
         ) {
             this.setState({
-                'ghostPiece': {
+                'hoverPiece': {
                     x: pieceCoordX,
                     y: pieceCoordY
                 }
             });
         } else {
             this.setState({
-                'ghostPiece': null,
+                'hoverPiece': null,
             });
         }
     },
@@ -157,6 +161,11 @@ var App = React.createClass({
             'room': room
         });
     },
+    handleRetractPassBtnClick: function () {
+        socket.emit('post_retract_pass', {
+            'room': room
+        });
+    },
     handleResignBtnClick: function () {
         socket.emit('post_resign', {
             'room': room
@@ -186,20 +195,21 @@ var App = React.createClass({
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}
                     selectedMoveIdx={this.state.selectedMoveIdx}
-                    ghostPiece={this.state.ghostPiece}
+                    hoverPiece={this.state.hoverPiece}
                     boardSize={this.state.boardSize}
                     borderSize={this.state.borderSize}
                     handleClick={this.handleBoardClick}
                     gridSize={this.gridSize()}
-                    playerColor={this.state.playerColor} />
+                    playerColor={this.state.playerColor}
+                    gameStatus={this.state.gameStatus} />
                 <GameStatusDisplay gameState={this.state.mostRecentGameState} />
-                <div className="buttons">
-                    <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
-                    <button className="btn" onClick={this.handleResignBtnClick}>Resign</button>
-                    <button className="btn" onClick={this.handleMuteBtnClick}>
-                        <i id="sound_display" className={this.state.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
-                        </button>
-                </div>
+                <ButtonArea
+                    gameStatus={this.state.gameStatus}
+                    onPassBtnClick={this.handlePassBtnClick}
+                    onRetractPassBtnClick={this.handleRetractPassBtnClick}
+                    onResignBtnClick={this.handleResignBtnClick}
+                    onMuteBtnClick={this.handleMuteBtnClick}
+                    muted={this.state.muted} />
             </div>
             <div className="col-md-3 sidebar-right">
                 <RoommatesBox roommates={this.state.roommates} />
@@ -217,11 +227,33 @@ var App = React.createClass({
     }
 });
 
+var ButtonArea = React.createClass({
+    render: function () {
+        if (this.props.gameStatus === null || this.props.gameStatus === 'playing') {
+            return <div className="buttons">
+                <button className="btn" onClick={this.props.onPassBtnClick}>Pass</button>
+                <button className="btn" onClick={this.props.onResignBtnClick}>Resign</button>
+                <button className="btn" onClick={this.props.onMuteBtnClick}>
+                    <i id="sound_display" className={this.props.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
+                    </button>
+            </div>
+        } else if (this.props.gameStatus === 'resolving_dead_groups') {
+            return <div className="buttons">
+                <button className="btn" onClick={this.props.onRetractPassBtnClick}>Retract Pass</button>
+                <button className="btn" onClick={this.props.onResignBtnClick}>Resign</button>
+                <button className="btn">
+                    <i id="sound_display" className={this.props.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
+                    </button>
+            </div>
+        }
+    }
+})
+
 var Board = React.createClass({
     // props:
     // mostRecentGameState
     // selectedMoveIdx
-    // ghostPiece
+    // hoverPiece
     // boardSize
     // borderSize
     // handleClick
@@ -243,6 +275,7 @@ var Board = React.createClass({
         } else {
             var selectedStones = boardStateHistoryOf(this.props.mostRecentGameState)[this.props.selectedMoveIdx + 1].stones;
         }
+        selectedStones = JSON.parse(JSON.stringify(selectedStones));
 
         var selectedMove = this.props.mostRecentGameState.moves[this.props.selectedMoveIdx];
 
@@ -252,23 +285,32 @@ var Board = React.createClass({
         var stoneStride = this.props.gridSize / 8;
         var stoneSize = stoneStride - 2;
 
+        var isNonEmptyStoneColor = function (i) {
+            return i === 1 || i === 2 || i === 3 || i === 4;
+        }
+
+        var isGhostStoneColor = function (i) {
+            return i === 3 || i === 4;
+        }
+
+        if ((this.props.gameStatus === 'playing' || this.props.gameStatus === null) &&
+            this.props.hoverPiece &&
+            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.hoverPiece.x, this.props.hoverPiece.y)) {
+
+            selectedStones[this.props.hoverPiece.x][this.props.hoverPiece.y] = { 'black': 3, 'white': 4 }[this.props.playerColor];
+
+        }
+
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
-            if (selectedStones[i][j] === 1 || selectedStones[i][j] === 2) {
+            if (isNonEmptyStoneColor(selectedStones[i][j])) {
                 stones.push({
                     x: i,
                     y: j,
-                    color: {1: 'black', 2: 'white'}[selectedStones[i][j]],
-                    isSelectedMove: selectedMove.row === i && selectedMove.col === j
+                    color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white' }[selectedStones[i][j]],
+                    isGhost: isGhostStoneColor(selectedStones[i][j]),
+                    isSelectedMove: selectedMove && selectedMove.row === i && selectedMove.col === j
                 });
             }
-        }
-
-        if (this.props.ghostPiece &&
-            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.ghostPiece.x, this.props.ghostPiece.y)) {
-            // monads yo
-            var ghostPieces = [this.props.ghostPiece];
-        } else {
-            var ghostPieces = [];
         }
 
         var boardSize = this.props.boardSize;
@@ -297,19 +339,9 @@ var Board = React.createClass({
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
                         width={stoneSize}
-                        height={stoneSize} />
+                        height={stoneSize}
+                        opacity={stone.isGhost ? 0.5 : 1} />
                 }
-            })}
-            {ghostPieces.map(function (ghostPiece) {
-                var posOfStone = self.posOf(ghostPiece.x, ghostPiece.y);
-                return <image
-                    key="ghostPiece"
-                    xlinkHref={"/img/" + self.props.playerColor + "_circle.png"}
-                    x={posOfStone.x - (stoneSize / 2)}
-                    y={posOfStone.y - (stoneSize / 2)}
-                    width={stoneSize}
-                    height={stoneSize}
-                    opacity={0.5} />
             })}
         </svg>
     }

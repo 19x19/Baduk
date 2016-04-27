@@ -70,20 +70,21 @@ var handleMove = function (socket, info, io, move, move_name) {
     logger.verbose(move_name, info);
     const user_id = socket.handshake.session.id;
     const color = games.current_users[user_id][info.room]['color'];
-    const newState = go.applyMove(info.room, Object.assign(move, {
+    const isLegalMove = go.applyMove(info.room, Object.assign(move, {
         'player_color': color,
     }));
-    if (newState.gameStatus === 'illegal_move') {
-        socket.emit('move_is_illegal', {});
+    if (isLegalMove) {
+        io.to(info.room).emit('new_game_state', go.currentGameState(info.room));
+        io.to(info.room).emit('new_game_status', go.currentGameStatus(info.room));
+        io.to(info.room).emit('new_dead_group_resolution_state', go.currentDeadGroupResolutionState(info.room));
     } else {
-        io.to(info.room).emit('new_game_state', newState.gameState);
-        io.to(info.room).emit('new_game_status', newState.gameStatus);
+        socket.emit('move_is_illegal', {});
     }
 
 }
 
 // Adds a new piece to the board
-var post_new_piece = function(socket, info, io) {
+var post_new_piece = function (socket, info, io) {
     handleMove(socket, info, io, {
         'action': 'new_piece',
         'row': info.row,
@@ -92,17 +93,23 @@ var post_new_piece = function(socket, info, io) {
 }
 
 // Adds a new pass from the given user
-var post_pass = function(socket, info, io) {
+var post_pass = function (socket, info, io) {
     handleMove(socket, info, io, {
         'action': 'pass',
     }, 'post_pass');
 }
 
 // Adds a new resign from the given user
-var post_resign = function(socket, info, io) {
+var post_resign = function (socket, info, io) {
     handleMove(socket, info, io, {
         'action': 'resign',
     }, 'post_resign');
+}
+
+var post_retract_pass = function (socket, info, io) {
+    handleMove(socket, info, io, {
+        'action': 'retract_pass',
+    }, 'rectract_pass');
 }
 
 exports.post_new_connect = post_new_connect;
@@ -111,3 +118,4 @@ exports.post_new_message = post_new_message;
 exports.post_new_piece = post_new_piece;
 exports.post_pass = post_pass;
 exports.post_resign = post_resign;
+exports.post_retract_pass = post_retract_pass;
