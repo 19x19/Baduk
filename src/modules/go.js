@@ -1,7 +1,11 @@
 /*
     Go game rules, and a bit of turn-taking logic
 
-    statesOfRoom maps roomId to gameState, takebackState and deadGroupResolutionState
+    statesOfRoom maps roomId to
+        - gameState,
+        - takebackState,
+        - deadGroupResolutionState
+        - gameResult
 */
 
 (function () {
@@ -13,40 +17,37 @@ var statesOfRoom = {};
 var applyMove = function (roomId, action) {
     /*
     update statesOfRoom[roomId] with action
-    return { gameState, gameStatus }
+    return if move was legal
     */
 
     if (currentGameStatus(roomId) === 'game_over') {
         if (isNodejs()) console.log('illegal move: game is over');
-        return {
-            gameStatus: 'illegal_move',
-            gameState: currentGameState(roomId),
-        };
+        return false;
     }
 
     var newState = withMove(currentGameState(roomId), action);
 
     if (newState.gameStatus === 'illegal_move') {
-        return newState;
+        return false;
     } else if (newState.gameStatus === 'playing') {
         var newGameState = newState.gameState;
         newGameState.moves.push(action);
         statesOfRoom[roomId].gameState = newGameState;
         statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return newState;
+        return true;
     } else if (newState.gameStatus === 'resolving_dead_groups') {
         var newGameState = newState.gameState;
         newGameState.moves.push(action);
         statesOfRoom[roomId].gameState = newGameState;
         statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
         statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return newState;
+        return true;
     } else if (newState.gameStatus === 'game_over') {
         var newGameState = newState.gameState;
         newGameState.moves.push(action);
         statesOfRoom[roomId].gameState = newGameState;
         statesOfRoom[roomId].gameStatus = newState.gameStatus;
-        return newState;
+        return true;
     } else if (newState.gameStatus === undefined) {
         console.log('undefined gameStatus on gameState ', newState);
     } else {

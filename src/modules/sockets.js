@@ -70,14 +70,15 @@ var handleMove = function (socket, info, io, move, move_name) {
     logger.verbose(move_name, info);
     const user_id = socket.handshake.session.id;
     const color = games.current_users[user_id][info.room]['color'];
-    const newState = go.applyMove(info.room, Object.assign(move, {
+    const isLegalMove = go.applyMove(info.room, Object.assign(move, {
         'player_color': color,
     }));
-    if (newState.gameStatus === 'illegal_move') {
-        socket.emit('move_is_illegal', {});
+    if (isLegalMove) {
+        console.log('emitting new game state and status');
+        io.to(info.room).emit('new_game_state', go.currentGameState(info.room));
+        io.to(info.room).emit('new_game_status', go.currentGameStatus(info.room));
     } else {
-        io.to(info.room).emit('new_game_state', newState.gameState);
-        io.to(info.room).emit('new_game_status', newState.gameStatus);
+        socket.emit('move_is_illegal', {});
     }
 
 }
