@@ -161,6 +161,11 @@ var App = React.createClass({
             'room': room
         });
     },
+    handleRetractPassBtnClick: function () {
+        socket.emit('post_retract_pass', {
+            'room': room
+        });
+    },
     handleResignBtnClick: function () {
         socket.emit('post_resign', {
             'room': room
@@ -198,13 +203,13 @@ var App = React.createClass({
                     playerColor={this.state.playerColor}
                     gameStatus={this.state.gameStatus} />
                 <GameStatusDisplay gameState={this.state.mostRecentGameState} />
-                <div className="buttons">
-                    <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
-                    <button className="btn" onClick={this.handleResignBtnClick}>Resign</button>
-                    <button className="btn" onClick={this.handleMuteBtnClick}>
-                        <i id="sound_display" className={this.state.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
-                        </button>
-                </div>
+                <ButtonArea
+                    gameStatus={this.state.gameStatus}
+                    onPassBtnClick={this.handlePassBtnClick}
+                    onRetractPassBtnClick={this.handleRetractPassBtnClick}
+                    onResignBtnClick={this.handleResignBtnClick}
+                    onMuteBtnClick={this.handleMuteBtnClick}
+                    muted={this.state.muted} />
             </div>
             <div className="col-md-3 sidebar-right">
                 <RoommatesBox roommates={this.state.roommates} />
@@ -221,6 +226,28 @@ var App = React.createClass({
         </div>
     }
 });
+
+var ButtonArea = React.createClass({
+    render: function () {
+        if (this.props.gameStatus === null || this.props.gameStatus === 'playing') {
+            return <div className="buttons">
+                <button className="btn" onClick={this.props.onPassBtnClick}>Pass</button>
+                <button className="btn" onClick={this.props.onResignBtnClick}>Resign</button>
+                <button className="btn" onClick={this.props.onMuteBtnClick}>
+                    <i id="sound_display" className={this.props.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
+                    </button>
+            </div>
+        } else if (this.props.gameStatus === 'resolving_dead_groups') {
+            return <div className="buttons">
+                <button className="btn" onClick={this.props.onRetractPassBtnClick}>Retract Pass</button>
+                <button className="btn" onClick={this.props.onResignBtnClick}>Resign</button>
+                <button className="btn">
+                    <i id="sound_display" className={this.props.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
+                    </button>
+            </div>
+        }
+    }
+})
 
 var Board = React.createClass({
     // props:

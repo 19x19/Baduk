@@ -25,11 +25,24 @@ var applyMove = function (roomId, action) {
         'illegal_move',
         'resolving_dead_groups',
         'playing',
+        'retract_pass'
     ];
 
     if (currentGameStatus(roomId) === 'game_over') {
         if (isNodejs()) console.log('illegal move: game is over');
         return false;
+    }
+
+    if (action['action'] === 'retract_pass') {
+        console.log('retract_pass');
+        if (currentGameStatus(roomId) === 'resolving_dead_groups') {
+            statesOfRoom[roomId].gameStatus = 'playing';
+            // todo: revert a previous pass
+            return true;
+        } else {
+            if (isNodejs()) console.log('illegal move: cannot retract_pass unless status is resolving_dead_groups');
+            return false;
+        }
     }
 
     var newState = withMove(currentGameState(roomId), action);

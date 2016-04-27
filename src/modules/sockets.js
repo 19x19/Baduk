@@ -84,7 +84,7 @@ var handleMove = function (socket, info, io, move, move_name) {
 }
 
 // Adds a new piece to the board
-var post_new_piece = function(socket, info, io) {
+var post_new_piece = function (socket, info, io) {
     handleMove(socket, info, io, {
         'action': 'new_piece',
         'row': info.row,
@@ -93,17 +93,23 @@ var post_new_piece = function(socket, info, io) {
 }
 
 // Adds a new pass from the given user
-var post_pass = function(socket, info, io) {
+var post_pass = function (socket, info, io) {
     handleMove(socket, info, io, {
         'action': 'pass',
     }, 'post_pass');
 }
 
 // Adds a new resign from the given user
-var post_resign = function(socket, info, io) {
+var post_resign = function (socket, info, io) {
     handleMove(socket, info, io, {
         'action': 'resign',
     }, 'post_resign');
+}
+
+var post_retract_pass = function (socket, info, io) {
+    handleMove(socket, info, io, {
+        'action': 'retract_pass',
+    }, 'rectract_pass');
 }
 
 exports.post_new_connect = post_new_connect;
@@ -112,3 +118,4 @@ exports.post_new_message = post_new_message;
 exports.post_new_piece = post_new_piece;
 exports.post_pass = post_pass;
 exports.post_resign = post_resign;
+exports.post_retract_pass = post_retract_pass;
