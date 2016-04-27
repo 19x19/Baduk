@@ -25,7 +25,6 @@ var applyMove = function (roomId, action) {
         'illegal_move',
         'resolving_dead_groups',
         'playing',
-        'retract_pass'
     ];
 
     if (currentGameStatus(roomId) === 'game_over') {

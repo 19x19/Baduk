@@ -19,7 +19,7 @@ socket.on('new_game_state', function (gameState) {
     // Play the sound for a new piece
     window.appElement.notifyNewGameState();
 
-    if (gameState.moves.length > 0) {
+    if (gameState.moves.length > 0) { // todo: not idempotent :'(
         var mostRecentMove = gameState.moves.slice(-1)[0];
         var color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
         if (mostRecentMove.action === 'pass') {
@@ -36,7 +36,9 @@ socket.on('new_game_state', function (gameState) {
 });
 
 socket.on('new_dead_group_resolution_state', function (msg) {
-    console.log(msg);
+    window.appElement.setState({
+        deadGroupResolutionState: msg,
+    });
 });
 
 socket.on('move_is_illegal', function (msg) {
@@ -63,6 +65,7 @@ var App = React.createClass({
             playerColor: null,
             roommates: [],
             gameStatus: null,
+            deadGroupResolutionState: null,
         }
     },
     notifyNewChatMessage: function (color, username, message) {
@@ -207,7 +210,8 @@ var App = React.createClass({
                     handleClick={this.handleBoardClick}
                     gridSize={this.gridSize()}
                     playerColor={this.state.playerColor}
-                    gameStatus={this.state.gameStatus} />
+                    gameStatus={this.state.gameStatus}
+                    deadGroupResolutionState={this.state.deadGroupResolutionState}/>
                 <GameStatusDisplay gameState={this.state.mostRecentGameState} />
                 <ButtonArea
                     gameStatus={this.state.gameStatus}
@@ -282,7 +286,17 @@ var Board = React.createClass({
             y: this.props.borderSize + (col * stoneSize),
         };
     },
-    render: function () {
+    getDisplayedStones: function () {
+        console.log(this.props.deadGroupResolutionState);
+        return this.getSelectedDisplayedStones();
+    },
+    getSelectedDisplayedStones: function () {
+        var isNonEmptyStoneColor = function (i) {
+            return i === 1 || i === 2 || i === 3 || i === 4;
+        }
+        var isGhostStoneColor = function (i) {
+            return i === 3 || i === 4;
+        }
 
         if (this.props.mostRecentGameState.moves.length === this.props.selectedMoveIdx + 1) {
             // fast path optimization, not strictly necessary
@@ -294,19 +308,7 @@ var Board = React.createClass({
 
         var selectedMove = this.props.mostRecentGameState.moves[this.props.selectedMoveIdx];
 
-        var stones = [];
-        var boardSize = this.props.mostRecentGameState.size;
-
-        var stoneStride = this.props.gridSize / 8;
-        var stoneSize = stoneStride - 2;
-
-        var isNonEmptyStoneColor = function (i) {
-            return i === 1 || i === 2 || i === 3 || i === 4;
-        }
-
-        var isGhostStoneColor = function (i) {
-            return i === 3 || i === 4;
-        }
+        var gameBoardSize = this.props.mostRecentGameState.size;
 
         if ((this.props.gameStatus === 'playing' || this.props.gameStatus === null) &&
             this.props.hoverPiece &&
@@ -316,9 +318,11 @@ var Board = React.createClass({
 
         }
 
-        for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+        var displayedStones = [];
+
+        for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
             if (isNonEmptyStoneColor(selectedStones[i][j])) {
-                stones.push({
+                displayedStones.push({
                     x: i,
                     y: j,
                     color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white' }[selectedStones[i][j]],
@@ -327,7 +331,14 @@ var Board = React.createClass({
                 });
             }
         }
+        return displayedStones;
+    },
+    render: function () {
 
+        var displayedStones = this.getDisplayedStones();
+
+        var stoneStride = this.props.gridSize / 8;
+        var stoneSize = stoneStride - 2;
         var boardSize = this.props.boardSize;
         var borderSize = this.props.borderSize;
         var gridSize = boardSize - 2*borderSize;
@@ -345,7 +356,7 @@ var Board = React.createClass({
                 height={gridSize}
                 x={borderSize}
                 y={borderSize} />
-            {stones.map(function (stone, i) {
+            {displayedStones.map(function (stone, i) {
                 var posOfStone = self.posOf(stone.x, stone.y);
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image
