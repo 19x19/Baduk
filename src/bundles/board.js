@@ -54,7 +54,7 @@ var App = React.createClass({
         return {
             mostRecentGameState: initialGameState(),
             selectedMoveIdx: -1,
-            ghostPiece: null,
+            hoverPiece: null,
             boardSize: 500,
             borderSize: 60,
             muted: true,
@@ -107,14 +107,14 @@ var App = React.createClass({
          && 0 <= pieceCoordY && pieceCoordY < 9
         ) {
             this.setState({
-                'ghostPiece': {
+                'hoverPiece': {
                     x: pieceCoordX,
                     y: pieceCoordY
                 }
             });
         } else {
             this.setState({
-                'ghostPiece': null,
+                'hoverPiece': null,
             });
         }
     },
@@ -190,7 +190,7 @@ var App = React.createClass({
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}
                     selectedMoveIdx={this.state.selectedMoveIdx}
-                    ghostPiece={this.state.ghostPiece}
+                    hoverPiece={this.state.hoverPiece}
                     boardSize={this.state.boardSize}
                     borderSize={this.state.borderSize}
                     handleClick={this.handleBoardClick}
@@ -225,7 +225,7 @@ var Board = React.createClass({
     // props:
     // mostRecentGameState
     // selectedMoveIdx
-    // ghostPiece
+    // hoverPiece
     // boardSize
     // borderSize
     // handleClick
@@ -256,23 +256,38 @@ var Board = React.createClass({
         var stoneStride = this.props.gridSize / 8;
         var stoneSize = stoneStride - 2;
 
+        var isNonEmptyStoneColor = function (i) {
+            return i === 1 || i === 2 || i === 3 || i === 4;
+        }
+
+        var isGhostStoneColor = function (i) {
+            return i === 3 || i === 4;
+        }
+
+
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
-            if (selectedStones[i][j] === 1 || selectedStones[i][j] === 2) {
+            if (isNonEmptyStoneColor(selectedStones[i][j])) {
                 stones.push({
                     x: i,
                     y: j,
                     color: {1: 'black', 2: 'white'}[selectedStones[i][j]],
+                    isGhost: isGhostStoneColor(selectedStones[i][j]),
                     isSelectedMove: selectedMove.row === i && selectedMove.col === j
                 });
             }
         }
 
-        if (this.props.ghostPiece &&
-            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.ghostPiece.x, this.props.ghostPiece.y)) {
-            // monads yo
-            var ghostPieces = [this.props.ghostPiece];
-        } else {
-            var ghostPieces = [];
+        if (this.props.hoverPiece &&
+            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.hoverPiece.x, this.props.hoverPiece.y)) {
+
+            stones.push({
+                x: this.props.hoverPiece.x,
+                y: this.props.hoverPiece.y,
+                color: this.props.playerColor,
+                isGhost: true,
+                isSelectedMove: false
+            });
+
         }
 
         var boardSize = this.props.boardSize;
@@ -301,19 +316,9 @@ var Board = React.createClass({
                         x={posOfStone.x - (stoneSize / 2)}
                         y={posOfStone.y - (stoneSize / 2)}
                         width={stoneSize}
-                        height={stoneSize} />
+                        height={stoneSize}
+                        opacity={stone.isGhost ? 0.5 : 1} />
                 }
-            })}
-            {ghostPieces.map(function (ghostPiece) {
-                var posOfStone = self.posOf(ghostPiece.x, ghostPiece.y);
-                return <image
-                    key="ghostPiece"
-                    xlinkHref={"/img/" + self.props.playerColor + "_circle.png"}
-                    x={posOfStone.x - (stoneSize / 2)}
-                    y={posOfStone.y - (stoneSize / 2)}
-                    width={stoneSize}
-                    height={stoneSize}
-                    opacity={0.5} />
             })}
         </svg>
     }

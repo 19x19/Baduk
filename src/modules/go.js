@@ -221,6 +221,8 @@ var initialGameState = function () {
     // 0 - empty
     // 1 - black
     // 2 - white
+    // 3 - black ghost
+    // 4 - white ghost
 
     var stones = [];
     for (var i=0; i<9; i++) {
