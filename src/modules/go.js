@@ -13,8 +13,16 @@ var statesOfRoom = {};
 var applyMove = function (roomId, action) {
     /*
     update statesOfRoom[roomId] with action
-    return false and do nothing else if it is an illegal move
+    return { gameState, gameStatus }
     */
+
+    if (currentGameStatus(roomId) === 'game_over') {
+        if (isNodejs()) console.log('illegal move: game is over');
+        return {
+            gameStatus: 'illegal_move',
+            gameState: currentGameState(roomId),
+        };
+    }
 
     var newState = withMove(currentGameState(roomId), action);
 
@@ -31,6 +39,12 @@ var applyMove = function (roomId, action) {
         newGameState.moves.push(action);
         statesOfRoom[roomId].gameState = newGameState;
         statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+        statesOfRoom[roomId].gameStatus = newState.gameStatus;
+        return newState;
+    } else if (newState.gameStatus === 'game_over') {
+        var newGameState = newState.gameState;
+        newGameState.moves.push(action);
+        statesOfRoom[roomId].gameState = newGameState;
         statesOfRoom[roomId].gameStatus = newState.gameStatus;
         return newState;
     } else if (newState.gameStatus === undefined) {
@@ -81,7 +95,7 @@ var withMove = function (gameState, action) {
             'advantage': 'resign',
         };
         return {
-            gameStatus: 'playing',
+            gameStatus: 'game_over',
             gameState: newGameState,
         };
     }
