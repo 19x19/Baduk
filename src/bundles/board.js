@@ -176,6 +176,12 @@ var App = React.createClass({
             muted: !this.state.muted,
         });
     },
+    handleCommitResolutionBtnClick: function () {
+        console.log('emitting post_commit_endgame_resolution');
+        socket.emit('post_commit_endgame_resolution', {
+            'room': room
+        });
+    },
     render: function () {
         var self = this;
         return <div className="row go">
@@ -209,6 +215,7 @@ var App = React.createClass({
                     onRetractPassBtnClick={this.handleRetractPassBtnClick}
                     onResignBtnClick={this.handleResignBtnClick}
                     onMuteBtnClick={this.handleMuteBtnClick}
+                    onCommitResolutionBtnClick={this.handleCommitResolutionBtnClick}
                     muted={this.state.muted} />
             </div>
             <div className="col-md-3 sidebar-right">
@@ -240,6 +247,7 @@ var ButtonArea = React.createClass({
         } else if (this.props.gameStatus === 'resolving_dead_groups') {
             return <div className="buttons">
                 <button className="btn" onClick={this.props.onRetractPassBtnClick}>Retract Pass</button>
+                <button className="btn" onClick={this.props.onCommitResolutionBtnClick}>Commit</button>
                 <button className="btn" onClick={this.props.onResignBtnClick}>Resign</button>
                 <button className="btn">
                     <i id="sound_display" className={this.props.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>

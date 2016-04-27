@@ -37,10 +37,20 @@ var applyMove = function (roomId, action) {
         console.log('retract_pass');
         if (currentGameStatus(roomId) === 'resolving_dead_groups') {
             statesOfRoom[roomId].gameStatus = 'playing';
-            // todo: revert a previous pass
+            // todo: revert one or two previous passes
             return true;
         } else {
             if (isNodejs()) console.log('illegal move: cannot retract_pass unless status is resolving_dead_groups');
+            return false;
+        }
+    }
+
+    if (action['action'] === 'commit_endgame_resolution') {
+        if (currentGameStatus(roomId) === 'resolving_dead_groups') {
+            statesOfRoom[roomId].deadGroupResolutionState[action.player_color + '_committed'] = true;
+            return true;
+        } else {
+            if (isNodejs()) console.log('illegal move: cannot commit_endgame_resolution unless status is resolving_dead_groups');
             return false;
         }
     }
