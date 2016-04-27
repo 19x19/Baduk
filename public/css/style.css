@@ -241,11 +241,19 @@ section.header .main-header button:hover{
     margin-top: 20px;
     height: 450px;
 }
+
+.move-history > div {
+    height: 100%;
+}
+
 .go .go-board{
     width: 535px;
 }
+
 .go .sidebar-right{
     flex:1;
+    max-height: 581px;
+    overflow: hidden;
 }
 
 .strong {
