@@ -75,6 +75,14 @@ var currentGameState = function (roomId) {
     return getStatesOfRoom(roomId).gameState;
 }
 
+var currentDeadGroupResolutionState = function (roomId) {
+    if (getStatesOfRoom(roomId).gameState === undefined) {
+        statesOfRoom[roomId].gameState = initialGameState();
+    }
+
+    return getStatesOfRoom(roomId).deadGroupResolutionState;
+}
+
 var currentGameStatus = function (roomId) {
     if (getStatesOfRoom(roomId).gameState === undefined) {
         statesOfRoom[roomId].gameState = 'playing';
@@ -83,7 +91,8 @@ var currentGameStatus = function (roomId) {
     return getStatesOfRoom(roomId).gameStatus;
 }
 
-// turn-taking logic
+// turn-taking logic - resign, pass, and new piece (delegated to other function)
+// returns a subset of { gameStatus, gameState, deadGroupResolutionState }
 
 var withMove = function (gameState, action) {
 
@@ -127,7 +136,7 @@ var withMove = function (gameState, action) {
             return {
                 gameStatus: 'resolving_dead_groups',
                 gameState: newGameState,
-                deadGroupResolutionState: [],
+                deadGroupResolutionState: copy(gameState.stones),
             }
         }
 
@@ -457,6 +466,7 @@ if (isNodejs()) {
     exports.applyMove = applyMove;
     exports.currentGameState = currentGameState;
     exports.currentGameStatus = currentGameStatus;
+    exports.currentDeadGroupResolutionState = currentDeadGroupResolutionState;
 
     // exported for testing
 

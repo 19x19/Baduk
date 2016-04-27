@@ -35,6 +35,10 @@ socket.on('new_game_state', function (gameState) {
     });
 });
 
+socket.on('new_dead_group_resolution_state', function (msg) {
+    console.log(msg);
+});
+
 socket.on('move_is_illegal', function (msg) {
     console.log('illegal move');
 });

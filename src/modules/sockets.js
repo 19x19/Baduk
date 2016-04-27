@@ -74,9 +74,9 @@ var handleMove = function (socket, info, io, move, move_name) {
         'player_color': color,
     }));
     if (isLegalMove) {
-        console.log('emitting new game state and status');
         io.to(info.room).emit('new_game_state', go.currentGameState(info.room));
         io.to(info.room).emit('new_game_status', go.currentGameStatus(info.room));
+        io.to(info.room).emit('new_dead_group_resolution_state', go.currentDeadGroupResolutionState(info.room));
     } else {
         socket.emit('move_is_illegal', {});
     }
