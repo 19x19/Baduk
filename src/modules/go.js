@@ -48,6 +48,13 @@ var applyMove = function (roomId, action) {
     if (action['action'] === 'commit_endgame_resolution') {
         if (currentGameStatus(roomId) === 'resolving_dead_groups') {
             statesOfRoom[roomId].deadGroupResolutionState[action.player_color + '_committed'] = true;
+
+            if (statesOfRoom[roomId].deadGroupResolutionState['white_committed'] &&
+                statesOfRoom[roomId].deadGroupResolutionState['black_committed']) {
+                statesOfRoom[roomId].gameStatus = 'game_over';
+                // todo: calculate score
+            }
+
             return true;
         } else {
             if (isNodejs()) console.log('illegal move: cannot commit_endgame_resolution unless status is resolving_dead_groups');

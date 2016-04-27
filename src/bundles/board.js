@@ -253,6 +253,13 @@ var ButtonArea = React.createClass({
                     <i id="sound_display" className={this.props.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
                     </button>
             </div>
+        } else if (this.props.gameStatus === 'game_over') {
+            return <div className="buttons">
+                <button className="btn">Good</button>
+                <button className="btn">Game</button>
+            </div>
+        } else {
+            console.log('unknown gameStatus ', this.props.gameStatus);
         }
     }
 })
