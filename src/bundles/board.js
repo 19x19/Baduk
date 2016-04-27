@@ -195,7 +195,8 @@ var App = React.createClass({
                     borderSize={this.state.borderSize}
                     handleClick={this.handleBoardClick}
                     gridSize={this.gridSize()}
-                    playerColor={this.state.playerColor} />
+                    playerColor={this.state.playerColor}
+                    gameStatus={this.state.gameStatus} />
                 <GameStatusDisplay gameState={this.state.mostRecentGameState} />
                 <div className="buttons">
                     <button className="btn" onClick={this.handlePassBtnClick}>Pass</button>
@@ -247,6 +248,7 @@ var Board = React.createClass({
         } else {
             var selectedStones = boardStateHistoryOf(this.props.mostRecentGameState)[this.props.selectedMoveIdx + 1].stones;
         }
+        selectedStones = JSON.parse(JSON.stringify(selectedStones));
 
         var selectedMove = this.props.mostRecentGameState.moves[this.props.selectedMoveIdx];
 
@@ -264,30 +266,24 @@ var Board = React.createClass({
             return i === 3 || i === 4;
         }
 
+        if ((this.props.gameStatus === 'playing' || this.props.gameStatus === null) &&
+            this.props.hoverPiece &&
+            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.hoverPiece.x, this.props.hoverPiece.y)) {
+
+            selectedStones[this.props.hoverPiece.x][this.props.hoverPiece.y] = { 'black': 3, 'white': 4 }[this.props.playerColor];
+
+        }
 
         for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
             if (isNonEmptyStoneColor(selectedStones[i][j])) {
                 stones.push({
                     x: i,
                     y: j,
-                    color: {1: 'black', 2: 'white'}[selectedStones[i][j]],
+                    color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white' }[selectedStones[i][j]],
                     isGhost: isGhostStoneColor(selectedStones[i][j]),
-                    isSelectedMove: selectedMove.row === i && selectedMove.col === j
+                    isSelectedMove: selectedMove && selectedMove.row === i && selectedMove.col === j
                 });
             }
-        }
-
-        if (this.props.hoverPiece &&
-            isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.hoverPiece.x, this.props.hoverPiece.y)) {
-
-            stones.push({
-                x: this.props.hoverPiece.x,
-                y: this.props.hoverPiece.y,
-                color: this.props.playerColor,
-                isGhost: true,
-                isSelectedMove: false
-            });
-
         }
 
         var boardSize = this.props.boardSize;
