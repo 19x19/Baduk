@@ -45,15 +45,15 @@
                     <h4 class="modal-title">Create a game</h4>
                 </div>
                 <div class="modal-body">
-                    <form role="form">
+                    <form id="start-form">
                         <label class="radio-inline">
-                          <input type="radio" checked="checked" name="optradio">19x19
+                          <input type="radio" name="size" value="19">19x19
                         </label>
                         <label class="radio-inline">
-                          <input type="radio" name="optradio">13x13
+                          <input type="radio" name="size" value="13">13x13
                         </label>
                         <label class="radio-inline">
-                          <input type="radio" name="optradio">9x9
+                          <input type="radio" name="size" value="9">9x9
                         </label>
                     </form>
                 </div>
@@ -136,6 +136,7 @@ Baduk is not for profit. We don't have ads and we don't collect your information
             type: "POST",
             url: "/go",
             data: {
+                'size' : $('input[name=size]:checked', "#start-form").val(),
             },
             success: function(url) {
                 location.href = url;
