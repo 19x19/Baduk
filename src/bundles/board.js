@@ -325,8 +325,6 @@ var Board = React.createClass({
             return i === 3 || i === 4;
         }
 
-        console.log(this.props.hoverPiece);
-
         if ((this.props.gameStatus === 'playing' || this.props.gameStatus === null) &&
             this.props.hoverPiece &&
             isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.hoverPiece.x, this.props.hoverPiece.y)) {

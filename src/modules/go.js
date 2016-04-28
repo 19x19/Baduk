@@ -186,6 +186,7 @@ var withMove = function (gameState, action) {
     }
 
     if (action['action'] === 'new_piece') {
+
         var newGameState = withNewPiece(copy(gameState), action.player_color, action.row, action.col);
         if (newGameState === false) {
             return {
@@ -337,7 +338,9 @@ var isAnyNeighbourDiffColorWithOnlyOneLiberty = function (gameState, color, x, y
 // ko
 
 var boardStateHistoryOf = function (gameState) {
-    var bs = initialGameState();
+    var bs = initialGameState({
+        board_size: gameState.size,
+    });
     var ret = [bs];
     gameState.moves.forEach(function (move) {
         bs = withMove(bs, move).gameState;
@@ -355,7 +358,7 @@ var isLegalMove = function (gameState, color, x, y) {
         player_color: color,
         action: 'new_piece',
         row: x,
-        col: y
+        col: y,
     });
     if (newState.gameStatus === 'illegal_move') return false;
     return true;
