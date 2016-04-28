@@ -56,7 +56,7 @@
                           <input type="radio" name="size" value="9">9x9
                         </label>
                     </form> -->
-                    <ul class="game-size">
+                    <ul class="game-size" id="start-form">
                         <li>
                             <input type="radio" id="a25" value="19" name="amount" checked="checked" />
                             <label for="a25">19x19</label>
@@ -150,7 +150,7 @@ Baduk is not for profit. We don't have ads and we don't collect your information
             type: "POST",
             url: "/go",
             data: {
-                'size' : $('input[name=size]:checked', "#start-form").val(),
+                'size' : $('input[name=amount]:checked', "#start-form").val(),
             },
             success: function(url) {
                 location.href = url;
