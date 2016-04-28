@@ -30,7 +30,6 @@ var applyMove = function (roomId, action) {
         'illegal_move',
         'resolving_dead_groups',
         'playing',
-        'retract_pass'
     ];
 
     if (currentGameStatus(roomId) === 'game_over') {
@@ -42,10 +41,27 @@ var applyMove = function (roomId, action) {
         console.log('retract_pass');
         if (currentGameStatus(roomId) === 'resolving_dead_groups') {
             statesOfRoom[roomId].gameStatus = 'playing';
-            // todo: revert a previous pass
+            // todo: revert one or two previous passes
             return true;
         } else {
             if (isNodejs()) console.log('illegal move: cannot retract_pass unless status is resolving_dead_groups');
+            return false;
+        }
+    }
+
+    if (action['action'] === 'commit_endgame_resolution') {
+        if (currentGameStatus(roomId) === 'resolving_dead_groups') {
+            statesOfRoom[roomId].deadGroupResolutionState[action.player_color + '_committed'] = true;
+
+            if (statesOfRoom[roomId].deadGroupResolutionState['white_committed'] &&
+                statesOfRoom[roomId].deadGroupResolutionState['black_committed']) {
+                statesOfRoom[roomId].gameStatus = 'game_over';
+                // todo: calculate score
+            }
+
+            return true;
+        } else {
+            if (isNodejs()) console.log('illegal move: cannot commit_endgame_resolution unless status is resolving_dead_groups');
             return false;
         }
     }
@@ -72,7 +88,11 @@ var applyMove = function (roomId, action) {
     statesOfRoom[roomId].gameStatus = newState.gameStatus;
 
     if (newState.gameStatus === 'resolving_dead_groups') {
-        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+        statesOfRoom[roomId].deadGroupResolutionState = {
+            'stones': newState.deadGroupResolutionState,
+            'white_committed': false,
+            'black_committed': false,
+        };
     }
 
     return true;

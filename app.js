@@ -158,8 +158,12 @@ io.on('connection', function (socket) {
     });
 
     socket.on('post_retract_pass', function (info) {
-        console.log('received post_retract_pass');
         sockets.post_retract_pass(socket, info, io);
+    });
+
+    socket.on('post_commit_endgame_resolution', function (info) {
+        console.log('socket received post_commit_endgame_resolution');
+        sockets.post_commit_endgame_resolution(socket, info, io);
     });
 
     socket.on('post_resign', function (info) {
