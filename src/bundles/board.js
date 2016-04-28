@@ -333,7 +333,11 @@ var Board = React.createClass({
             onClick={this.props.handleClick}
         >
             <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSizePixels} height={boardSizePixels} />
-            <image xlinkHref={ { 9: "/img/go_board_9*9.png", 13: "/img/go_board_13*13.png" }[boardSize] }
+            <image xlinkHref={{
+                9: "/img/go_board_9*9.png",
+                13: "/img/go_board_13*13.png",
+                19: "/img/go_board_19*19.png",
+            }[boardSize] }
                 width={gridSize}
                 height={gridSize}
                 x={borderSize}
