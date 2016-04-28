@@ -1,8 +1,19 @@
-pm2 kill
-git checkout master
-git reset --hard HEAD
-git pull --no-edit
-npm install
-bower install --allow-root
-cp ~/config.js .
-pm2 start app.js
+#!/bin/bash
+
+HOST=baduk.ca
+USER=root
+
+# A script used to update the site. Simply run if you have the SSH key.
+# If you don't have the SSH key, stop trying to get into my server.
+
+ssh $USER@$HOST bash -c "'
+    cd Baduk
+    pm2 kill
+    git checkout master
+    git reset --hard HEAD
+    git pull --no-edit
+    npm install
+    bower install --allow-root
+    cp ~/config.js .
+    pm2 start app.js
+'"
