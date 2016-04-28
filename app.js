@@ -30,6 +30,7 @@ const Ddos = require('ddos');
 const git = require('git-rev');
 const csurf = require('csurf');
 const ddos = new Ddos({'silentStart' : true});
+const bodyParser = require('body-parser');
 
 // Baduk modules
 const games = require('./src/modules/games.js');
@@ -42,6 +43,7 @@ app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
 app.use(session);
+app.use(bodyParser.urlencoded({extended: true}));
 app.disable('X-Powered-By');
 if(config.env == "PROD") {
     app.all('*', require('express-force-domain')('https://baduk.ca'));
@@ -100,11 +102,16 @@ app.get('/robots.txt', function(req, res) {
     res.sendFile(__dirname + '/src/views/robots.txt');
 });
 
-app.get('/go', function (req, res) {
+app.post('/go', function (req, res) {
     // If someone just goes to /go without a room ID, we generate a new one.
     // IDs are generated with SHA-1, which git uses too so I think its
     // a safe assumption that no collisions will occur
-    res.redirect('/go/' + games.current_hash());
+    console.log(req.body.size);
+    var hash = games.registerGameRoom({
+        'board_size': req.body.size,
+    });
+    console.log(hash);
+    res.end(req.protocol + "://" + req.headers.host + '/go/' + hash);
 });
 
 app.get('/go/:id', function (req, res) {

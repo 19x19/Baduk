@@ -14,6 +14,11 @@ var statesOfRoom = {};
 
 // public API
 
+var registerGameRoom = function (roomId, options) {
+    statesOfRoom[roomId] = {};
+    statesOfRoom[roomId].gameState = initialGameState(options);
+}
+
 var applyMove = function (roomId, action) {
     /*
     update statesOfRoom[roomId] with action
@@ -249,7 +254,9 @@ var colorOf = function (gameState, x, y) {
     return ['empty', 'black', 'white'][gameState.stones[x][y]];
 }
 
-var initialGameState = function () {
+var initialGameState = function (options) {
+
+    options = options || {};
 
     // 0 - empty
     // 1 - black
@@ -257,17 +264,19 @@ var initialGameState = function () {
     // 3 - black ghost
     // 4 - white ghost
 
+    var board_size = parseInt(options.board_size, 10) || 9;
+
     var stones = [];
-    for (var i=0; i<9; i++) {
+    for (var i=0; i<board_size; i++) {
         stones[i] = [];
-        for (var j=0; j<9; j++) {
+        for (var j=0; j<board_size; j++) {
             stones[i][j] = 0;
         }
     }
     return {
         'stones': stones,
         'turn': 'black',
-        'size': 9,
+        'size': board_size,
         'moves': [],
     };
 };
@@ -502,6 +511,7 @@ if (isNodejs()) {
     exports.currentGameState = currentGameState;
     exports.currentGameStatus = currentGameStatus;
     exports.currentDeadGroupResolutionState = currentDeadGroupResolutionState;
+    exports.registerGameRoom = registerGameRoom;
 
     // exported for testing
 

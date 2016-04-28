@@ -36,12 +36,54 @@
 </head>
 
 <body>
+    <!-- Game start modal -->
+    <div class="modal fade" id="createGame" role="dialog" data-backdrop="static">
+        <div class="modal-dialog" style="margin-top: 120px">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Create a game</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- <form id="start-form">
+                        <label class="radio-inline">
+                          <input type="radio" name="size" value="19">19x19
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" name="size" value="13">13x13
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" name="size" value="9">9x9
+                        </label>
+                    </form> -->
+                    <ul class="game-size" id="start-form">
+                        <li>
+                            <input type="radio" id="a25" value="19" name="amount" checked="checked" />
+                            <label for="a25">19x19</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="a50" value="13" name="amount" />
+                            <label for="a50">13x13</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="a75" value="9" name="amount" />
+                            <label for="a75">9x9</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" id="startGame">Start</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Head content -->
     <section class="header">
         <div class="container main-header text-center">
             <h1 class="">Baduk</h1>
             <p>The easiest Go platform you've ever used</p>
-            <a href="/go"><button class="btn btn-primary" ><i class="icon-control-play icons"></i> Play Go</button></a>
+            <button class="btn btn-primary" id="playGame_top"><i class="icon-control-play icons"></i> Play Go</button>
         </div>
     </section>
 
@@ -66,7 +108,7 @@
                 <p>Created using the most bleeding-edge technology stack, we welcome any programmers that want to contribute to our <a href="https://github.com/19x19/Baduk/">repository</a>.</p>
             </div>
         </div>
-        <a href="/go"><button class="btn btn-primary" ><i class="icon-control-play icons"></i> Play Now</button></a>
+        <button class="btn btn-primary" id="playGame_bot"><i class="icon-control-play icons"></i> Play Now</button>
     </section>
     <section class="container-fluid info">
         <div class="col-md-6">
@@ -92,6 +134,30 @@ Baduk is not for profit. We don't have ads and we don't collect your information
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Create game processing -->
+    <script>
+    $("#playGame_top").on("click", function() {
+        $("#createGame").modal('show');
+    });
+
+    $("#playGame_bot").on("click", function() {
+        $("#createGame").modal('show');
+    });
+
+    $("#startGame").on("click", function() {
+        $.ajax({
+            type: "POST",
+            url: "/go",
+            data: {
+                'size' : $('input[name=amount]:checked', "#start-form").val(),
+            },
+            success: function(url) {
+                location.href = url;
+            },
+        });
+    });
+    </script>
 
 </body>
 

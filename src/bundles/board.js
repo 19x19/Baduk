@@ -104,10 +104,14 @@ var App = React.createClass({
         var pieceCoordX = coordOfClickE.x;
         var pieceCoordY = coordOfClickE.y;
 
-        var stoneSize = this.gridSize() / 8;
+        var boardSize = this.state.mostRecentGameState.size;
 
-        if (0 <= pieceCoordX && pieceCoordX < 9
-         && 0 <= pieceCoordY && pieceCoordY < 9
+        var stoneSize = this.gridSize() / (boardSize - 1);
+
+        console.log(pieceCoordX, pieceCoordY, boardSize);
+
+        if (0 <= pieceCoordX && pieceCoordX < boardSize
+         && 0 <= pieceCoordY && pieceCoordY < boardSize
         ) {
             this.setState({
                 'hoverPiece': {
@@ -132,8 +136,10 @@ var App = React.createClass({
         var mousePctX = mouseRelX / this.gridSize();
         var mousePctY = mouseRelY / this.gridSize();
 
-        var pieceCoordX = Math.round(mousePctX * 8);
-        var pieceCoordY = Math.round(mousePctY * 8);
+        var boardSize = this.state.mostRecentGameState.size;
+
+        var pieceCoordX = Math.round(mousePctX * (boardSize - 1));
+        var pieceCoordY = Math.round(mousePctY * (boardSize - 1));
 
         return {
             x: pieceCoordX,
@@ -141,7 +147,7 @@ var App = React.createClass({
         }
     },
     posOf: function (row, col) {
-        var stoneSize = this.gridSize() / 8;
+        var stoneSize = this.gridSize() / (this.state.mostRecentGameState.size - 1);
         return {
             x: this.state.borderSize + (row * stoneSize),
             y: this.state.borderSize + (col * stoneSize),
@@ -280,7 +286,7 @@ var Board = React.createClass({
     // playerColor
     // todo: reduce
     posOf: function (row, col) {
-        var stoneSize = this.props.gridSize / 8;
+        var stoneSize = this.props.gridSize / (this.props.mostRecentGameState.size - 1);
         return {
             x: this.props.borderSize + (row * stoneSize),
             y: this.props.borderSize + (col * stoneSize),
@@ -308,7 +314,21 @@ var Board = React.createClass({
 
         var selectedMove = this.props.mostRecentGameState.moves[this.props.selectedMoveIdx];
 
-        var gameBoardSize = this.props.mostRecentGameState.size;
+        var stones = [];
+        var boardSize = this.props.mostRecentGameState.size;
+
+        var stoneStride = this.props.gridSize / (boardSize - 1);
+        var stoneSize = stoneStride - 2;
+
+        var isNonEmptyStoneColor = function (i) {
+            return i === 1 || i === 2 || i === 3 || i === 4;
+        }
+
+        var isGhostStoneColor = function (i) {
+            return i === 3 || i === 4;
+        }
+
+        console.log(this.props.hoverPiece);
 
         if ((this.props.gameStatus === 'playing' || this.props.gameStatus === null) &&
             this.props.hoverPiece &&
@@ -336,22 +356,23 @@ var Board = React.createClass({
     render: function () {
 
         var displayedStones = this.getDisplayedStones();
-
-        var stoneStride = this.props.gridSize / 8;
-        var stoneSize = stoneStride - 2;
-        var boardSize = this.props.boardSize;
+        var boardSizePixels = this.props.boardSize;
         var borderSize = this.props.borderSize;
-        var gridSize = boardSize - 2*borderSize;
+        var gridSize = boardSizePixels - 2*borderSize;
 
         var self = this;
 
         return <svg
-            height={this.props.boardSize}
-            width={this.props.boardSize}
+            height={boardSizePixels}
+            width={boardSizePixels}
             onClick={this.props.handleClick}
         >
-            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSize} height={boardSize} />
-            <image xlinkHref="/img/go_board_9*9.png"
+            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSizePixels} height={boardSizePixels} />
+            <image xlinkHref={{
+                9: "/img/go_board_9*9.png",
+                13: "/img/go_board_13*13.png",
+                19: "/img/go_board_19*19.png",
+            }[boardSize] }
                 width={gridSize}
                 height={gridSize}
                 x={borderSize}

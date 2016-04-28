@@ -15,7 +15,6 @@ var updateRoommates = function(roommates) {
 
 // Get a message when a new user connects
 socket.on('get_new_connect', function(info) {
-    
     window.appElement.notifyFromServer(info.username + " has connected");
     updateRoommates(info.roommates);
 

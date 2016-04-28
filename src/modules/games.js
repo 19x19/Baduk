@@ -2,12 +2,20 @@ var moniker = require('moniker');
 var schedule = require('node-schedule');
 var cryptohat = require('cryptohat');
 
+var go = require('./go.js');
+
 /*
     Javascript module for games.
 */
 
 var current_games = [];
 var current_users = {};
+
+var registerGameRoom = function (options) {
+    var hash = current_hash();
+    go.registerGameRoom(hash, options);
+    return hash;
+}
 
 // Generates the hash of the next game. Should probably increase the entropy
 // here at some point as it's limited by Math.random().
@@ -126,6 +134,7 @@ exports.add_user = add_user;
 exports.remove_user = remove_user;
 exports.players_in_room = players_in_room;
 exports.cleanse = cleanse;
+exports.registerGameRoom = registerGameRoom;
 
 exports.current_games = current_games;
 exports.current_users = current_users;
