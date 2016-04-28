@@ -108,8 +108,6 @@ var App = React.createClass({
 
         var stoneSize = this.gridSize() / (boardSize - 1);
 
-        console.log(pieceCoordX, pieceCoordY, boardSize);
-
         if (0 <= pieceCoordX && pieceCoordX < boardSize
          && 0 <= pieceCoordY && pieceCoordY < boardSize
         ) {
@@ -293,7 +291,6 @@ var Board = React.createClass({
         };
     },
     getDisplayedStones: function () {
-        console.log(this.props.deadGroupResolutionState);
         return this.getSelectedDisplayedStones();
     },
     getSelectedDisplayedStones: function () {
@@ -315,9 +312,9 @@ var Board = React.createClass({
         var selectedMove = this.props.mostRecentGameState.moves[this.props.selectedMoveIdx];
 
         var stones = [];
-        var boardSize = this.props.mostRecentGameState.size;
+        var gameBoardSize = this.props.mostRecentGameState.size;
 
-        var stoneStride = this.props.gridSize / (boardSize - 1);
+        var stoneStride = this.props.gridSize / (gameBoardSize - 1);
         var stoneSize = stoneStride - 2;
 
         var isNonEmptyStoneColor = function (i) {
@@ -359,6 +356,8 @@ var Board = React.createClass({
         var boardSizePixels = this.props.boardSize;
         var borderSize = this.props.borderSize;
         var gridSize = boardSizePixels - 2*borderSize;
+        var gameBoardSize = this.props.mostRecentGameState.size;
+        var stoneSize = gridSize / gameBoardSize;
 
         var self = this;
 
@@ -372,7 +371,7 @@ var Board = React.createClass({
                 9: "/img/go_board_9*9.png",
                 13: "/img/go_board_13*13.png",
                 19: "/img/go_board_19*19.png",
-            }[boardSize] }
+            }[gameBoardSize] }
                 width={gridSize}
                 height={gridSize}
                 x={borderSize}
