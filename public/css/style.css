@@ -260,13 +260,13 @@ section.header .main-header button:hover{
     font-weight: 700;
 }
 
-.donate-now {
+.game-size {
      list-style-type:none;
      margin: 5px 0 0 0;
      padding:0;
 }
 
-.donate-now li {
+.game-size li {
     float:left;
     margin:0 15px 0 0;
     width:60px;
@@ -275,7 +275,7 @@ section.header .main-header button:hover{
     text-align: center;
 }
 
-.donate-now label, .donate-now input {
+.game-size label, .game-size input {
     display:block;
     position:absolute;
     top:0;
@@ -284,17 +284,17 @@ section.header .main-header button:hover{
     bottom:0;
 }
 
-.donate-now input[type="radio"] {
+.game-size input[type="radio"] {
     opacity:0.01;
     z-index:100;
 }
 
-.donate-now input[type="radio"]:checked + label,
+.game-size input[type="radio"]:checked + label,
 .Checked + label {
     background: #DA695B;
 }
 
-.donate-now label {
+.game-size label {
      padding:5px;
      border:1px solid #CCC;
      border-radius: 5px;  
@@ -302,7 +302,7 @@ section.header .main-header button:hover{
     z-index:90;
 }
 
-.donate-now label:hover {
+.dgame-size label:hover {
      background:#DDD;
 }
 
