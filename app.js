@@ -30,6 +30,7 @@ const Ddos = require('ddos');
 const git = require('git-rev');
 const csurf = require('csurf');
 const ddos = new Ddos({'silentStart' : true});
+const bodyParser = require('body-parser');
 
 // Baduk modules
 const games = require('./src/modules/games.js');
@@ -42,6 +43,7 @@ app.use('/src', express.static('src'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
 app.use(session);
+app.use(bodyParser.urlencoded({extended: true}));
 app.disable('X-Powered-By');
 if(config.env == "PROD") {
     app.all('*', require('express-force-domain')('https://baduk.ca'));
