@@ -106,6 +106,7 @@ app.post('/go', function (req, res) {
     // If someone just goes to /go without a room ID, we generate a new one.
     // IDs are generated with SHA-1, which git uses too so I think its
     // a safe assumption that no collisions will occur
+    console.log(req.body.size);
     res.end(req.protocol + "://" + req.headers.host + '/go/' + games.current_hash());
 });
 
