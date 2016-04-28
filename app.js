@@ -45,8 +45,10 @@ app.use(ddos.express);
 app.use(session);
 app.use(bodyParser.urlencoded({extended: true}));
 app.disable('X-Powered-By');
-if(config.env == "PROD") {
+if(config.env == "PROD" && config.HTTPS) {
     app.all('*', require('express-force-domain')('https://baduk.ca'));
+} else if(config.env =="PROD" && !config.HTTPS) {
+    app.all('*', require('express-force-domain')('http://baduk.ca'));
 }
 
 // Add a handler to inspect the req.secure flag (see
