@@ -107,7 +107,11 @@ app.post('/go', function (req, res) {
     // IDs are generated with SHA-1, which git uses too so I think its
     // a safe assumption that no collisions will occur
     console.log(req.body.size);
-    res.end(req.protocol + "://" + req.headers.host + '/go/' + games.current_hash());
+    var hash = games.registerGameRoom({
+        'board_size': req.body.size,
+    });
+    console.log(hash);
+    res.end(req.protocol + "://" + req.headers.host + '/go/' + hash);
 });
 
 app.get('/go/:id', function (req, res) {
