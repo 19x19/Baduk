@@ -66,7 +66,6 @@ var App = React.createClass({
             selectedMoveIdx: -1,
             hoverPiece: null,
             boardSizePixels: 500,
-            borderSize: 60,
             muted: true,
             chatHistory: [],
             playerName: null,
