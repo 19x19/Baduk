@@ -171,6 +171,10 @@ io.on('connection', function (socket) {
     socket.on('post_resign', function (info) {
         sockets.post_resign(socket, info, io);
     });
+
+    socket.on('mark_group_as_dead', function (info) {
+        sockets.mark_group_as_dead(socket, info, io);
+    });
 });
 
 // Figure out if we want HTTPS or not

@@ -66,6 +66,32 @@ var applyMove = function (roomId, action) {
         }
     }
 
+    if (action['action'] === 'mark_group_as_dead') {
+        if (currentGameStatus(roomId) === 'resolving_dead_groups') {
+
+            var stones = statesOfRoom[roomId].deadGroupResolutionState.stones;
+            var colorOfMarkedStone = stones[action.row][action.col];
+            var groupOfMarkedStone = groupOf_stones(stones, action.row, action.col);
+
+            var colorOfDeadMarkedStone = colorOfMarkedStone + 2;
+
+            console.log(colorOfMarkedStone, colorOfDeadMarkedStone);
+
+            groupOfMarkedStone.forEach(function (stone) {
+                statesOfRoom[roomId].deadGroupResolutionState.stones[stone.x][stone.y] = colorOfDeadMarkedStone;
+            });
+
+            console.log(groupOfMarkedStone);
+
+            return true;
+        } else {
+            if (isNodejs()) console.log('illegal move');
+            return false;
+        }
+    }
+
+    // it's probably a post_new_piece. todo: verify that
+
     var newState = withMove(currentGameState(roomId), action);
 
     if (newState.gameStatus === undefined) {
@@ -427,6 +453,40 @@ var withoutDeadGroups = function (gameState) {
 
     return newState;
 
+}
+
+var groupOf_stones = function (stones, x, y, blacklist) {
+    blacklist = blacklist || [];
+
+    if (blacklist.indexOf(reprStone(x, y)) !== -1) return [];
+
+    var color = stones[x][y];
+    if (color === 0) return [];
+
+    var ret = [{'x': x, 'y': y}];
+
+    for (var dx=-1; dx <= 1; dx += 1) for (var dy=-1; dy <= 1; dy += 1) {
+        if (dx === 0 && dy === 0) continue;
+        if (dx * dy !== 0) continue;
+
+        if (0 <= x+dx && x+dx < stones.length &&
+            0 <= y+dy && y+dy < stones.length) {
+            var otherColor = stones[x+dx][y+dy];
+
+            if (otherColor === color) {
+                if (ret.map(function (s) { return reprStone(s.x, s.y)}).indexOf(reprStone(x+dx, y+dy)) === -1) {
+                    ret.push({'x': x+dx, 'y': y+dy});
+                }
+                var retConcat = groupOf_stones(stones, x+dx, y+dy, blacklist.concat([reprStone(x, y)]));
+                retConcat.forEach(function (sc) {
+                    if (ret.map(function (s) { return reprStone(s.x, s.y)}).indexOf(reprStone(sc.x, sc.y)) === -1) {
+                        ret.push({'x': sc.x, 'y': sc.y});
+                    }
+                });
+            }
+        }
+    }
+    return ret;
 }
 
 var groupOf = function (gameState, x, y, blacklist) {

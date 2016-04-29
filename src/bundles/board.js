@@ -164,14 +164,33 @@ var App = React.createClass({
     handleBoardClick: function (e) {
 
         var coordOfClickE = this.coordOfClick(e.pageX, e.pageY);
-
         var room = /[^/]*$/.exec(window.location.pathname)[0];
 
-        socket.emit('post_new_piece', {
-            'row': coordOfClickE.x,
-            'col': coordOfClickE.y,
-            'room': room
-        });
+        if (this.state.gameStatus === 'playing' || this.state.gameStatus === null) {
+
+            socket.emit('post_new_piece', {
+                'row': coordOfClickE.x,
+                'col': coordOfClickE.y,
+                'room': room,
+            });
+
+        } else if (this.state.gameStatus === 'resolving_dead_groups') {
+
+            var colorOfClickedStone = this.state.deadGroupResolutionState.stones[coordOfClickE.x][coordOfClickE.y];
+
+            if (colorOfClickedStone === 0) return;
+
+            if (colorOfClickedStone === 1 || colorOfClickedStone === 2) {
+                socket.emit('mark_group_as_dead', {
+                    'row': coordOfClickE.x,
+                    'col': coordOfClickE.y,
+                    'room': room,
+                });
+            }
+        } else {
+            console.log('???');
+        }
+
     },
     handlePassBtnClick: function () {
         socket.emit('post_pass', {
@@ -301,6 +320,37 @@ var Board = React.createClass({
         };
     },
     getDisplayedStones: function () {
+        if (this.props.gameStatus === 'resolving_dead_groups' && this.props.deadGroupResolutionState) {
+            var displayedStones = [];
+            var gameBoardSize = this.props.mostRecentGameState.size;
+
+            var stones = this.props.deadGroupResolutionState.stones;
+
+            var isNonEmptyStoneColor = function (i) {
+                return i === 1 || i === 2 || i === 3 || i === 4;
+            }
+            var isGhostStoneColor = function (i) {
+                return i === 3 || i === 4;
+            }
+
+            console.log(stones[2][2]);
+
+            for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
+                if (isNonEmptyStoneColor(stones[i][j])) {
+                    displayedStones.push({
+                        x: i,
+                        y: j,
+                        color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white' }[stones[i][j]],
+                        isGhost: isGhostStoneColor(stones[i][j]),
+                        isSelectedMove: false
+                    });
+                }
+            }
+            console.log(displayedStones);
+            return displayedStones;
+
+
+        }
         return this.getSelectedDisplayedStones();
     },
     getSelectedDisplayedStones: function () {

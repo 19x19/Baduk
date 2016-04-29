@@ -118,6 +118,14 @@ var post_commit_endgame_resolution = function (socket, info, io) {
     }, 'commit_endgame_resolution');
 }
 
+var mark_group_as_dead = function (socket, info, io) {
+    handleMove(socket, info, io, {
+        'action': 'mark_group_as_dead',
+        'row': info.row,
+        'col': info.col,
+    });
+}
+
 exports.post_new_connect = post_new_connect;
 exports.post_new_disconnect = post_new_disconnect;
 exports.post_new_message = post_new_message;
@@ -126,3 +134,4 @@ exports.post_pass = post_pass;
 exports.post_resign = post_resign;
 exports.post_retract_pass = post_retract_pass;
 exports.post_commit_endgame_resolution = post_commit_endgame_resolution;
+exports.mark_group_as_dead = mark_group_as_dead;
