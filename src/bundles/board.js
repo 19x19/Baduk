@@ -187,6 +187,7 @@ var App = React.createClass({
                     'room': room,
                 });
             }
+
         } else {
             console.log('???');
         }
@@ -333,8 +334,6 @@ var Board = React.createClass({
                 return i === 3 || i === 4;
             }
 
-            console.log(stones[2][2]);
-
             for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
                 if (isNonEmptyStoneColor(stones[i][j])) {
                     displayedStones.push({
@@ -346,7 +345,6 @@ var Board = React.createClass({
                     });
                 }
             }
-            console.log(displayedStones);
             return displayedStones;
 
 

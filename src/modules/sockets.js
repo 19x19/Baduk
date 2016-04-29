@@ -37,6 +37,7 @@ var post_new_connect = function(socket, info, io) {
     });
     socket.emit('new_game_state', go.currentGameState(info.room));
     socket.emit('new_game_status', go.currentGameStatus(info.room));
+    socket.emit('new_dead_group_resolution_state', go.currentDeadGroupResolutionState(info.room));
 }
 
 // Reacts to new disconnections
