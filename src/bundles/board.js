@@ -51,13 +51,21 @@ socket.on('new_game_status', function (msg) {
     });
 });
 
+var borderSizeOf = function (boardSize, boardSizePixels) {
+    return {
+        9: 60,
+        13: 45,
+        19: 30
+    }[boardSize];
+}
+
 var App = React.createClass({
     getInitialState: function () {
         return {
             mostRecentGameState: initialGameState(),
             selectedMoveIdx: -1,
             hoverPiece: null,
-            boardSize: 500,
+            boardSizePixels: 500,
             borderSize: 60,
             muted: true,
             chatHistory: [],
@@ -92,9 +100,9 @@ var App = React.createClass({
         }
     },
     gridSize: function () {
-        var boardSize = this.state.boardSize;
-        var borderSize = this.state.borderSize;
-        return boardSize - 2*borderSize;
+        var boardSizePixels = this.state.boardSizePixels;
+        var borderSize = borderSizeOf(this.state.mostRecentGameState.size, this.state.boardSizePixels);
+        return boardSizePixels - 2*borderSize;
     },
     handleMouseMove: function (e) {
         if (this.state.playerColor === null) return;
@@ -128,8 +136,10 @@ var App = React.createClass({
         var boardX = $(ReactDOM.findDOMNode(this.refs.gameBoard)).offset().left;
         var boardY = $(ReactDOM.findDOMNode(this.refs.gameBoard)).offset().top;
 
-        var mouseRelX = mouseX - boardX - this.state.borderSize;
-        var mouseRelY = mouseY - boardY - this.state.borderSize;
+        var borderSize = borderSizeOf(this.state.mostRecentGameState.size, this.state.boardSizePixels);
+
+        var mouseRelX = mouseX - boardX - borderSize;
+        var mouseRelY = mouseY - boardY - borderSize;
 
         var mousePctX = mouseRelX / this.gridSize();
         var mousePctY = mouseRelY / this.gridSize();
@@ -146,9 +156,10 @@ var App = React.createClass({
     },
     posOf: function (row, col) {
         var stoneSize = this.gridSize() / (this.state.mostRecentGameState.size - 1);
+        var borderSize = borderSizeOf(this.state.mostRecentGameState.size, this.state.boardSizePixels);
         return {
-            x: this.state.borderSize + (row * stoneSize),
-            y: this.state.borderSize + (col * stoneSize),
+            x: borderSize + (row * stoneSize),
+            y: borderSize + (col * stoneSize),
         };
     },
     handleBoardClick: function (e) {
@@ -209,8 +220,8 @@ var App = React.createClass({
                     mostRecentGameState={this.state.mostRecentGameState}
                     selectedMoveIdx={this.state.selectedMoveIdx}
                     hoverPiece={this.state.hoverPiece}
-                    boardSize={this.state.boardSize}
-                    borderSize={this.state.borderSize}
+                    boardSize={this.state.boardSizePixels}
+                    borderSize={borderSizeOf(this.state.mostRecentGameState.size, this.state.boardSizePixels)}
                     handleClick={this.handleBoardClick}
                     gridSize={this.gridSize()}
                     playerColor={this.state.playerColor}
