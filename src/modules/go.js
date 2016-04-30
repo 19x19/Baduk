@@ -66,22 +66,31 @@ var applyMove = function (roomId, action) {
         }
     }
 
-    if (action['action'] === 'mark_group_as_dead') {
+    if (action['action'] === 'mark_group_as_dead' || action['action'] === 'mark_group_as_alive') {
         if (currentGameStatus(roomId) === 'resolving_dead_groups') {
 
             var stones = statesOfRoom[roomId].deadGroupResolutionState.stones;
             var colorOfMarkedStone = stones[action.row][action.col];
             var groupOfMarkedStone = groupOf_stones(stones, action.row, action.col);
 
-            var colorOfDeadMarkedStone = colorOfMarkedStone + 2;
+            if (action['action'] === 'mark_group_as_dead') {
+                var colorOfDeadMarkedStone = colorOfMarkedStone + 2;
+                console.log(colorOfMarkedStone, colorOfDeadMarkedStone);
 
-            console.log(colorOfMarkedStone, colorOfDeadMarkedStone);
+                groupOfMarkedStone.forEach(function (stone) {
+                    statesOfRoom[roomId].deadGroupResolutionState.stones[stone.x][stone.y] = colorOfDeadMarkedStone;
+                });
 
-            groupOfMarkedStone.forEach(function (stone) {
-                statesOfRoom[roomId].deadGroupResolutionState.stones[stone.x][stone.y] = colorOfDeadMarkedStone;
-            });
+                console.log(groupOfMarkedStone);
+            } else if (action['action'] === 'mark_group_as_alive') {
+                var colorOfAliveMarkedStone = colorOfMarkedStone - 2;
+                console.log(colorOfMarkedStone, colorOfAliveMarkedStone);
 
-            console.log(groupOfMarkedStone);
+                groupOfMarkedStone.forEach(function (stone) {
+                    statesOfRoom[roomId].deadGroupResolutionState.stones[stone.x][stone.y] = colorOfAliveMarkedStone;
+                });
+            }
+
 
             return true;
         } else {

@@ -175,6 +175,10 @@ io.on('connection', function (socket) {
     socket.on('mark_group_as_dead', function (info) {
         sockets.mark_group_as_dead(socket, info, io);
     });
+
+    socket.on('mark_group_as_alive', function (info) {
+        sockets.mark_group_as_alive(socket, info, io);
+    });
 });
 
 // Figure out if we want HTTPS or not

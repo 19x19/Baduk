@@ -186,6 +186,12 @@ var App = React.createClass({
                     'col': coordOfClickE.y,
                     'room': room,
                 });
+            } else if (colorOfClickedStone === 3 || colorOfClickedStone === 4) {
+                socket.emit('mark_group_as_alive', {
+                    'row': coordOfClickE.x,
+                    'col': coordOfClickE.y,
+                    'room': room,
+                });
             }
 
         } else {
