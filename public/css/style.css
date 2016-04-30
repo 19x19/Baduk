@@ -34,12 +34,12 @@ footer {
 }
 
 .moveEntry:hover {
-    background-color: lightgrey;
-    cursor: pointer;
+  background-color: lightgrey;
+  cursor: pointer;
 }
 
 p {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 hr {
@@ -50,19 +50,15 @@ hr {
 
 /* Used to make sure chat is sent neatly */
 pre {
-    border-style: none;
-    white-space: pre-wrap;       /* CSS 3 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-    margin: 0 0 0 0;
-    padding: 2px 2px 2px 2px;
-    font-family: 'Ubuntu', sans-serif;
-}
-
-.wood-color {
-	background-color: #966F33;
+  border-style: none;
+  white-space: pre-wrap;       /* CSS 3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  margin: 0 0 0 0;
+  padding: 2px 2px 2px 2px;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 .chat-controls {
@@ -78,21 +74,22 @@ pre {
 }
 
 .chat {
-    height: 30vh;
-    overflow-y: scroll;
-    padding: 10px 10px;
+  height: 30vh;
+  overflow-y: scroll;
+  padding: 10px 10px;
 }
 
 #userWait {
-    position: absolute;
-    top: 10%;
+  position: absolute;
+  top: 10%;
 }
+
 .navbar-inverse{
-    background-color: rgba(0,0,0,0);
-    border:none;
+  background-color: rgba(0,0,0,0);
+  border:none;
 }
-.navbar-inverse .navbar-brand{
-    color:#fff;
+.navbar-inverse .navbar-brand {
+  color:#fff;
 }
 nav.navbar.navbar-inverse.navbar-fixed-top{
     margin-bottom: 0;
@@ -181,10 +178,8 @@ section.header .main-header button:hover{
 .info .info-content h4{
     font-weight: 700;
 }
-.go{
-    display: flex;
-}
-.go .well{
+
+.well {
     border-radius: 0;
     box-shadow: none;
     border: none;
@@ -232,28 +227,13 @@ section.header .main-header button:hover{
     flex: 1;
 }
 .go .buttons button:hover{
-    background:  #B4485B;
+    background: #B4485B;
 }
 .go .buttons button:nth-last-child(1){
     flex: none;
 }
 .go .move-history{
     margin-top: 20px;
-    height: 450px;
-}
-
-.move-history > div {
-    height: 100%;
-}
-
-.go .go-board{
-    width: 535px;
-}
-
-.go .sidebar-right{
-    flex:1;
-    max-height: 581px;
-    overflow: hidden;
 }
 
 .strong {
@@ -297,7 +277,7 @@ section.header .main-header button:hover{
 .game-size label {
      padding:5px;
      border:1px solid #CCC;
-     border-radius: 5px;  
+     border-radius: 5px;
      cursor:pointer;
     z-index:90;
 }

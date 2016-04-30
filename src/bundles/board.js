@@ -228,16 +228,18 @@ var App = React.createClass({
     render: function () {
         var self = this;
         return <div className="row go">
-            <ChatBox
-                chatHistory={this.state.chatHistory}
-                playerName={this.state.playerName}
-                playerColor={this.state.playerColor}
-                onSendMessage={function (msg) {
-                    socket.emit('post_new_message', {
-                        'message': msg,
-                        'room': room,
-                    });
-                }} />
+            <div className="col-md-3">
+                <ChatBox
+                    chatHistory={this.state.chatHistory}
+                    playerName={this.state.playerName}
+                    playerColor={this.state.playerColor}
+                    onSendMessage={function (msg) {
+                        socket.emit('post_new_message', {
+                            'message': msg,
+                            'room': room,
+                        });
+                    }} />
+            </div>
             <div className="col-md-6 go-board">
                 <pre>{JSON.stringify(this.state.gameStatus)}</pre>
                 <Board
@@ -262,7 +264,7 @@ var App = React.createClass({
                     onCommitResolutionBtnClick={this.handleCommitResolutionBtnClick}
                     muted={this.state.muted} />
             </div>
-            <div className="col-md-3 sidebar-right">
+            <div className="col-md-3">
                 <RoommatesBox roommates={this.state.roommates} />
                 <MoveHistoryBox
                     moves={this.state.mostRecentGameState.moves}

@@ -10,7 +10,7 @@ window.ChatBox = React.createClass({
     },
     render: function () {
         var self = this;
-        return <div className="col-md-3 well">
+        return <div className="well">
             <h5>Chat</h5>
             <center>
                 Your name is <span className="strong">{this.props.playerName}</span><br />
