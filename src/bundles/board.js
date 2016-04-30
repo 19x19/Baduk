@@ -6,7 +6,9 @@ $(window).mousemove(function (e) {
 });
 
 $(window).resize(function () {
-    // TBD
+    window.appElement.setState({
+        boardSizePixels: $('.col-md-6').width(),
+    });
 });
 
 socket.on('new_game_state', function (gameState) {
@@ -74,6 +76,9 @@ var App = React.createClass({
             gameStatus: null,
             deadGroupResolutionState: null,
         }
+    },
+    componentDidMount: function () {
+        window.setTimeout(function () { $(window).resize() }, 0);
     },
     notifyNewChatMessage: function (color, username, message) {
         this.setState(({
