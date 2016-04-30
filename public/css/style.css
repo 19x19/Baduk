@@ -74,7 +74,8 @@ pre {
 }
 
 .chat {
-  height: 30vh;
+  min-height: 10em;
+  max-height: 30em;
   overflow-y: scroll;
   padding: 10px 10px;
 }
@@ -187,7 +188,8 @@ section.header .main-header button:hover{
     display: flex;
     flex-direction: column;
 }
-.go input{
+
+.go input {
     box-shadow: none;
     border-radius: 0;
     border:1px solid #DA695B;
@@ -196,6 +198,7 @@ section.header .main-header button:hover{
     transition: 0.3s all;
     font-family: "Lato";
 }
+
 .go input:focus{
     box-shadow: none;
     border-radius: 0;
@@ -204,6 +207,7 @@ section.header .main-header button:hover{
     color: #fff;
     font-family: "Lato";
 }
+
 .go p{
     font-size: 14px;
 }
@@ -231,6 +235,7 @@ section.header .main-header button:hover{
 }
 .go .buttons button:nth-last-child(1){
     flex: none;
+    margin-right: 0;
 }
 .go .move-history{
     margin-top: 20px;

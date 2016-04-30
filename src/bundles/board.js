@@ -245,7 +245,7 @@ var App = React.createClass({
                         });
                     }} />
             </div>
-            <div className="col-md-6 go-board">
+            <div className="col-md-6">
                 <pre>{JSON.stringify(this.state.gameStatus)}</pre>
                 <Board
                     ref="gameBoard"
