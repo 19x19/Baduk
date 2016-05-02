@@ -8,7 +8,7 @@ var go = require('./go.js');
     Javascript module for games.
 */
 
-var current_games = [];
+var current_games = {};
 var current_users = {};
 
 var registerGameRoom = function (options) {
@@ -23,8 +23,8 @@ var game_hash = function() {
     return function() {
         do {
             var new_hash = cryptohat();
-        } while(current_games.indexOf(new_hash) > -1);
-        current_games.push(new_hash);
+        } while(game_exists(new_hash));
+        current_games[new_hash] = {};
         return new_hash;
     }
 };
@@ -32,7 +32,7 @@ var current_hash = game_hash();
 
 // Returns true if the given hash is a current game
 var game_exists = function(hash) {
-    return current_games.indexOf(hash) > -1;
+    return current_games[hash] !== undefined;
 };
 
 // Returns true if the given user exists
@@ -108,8 +108,7 @@ var cleanse = schedule.scheduleJob('0 0 12 * * *', function() {
     // Cleanse the rooms
     for (var room in current_games) {
         if(players_in_room(room).length == 0) {
-            var index = current_games.indexOf(room);
-            delete players_in_room[index];
+            delete current_games[room];
         }
     }
 
