@@ -25,6 +25,7 @@ var game_hash = function() {
             var new_hash = cryptohat();
         } while(game_exists(new_hash));
         current_games[new_hash] = {};
+        current_games[new_hash]['conversation'] = [];
         return new_hash;
     }
 };

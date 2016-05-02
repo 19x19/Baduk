@@ -25,7 +25,7 @@ var post_new_connect = function(socket, info, io) {
     logger.verbose('post_new_connect', info);
     games.add_user(info, socket);
     const user_id = socket.handshake.session.id;
-    if(games.current_users[user_id][info.room]['instances'] == 1) {
+    if(games.current_users[user_id][info.room]['instances'] === 1) {
         io.to(info.room).emit('get_new_connect', {
             'username' : games.current_users[user_id].username,
             'roommates' : games.players_in_room(info.room),
@@ -64,6 +64,10 @@ var post_new_message = function(socket, info, io) {
         'username' : games.current_users[user_id]['username'],
         'color' : games.current_users[user_id][info.room]['color'],
     }));
+    // Save the message for later reloading if required
+    games.current_games[info.room]['conversation'].push(
+        ['message', info.room, user_id, info.message]
+    );
 }
 
 
