@@ -38,6 +38,10 @@ var post_new_connect = function(socket, info, io) {
     socket.emit('new_game_state', go.currentGameState(info.room));
     socket.emit('new_game_status', go.currentGameStatus(info.room));
     socket.emit('new_dead_group_resolution_state', go.currentDeadGroupResolutionState(info.room));
+    // Save the connect
+    games.current_games[info.room]['conversation'].push(
+        ['connect', info.room, user_id]
+    );
 }
 
 // Reacts to new disconnections
@@ -53,6 +57,10 @@ var post_new_disconnect = function(socket, info, io) {
             });
         }
     }
+    // Save the disconnect
+    games.current_games[info.room]['conversation'].push(
+        ['disconnect', info.room, user_id]
+    );
 }
 
 // Sends a new message to the room
