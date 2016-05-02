@@ -6,11 +6,11 @@ Currently in the pre-alpha stage. Expected Alpha release date is April 29th, 201
 
 ## Installation
 
-First install Node.js v5.9.1. You can do this on OS X with:
+First install Node.js v5.9.1. You can do this by via nvm as follows:
 
 ```
-brew install wget
-curl "https://nodejs.org/dist/latest/node-${VERSION:-$(wget -qO- https://nodejs.org/dist/latest/ | sed -nE 's|.*>node-(.*)\.pkg</a>.*|\1|p')}.pkg" > "$HOME/Downloads/node-latest.pkg" && sudo installer -store -pkg "$HOME/Downloads/node-latest.pkg" -target "/"
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
+nvm install 5.9.1
 ```
 
 Next, clone the repository and install dependencies:
