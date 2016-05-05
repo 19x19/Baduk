@@ -245,6 +245,18 @@ section.header .main-header button:hover{
     font-weight: 700;
 }
 
+.game-size .size {
+  border: 0px;
+  font-size: 23px;
+  padding: 0px 5px 5px 5px;
+  font-weight: 400;
+  cursor: default;
+}
+
+.game-size .size:hover {
+  background: white;
+}
+
 .game-size {
      list-style-type:none;
      margin: 5px 0 0 0;
@@ -294,3 +306,4 @@ section.header .main-header button:hover{
 .modal-body {
     overflow: hidden;
 }
+
