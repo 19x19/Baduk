@@ -19,7 +19,7 @@ socket.on('new_game_state', function (gameState) {
     // Play the sound for a new piece
     window.appElement.notifyNewGameState();
 
-    if (gameState.moves.length > 0) {
+    if (gameState.moves.length > 0) { // todo: not idempotent :'(
         var mostRecentMove = gameState.moves.slice(-1)[0];
         var color = mostRecentMove.player_color.charAt(0).toUpperCase() + mostRecentMove.player_color.slice(1);
         if (mostRecentMove.action === 'pass') {
@@ -36,7 +36,9 @@ socket.on('new_game_state', function (gameState) {
 });
 
 socket.on('new_dead_group_resolution_state', function (msg) {
-    console.log(msg);
+    window.appElement.setState({
+        deadGroupResolutionState: msg,
+    });
 });
 
 socket.on('move_is_illegal', function (msg) {
@@ -63,6 +65,7 @@ var App = React.createClass({
             playerColor: null,
             roommates: [],
             gameStatus: null,
+            deadGroupResolutionState: null,
         }
     },
     notifyNewChatMessage: function (color, username, message) {
@@ -101,10 +104,14 @@ var App = React.createClass({
         var pieceCoordX = coordOfClickE.x;
         var pieceCoordY = coordOfClickE.y;
 
-        var stoneSize = this.gridSize() / 8;
+        var boardSize = this.state.mostRecentGameState.size;
 
-        if (0 <= pieceCoordX && pieceCoordX < 9
-         && 0 <= pieceCoordY && pieceCoordY < 9
+        var stoneSize = this.gridSize() / (boardSize - 1);
+
+        console.log(pieceCoordX, pieceCoordY, boardSize);
+
+        if (0 <= pieceCoordX && pieceCoordX < boardSize
+         && 0 <= pieceCoordY && pieceCoordY < boardSize
         ) {
             this.setState({
                 'hoverPiece': {
@@ -129,8 +136,10 @@ var App = React.createClass({
         var mousePctX = mouseRelX / this.gridSize();
         var mousePctY = mouseRelY / this.gridSize();
 
-        var pieceCoordX = Math.round(mousePctX * 8);
-        var pieceCoordY = Math.round(mousePctY * 8);
+        var boardSize = this.state.mostRecentGameState.size;
+
+        var pieceCoordX = Math.round(mousePctX * (boardSize - 1));
+        var pieceCoordY = Math.round(mousePctY * (boardSize - 1));
 
         return {
             x: pieceCoordX,
@@ -138,7 +147,7 @@ var App = React.createClass({
         }
     },
     posOf: function (row, col) {
-        var stoneSize = this.gridSize() / 8;
+        var stoneSize = this.gridSize() / (this.state.mostRecentGameState.size - 1);
         return {
             x: this.state.borderSize + (row * stoneSize),
             y: this.state.borderSize + (col * stoneSize),
@@ -176,6 +185,12 @@ var App = React.createClass({
             muted: !this.state.muted,
         });
     },
+    handleCommitResolutionBtnClick: function () {
+        console.log('emitting post_commit_endgame_resolution');
+        socket.emit('post_commit_endgame_resolution', {
+            'room': room
+        });
+    },
     render: function () {
         var self = this;
         return <div className="row go">
@@ -201,7 +216,8 @@ var App = React.createClass({
                     handleClick={this.handleBoardClick}
                     gridSize={this.gridSize()}
                     playerColor={this.state.playerColor}
-                    gameStatus={this.state.gameStatus} />
+                    gameStatus={this.state.gameStatus}
+                    deadGroupResolutionState={this.state.deadGroupResolutionState}/>
                 <GameStatusDisplay gameState={this.state.mostRecentGameState} />
                 <ButtonArea
                     gameStatus={this.state.gameStatus}
@@ -209,6 +225,7 @@ var App = React.createClass({
                     onRetractPassBtnClick={this.handleRetractPassBtnClick}
                     onResignBtnClick={this.handleResignBtnClick}
                     onMuteBtnClick={this.handleMuteBtnClick}
+                    onCommitResolutionBtnClick={this.handleCommitResolutionBtnClick}
                     muted={this.state.muted} />
             </div>
             <div className="col-md-3 sidebar-right">
@@ -240,11 +257,19 @@ var ButtonArea = React.createClass({
         } else if (this.props.gameStatus === 'resolving_dead_groups') {
             return <div className="buttons">
                 <button className="btn" onClick={this.props.onRetractPassBtnClick}>Retract Pass</button>
+                <button className="btn" onClick={this.props.onCommitResolutionBtnClick}>Commit</button>
                 <button className="btn" onClick={this.props.onResignBtnClick}>Resign</button>
                 <button className="btn">
                     <i id="sound_display" className={this.props.muted ? "fa fa-volume-off" : "fa fa-volume-up"} aria-hidden="true"></i>
                     </button>
             </div>
+        } else if (this.props.gameStatus === 'game_over') {
+            return <div className="buttons">
+                <button className="btn">Good</button>
+                <button className="btn">Game</button>
+            </div>
+        } else {
+            console.log('unknown gameStatus ', this.props.gameStatus);
         }
     }
 })
@@ -261,13 +286,23 @@ var Board = React.createClass({
     // playerColor
     // todo: reduce
     posOf: function (row, col) {
-        var stoneSize = this.props.gridSize / 8;
+        var stoneSize = this.props.gridSize / (this.props.mostRecentGameState.size - 1);
         return {
             x: this.props.borderSize + (row * stoneSize),
             y: this.props.borderSize + (col * stoneSize),
         };
     },
-    render: function () {
+    getDisplayedStones: function () {
+        console.log(this.props.deadGroupResolutionState);
+        return this.getSelectedDisplayedStones();
+    },
+    getSelectedDisplayedStones: function () {
+        var isNonEmptyStoneColor = function (i) {
+            return i === 1 || i === 2 || i === 3 || i === 4;
+        }
+        var isGhostStoneColor = function (i) {
+            return i === 3 || i === 4;
+        }
 
         if (this.props.mostRecentGameState.moves.length === this.props.selectedMoveIdx + 1) {
             // fast path optimization, not strictly necessary
@@ -282,7 +317,7 @@ var Board = React.createClass({
         var stones = [];
         var boardSize = this.props.mostRecentGameState.size;
 
-        var stoneStride = this.props.gridSize / 8;
+        var stoneStride = this.props.gridSize / (boardSize - 1);
         var stoneSize = stoneStride - 2;
 
         var isNonEmptyStoneColor = function (i) {
@@ -293,6 +328,8 @@ var Board = React.createClass({
             return i === 3 || i === 4;
         }
 
+        console.log(this.props.hoverPiece);
+
         if ((this.props.gameStatus === 'playing' || this.props.gameStatus === null) &&
             this.props.hoverPiece &&
             isLegalMove(this.props.mostRecentGameState, this.props.playerColor, this.props.hoverPiece.x, this.props.hoverPiece.y)) {
@@ -301,9 +338,11 @@ var Board = React.createClass({
 
         }
 
-        for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+        var displayedStones = [];
+
+        for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
             if (isNonEmptyStoneColor(selectedStones[i][j])) {
-                stones.push({
+                displayedStones.push({
                     x: i,
                     y: j,
                     color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white' }[selectedStones[i][j]],
@@ -312,25 +351,33 @@ var Board = React.createClass({
                 });
             }
         }
+        return displayedStones;
+    },
+    render: function () {
 
-        var boardSize = this.props.boardSize;
+        var displayedStones = this.getDisplayedStones();
+        var boardSizePixels = this.props.boardSize;
         var borderSize = this.props.borderSize;
-        var gridSize = boardSize - 2*borderSize;
+        var gridSize = boardSizePixels - 2*borderSize;
 
         var self = this;
 
         return <svg
-            height={this.props.boardSize}
-            width={this.props.boardSize}
+            height={boardSizePixels}
+            width={boardSizePixels}
             onClick={this.props.handleClick}
         >
-            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSize} height={boardSize} />
-            <image xlinkHref="/img/go_board_9*9.png"
+            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSizePixels} height={boardSizePixels} />
+            <image xlinkHref={{
+                9: "/img/go_board_9*9.png",
+                13: "/img/go_board_13*13.png",
+                19: "/img/go_board_19*19.png",
+            }[boardSize] }
                 width={gridSize}
                 height={gridSize}
                 x={borderSize}
                 y={borderSize} />
-            {stones.map(function (stone, i) {
+            {displayedStones.map(function (stone, i) {
                 var posOfStone = self.posOf(stone.x, stone.y);
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image

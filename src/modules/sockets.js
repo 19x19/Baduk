@@ -112,6 +112,12 @@ var post_retract_pass = function (socket, info, io) {
     }, 'rectract_pass');
 }
 
+var post_commit_endgame_resolution = function (socket, info, io) {
+    handleMove(socket, info, io, {
+        'action': 'commit_endgame_resolution',
+    }, 'commit_endgame_resolution');
+}
+
 exports.post_new_connect = post_new_connect;
 exports.post_new_disconnect = post_new_disconnect;
 exports.post_new_message = post_new_message;
@@ -119,3 +125,4 @@ exports.post_new_piece = post_new_piece;
 exports.post_pass = post_pass;
 exports.post_resign = post_resign;
 exports.post_retract_pass = post_retract_pass;
+exports.post_commit_endgame_resolution = post_commit_endgame_resolution;

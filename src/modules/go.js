@@ -14,6 +14,11 @@ var statesOfRoom = {};
 
 // public API
 
+var registerGameRoom = function (roomId, options) {
+    statesOfRoom[roomId] = {};
+    statesOfRoom[roomId].gameState = initialGameState(options);
+}
+
 var applyMove = function (roomId, action) {
     /*
     update statesOfRoom[roomId] with action
@@ -25,7 +30,6 @@ var applyMove = function (roomId, action) {
         'illegal_move',
         'resolving_dead_groups',
         'playing',
-        'retract_pass'
     ];
 
     if (currentGameStatus(roomId) === 'game_over') {
@@ -37,10 +41,27 @@ var applyMove = function (roomId, action) {
         console.log('retract_pass');
         if (currentGameStatus(roomId) === 'resolving_dead_groups') {
             statesOfRoom[roomId].gameStatus = 'playing';
-            // todo: revert a previous pass
+            // todo: revert one or two previous passes
             return true;
         } else {
             if (isNodejs()) console.log('illegal move: cannot retract_pass unless status is resolving_dead_groups');
+            return false;
+        }
+    }
+
+    if (action['action'] === 'commit_endgame_resolution') {
+        if (currentGameStatus(roomId) === 'resolving_dead_groups') {
+            statesOfRoom[roomId].deadGroupResolutionState[action.player_color + '_committed'] = true;
+
+            if (statesOfRoom[roomId].deadGroupResolutionState['white_committed'] &&
+                statesOfRoom[roomId].deadGroupResolutionState['black_committed']) {
+                statesOfRoom[roomId].gameStatus = 'game_over';
+                // todo: calculate score
+            }
+
+            return true;
+        } else {
+            if (isNodejs()) console.log('illegal move: cannot commit_endgame_resolution unless status is resolving_dead_groups');
             return false;
         }
     }
@@ -67,7 +88,11 @@ var applyMove = function (roomId, action) {
     statesOfRoom[roomId].gameStatus = newState.gameStatus;
 
     if (newState.gameStatus === 'resolving_dead_groups') {
-        statesOfRoom[roomId].deadGroupResolutionState = newState.deadGroupResolutionState;
+        statesOfRoom[roomId].deadGroupResolutionState = {
+            'stones': newState.deadGroupResolutionState,
+            'white_committed': false,
+            'black_committed': false,
+        };
     }
 
     return true;
@@ -229,7 +254,9 @@ var colorOf = function (gameState, x, y) {
     return ['empty', 'black', 'white'][gameState.stones[x][y]];
 }
 
-var initialGameState = function () {
+var initialGameState = function (options) {
+
+    options = options || {};
 
     // 0 - empty
     // 1 - black
@@ -237,17 +264,19 @@ var initialGameState = function () {
     // 3 - black ghost
     // 4 - white ghost
 
+    var board_size = parseInt(options.board_size, 10) || 9;
+
     var stones = [];
-    for (var i=0; i<9; i++) {
+    for (var i=0; i<board_size; i++) {
         stones[i] = [];
-        for (var j=0; j<9; j++) {
+        for (var j=0; j<board_size; j++) {
             stones[i][j] = 0;
         }
     }
     return {
         'stones': stones,
         'turn': 'black',
-        'size': 9,
+        'size': board_size,
         'moves': [],
     };
 };
@@ -482,6 +511,7 @@ if (isNodejs()) {
     exports.currentGameState = currentGameState;
     exports.currentGameStatus = currentGameStatus;
     exports.currentDeadGroupResolutionState = currentDeadGroupResolutionState;
+    exports.registerGameRoom = registerGameRoom;
 
     // exported for testing
 
