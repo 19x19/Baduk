@@ -57,7 +57,22 @@ var applyMove = function (roomId, action) {
             if (statesOfRoom[roomId].deadGroupResolutionState['white_committed'] &&
                 statesOfRoom[roomId].deadGroupResolutionState['black_committed']) {
                 statesOfRoom[roomId].gameStatus = 'game_over';
-                // todo: calculate score
+
+                var size = statesOfRoom[roomId].gameState.size;
+
+                var score = scoreOfBoard(size, statesOfRoom[roomId].deadGroupResolutionState.stones);
+
+                if (score > 0) {
+                    statesOfRoom[roomId].gameState.result = {
+                        'winner': 'black',
+                        'advantage': score,
+                    }
+                } else {
+                    statesOfRoom[roomId].gameState.result = {
+                        'winner': 'white',
+                        'advantage': -score,
+                    }
+                }
             }
 
             return true;
@@ -468,13 +483,41 @@ var estimatedScoreOfBoard = function (boardSize, stones) {
         }
     }
 
-    for (var k=0; k<boardSize; k++) liveStones = withExpandedBorder(boardSize, liveStones);
+    for (var k=0; k<2*boardSize; k++) liveStones = withExpandedBorder(boardSize, liveStones);
 
     return liveStones;
 
 }
 
+var scoreOfBoard = function (boardSize, stones) {
 
+    /*
+    returns an integer
+    */
+
+    var prisonerScore = 0;
+
+    var liveStones = copy(stones);
+
+    for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+        if (liveStones[i][j] === 3) {
+            prisonerScore -= 1;
+            liveStones[i][j] = 0;
+        }
+        if (liveStones[i][j] === 4) {
+            prisonerScore += 1;
+            liveStones[i][j] = 0;
+        }
+    }
+
+    for (var k=0; k<2*boardSize; k++) liveStones = withExpandedBorder(boardSize, liveStones);
+
+    var numBlackTerritory = numBlackStones(liveStones);
+    var numWhiteTerritory = numWhiteStones(liveStones);
+
+    return prisonerScore + numBlackTerritory - numWhiteTerritory;
+
+}
 
 var numBlackStones = function (stones) {
     return numStonesWithColor(1, stones);

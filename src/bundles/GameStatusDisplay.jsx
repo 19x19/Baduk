@@ -2,7 +2,7 @@ var resultStringOf = function (color, advantage) {
     if (advantage === 'resign') {
         return color[0].toUpperCase() + '+R';
     } else {
-        return color[0].toUpperCase() + advantage.toString();
+        return color[0].toUpperCase() + '+' + advantage.toString();
     }
 }
 
