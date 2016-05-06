@@ -246,7 +246,7 @@ var App = React.createClass({
                     }} />
             </div>
             <div className="col-md-6">
-                <pre>{JSON.stringify(this.state.gameStatus)}</pre>
+                <pre>{JSON.stringify(this.state.gameStatus) + JSON.stringify(this.state.mostRecentGameState ? this.state.mostRecentGameState.prisonerScore : '??')}</pre>
                 <Board
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}
@@ -341,7 +341,7 @@ var Board = React.createClass({
             var stones = this.props.deadGroupResolutionState.stones;
 
             var isNonEmptyStoneColor = function (i) {
-                return i === 1 || i === 2 || i === 3 || i === 4;
+                return i === 1 || i === 2 || i === 3 || i === 4 || i === 7 || i === 8;
             }
             var isGhostStoneColor = function (i) {
                 return i === 3 || i === 4;
@@ -359,17 +359,19 @@ var Board = React.createClass({
                 }
             }
             return displayedStones;
-
-
+        } else {
+            return this.getSelectedDisplayedStones();
         }
-        return this.getSelectedDisplayedStones();
     },
     getSelectedDisplayedStones: function () {
         var isNonEmptyStoneColor = function (i) {
-            return i === 1 || i === 2 || i === 3 || i === 4;
+            return i === 1 || i === 2 || i === 3 || i === 4 || i === 7 || i === 8;
         }
         var isGhostStoneColor = function (i) {
             return i === 3 || i === 4;
+        }
+        var isEstimateColor = function (i) {
+            return i === 7 || i === 8;
         }
 
         if (this.props.mostRecentGameState.moves.length === this.props.selectedMoveIdx + 1) {
@@ -385,11 +387,8 @@ var Board = React.createClass({
         var stones = [];
         var gameBoardSize = this.props.mostRecentGameState.size;
 
-        var stoneStride = this.props.gridSize / (gameBoardSize - 1);
-        var stoneSize = stoneStride - 2;
-
         var isNonEmptyStoneColor = function (i) {
-            return i === 1 || i === 2 || i === 3 || i === 4;
+            return i === 1 || i === 2 || i === 3 || i === 4 || i === 7 || i === 8;
         }
 
         var isGhostStoneColor = function (i) {
@@ -404,6 +403,19 @@ var Board = React.createClass({
 
         }
 
+        var estimatedScore = estimatedScoreOfBoard(gameBoardSize, selectedStones);
+
+        for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
+            if (selectedStones[i][j] === 0) {
+                if (estimatedScore[i][j] === 1) {
+                    selectedStones[i][j] = 7;
+                }
+                if (estimatedScore[i][j] === 2) {
+                    selectedStones[i][j] = 8;
+                }
+            }
+        }
+
         var displayedStones = [];
 
         for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
@@ -411,9 +423,10 @@ var Board = React.createClass({
                 displayedStones.push({
                     x: i,
                     y: j,
-                    color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white' }[selectedStones[i][j]],
+                    color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white', 7: 'black', 8: 'white' }[selectedStones[i][j]],
                     isGhost: isGhostStoneColor(selectedStones[i][j]),
-                    isSelectedMove: selectedMove && selectedMove.row === i && selectedMove.col === j
+                    isSelectedMove: selectedMove && selectedMove.row === i && selectedMove.col === j,
+                    isEstimate: isEstimateColor(selectedStones[i][j]),
                 });
             }
         }
@@ -426,7 +439,6 @@ var Board = React.createClass({
         var borderSize = this.props.borderSize;
         var gridSize = boardSizePixels - 2*borderSize;
         var gameBoardSize = this.props.mostRecentGameState.size;
-        var stoneSize = gridSize / gameBoardSize;
 
         var self = this;
 
@@ -447,6 +459,7 @@ var Board = React.createClass({
                 y={borderSize} />
             {displayedStones.map(function (stone, i) {
                 var posOfStone = self.posOf(stone.x, stone.y);
+                var stoneSize = stone.isEstimate ? 15 : gridSize / gameBoardSize;
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image
                         key={stone.color + "-" + stone.x + "-" + stone.y}

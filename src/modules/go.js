@@ -4,8 +4,9 @@
     statesOfRoom maps roomId to
         - gameState,
         - takebackState,
-        - deadGroupResolutionState
-        - gameResult
+        - deadGroupResolutionState,
+        - gameResult,
+        - gameStatus
 */
 
 (function () {
@@ -314,6 +315,7 @@ var initialGameState = function (options) {
         'turn': 'black',
         'size': board_size,
         'moves': [],
+        'prisonerScore': 0,
     };
 };
 
@@ -401,10 +403,111 @@ var isLegalMove = function (gameState, color, x, y) {
 
 // go-specific logic
 
+var withExpandedBorder = function (boardSize, stones) {
+
+    // gets rid of some 0s
+
+    var ret = [];
+    for (var i = 0; i < boardSize; i++) ret.push([]);
+
+    for (var x=0; x<boardSize; x++) for (var y=0; y<boardSize; y++) {
+        if (stones[x][y] === 0) {
+
+            var influence = 0;
+            var influenced = false;
+
+            for (var dx=-1; dx <= 1; dx += 1) for (var dy=-1; dy <= 1; dy += 1) {
+                if (dx === 0 && dy === 0) continue;
+                if (dx * dy !== 0) continue;
+                if (!(0 <= x+dx && x+dx < boardSize)) continue;
+                if (!(0 <= y+dy && y+dy < boardSize)) continue;
+
+                if (stones[x+dx][y+dy] === 1) {
+                    influence += 1;
+                    influenced = true;
+                }
+                if (stones[x+dx][y+dy] === 2) {
+                    influence -= 1;
+                    influenced = true;
+                }
+            }
+            if (!influenced) ret[x][y] = 0;
+            if (influence > 0) ret[x][y] = 1;
+            if (influenced && influence === 0) ret[x][y] = 5;
+            if (influence < 0) ret[x][y] = 2;
+
+        } else {
+            ret[x][y] = stones[x][y];
+        }
+    }
+    return ret;
+
+}
+
+var estimatedScoreOfBoard = function (boardSize, stones) {
+
+    /*
+    returns an array of
+    1 - black territory
+    2 - white territory
+    5 - wall
+    */
+
+    var prisonerScore = 0;
+
+    var liveStones = copy(stones);
+
+    for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
+        if (liveStones[i][j] === 3) {
+            prisonerScore -= 1;
+            liveStones[i][j] = 0;
+        }
+        if (liveStones[i][j] === 4) {
+            prisonerScore += 1;
+            liveStones[i][j] = 0;
+        }
+    }
+
+    for (var k=0; k<boardSize; k++) liveStones = withExpandedBorder(boardSize, liveStones);
+
+    return liveStones;
+
+}
+
+
+
+var numBlackStones = function (stones) {
+    return numStonesWithColor(1, stones);
+}
+
+var numWhiteStones = function (stones) {
+    return numStonesWithColor(2, stones);
+}
+
+var sum = function (nums) {
+    if (nums.length === 0) return 0;
+    return nums[0] + sum(nums.slice(1));
+}
+
+var numStonesWithColor = function (color, stones) {
+    return sum(stones.map(function (row) {
+        return row.filter(function (c) {
+            return c === color;
+        }).length;
+    }));
+}
+
+var assert = function (b) {
+    if (!b) console.log("assertion failure");
+}
+
 var withNewPiece = function (gameState, color, x, y) {
     if (['black', 'white'].indexOf(color) === -1) throw new Exception("color");
 
     var oldGameState = copy(gameState);
+
+    var oldNumBlackStones = numBlackStones(gameState.stones);
+    var oldNumWhiteStones = numWhiteStones(gameState.stones);
 
     if (colorOf(gameState, x, y) !== 'empty') {
         if (isNodejs()) console.log('illegal move: not an empty intersection');
@@ -440,6 +543,29 @@ var withNewPiece = function (gameState, color, x, y) {
     if (repeatedOldPosition) {
         if (isNodejs()) console.log('illegal: positional superko');
         return false;
+    }
+
+    var newNumBlackStones = numBlackStones(gameState.stones);
+    var newNumWhiteStones = numWhiteStones(gameState.stones);
+
+    if (color === 'black') {
+        assert(newNumBlackStones === oldNumBlackStones + 1);
+        var numWhiteStonesKilled = oldNumWhiteStones - newNumWhiteStones;
+        assert(numWhiteStonesKilled >= 0);
+
+        if (numWhiteStonesKilled > 0) {
+            if (isNodejs()) console.log('killed', numWhiteStonesKilled, 'white stones');
+            gameState.prisonerScore += numWhiteStonesKilled;
+        }
+    } else if (color === 'white') {
+        assert(newNumWhiteStones === oldNumWhiteStones + 1);
+        var numBlackStonesKilled = oldNumBlackStones - newNumBlackStones;
+        assert(numBlackStonesKilled >= 0);
+
+        if (numBlackStonesKilled > 0) {
+            if (isNodejs()) console.log('killed', numBlackStonesKilled, 'black stones');
+            gameState.prisonerScore -= numBlackStonesKilled;
+        }
     }
 
     if (gameState.turn === 'white') {
@@ -597,12 +723,19 @@ if (isNodejs()) {
     exports.withNewPiece = withNewPiece;
     exports.boardStateHistoryOf = boardStateHistoryOf;
     exports.prettyReprOfStones = prettyReprOfStones;
+    exports.sum = sum;
+    exports.numBlackStones = numBlackStones;
+    exports.numWhiteStones = numWhiteStones;
+    exports.estimatedScoreOfBoard = estimatedScoreOfBoard;
+    exports.withExpandedBorder = withExpandedBorder;
+
 }
 
 if (isBrowser()) {
     window.isLegalMove = isLegalMove;
     window.boardStateHistoryOf = boardStateHistoryOf;
     window.initialGameState = initialGameState;
+    window.estimatedScoreOfBoard = estimatedScoreOfBoard;
 }
 
 })();

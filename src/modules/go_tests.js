@@ -8,7 +8,61 @@ var isAnyNeighbourDiffColorWithOnlyOneLiberty = go.isAnyNeighbourDiffColorWithOn
 var isSuicide = go.isSuicide;
 var withNewPiece = go.withNewPiece;
 var boardStateHistoryOf = go.boardStateHistoryOf;
-var prettyReprOfStones = go.prettyReprOfStones
+var prettyReprOfStones = go.prettyReprOfStones;
+var sum = go.sum;
+var numBlackStones = go.numBlackStones;
+var numWhiteStones = go.numWhiteStones;
+var estimatedScoreOfBoard = go.estimatedScoreOfBoard;
+var withExpandedBorder = go.withExpandedBorder;
+
+console.log(sum([]) === 0);
+console.log(sum([1, 2]) === 3);
+console.log(numBlackStones([
+    [1, 2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 2, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+]) === 2);
+console.log(numWhiteStones([
+    [1, 2, 0, 0, 0, 0, 0, 0, 0],
+    [2, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 2, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+]) === 3);
+
+var bs1 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 2, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+];
+console.log(bs1);
+var bs2 = withExpandedBorder(9, bs1);
+console.log(bs2);
+var bs3 = withExpandedBorder(9, bs2);
+console.log(bs3);
+var bs4 = withExpandedBorder(9, bs3);
+console.log(bs4);
+var bs5 = withExpandedBorder(9, bs4);
+console.log(bs5);
+
+console.log(estimatedScoreOfBoard(9, bs1));
+
 
 var gs1 = {
     stones: [
