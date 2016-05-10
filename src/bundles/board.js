@@ -246,7 +246,7 @@ var App = React.createClass({
                     }} />
             </div>
             <div className="col-md-6">
-                <pre>{JSON.stringify(this.state.gameStatus) + JSON.stringify(this.state.mostRecentGameState ? this.state.mostRecentGameState.numWhitePrisoners + '/' + this.state.mostRecentGameState.numBlackPrisoners : '??')}</pre>
+                <pre>{JSON.stringify(this.state.gameStatus)}</pre>
                 <Board
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}

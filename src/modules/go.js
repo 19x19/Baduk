@@ -330,8 +330,6 @@ var initialGameState = function (options) {
         'turn': 'black',
         'size': board_size,
         'moves': [],
-        'numBlackPrisoners': 0,
-        'numWhitePrisoners': 0,
     };
 };
 
@@ -469,17 +467,13 @@ var estimatedSquareOwnershipOfBoard = function (boardSize, stones) {
     5 - wall
     */
 
-    var prisonerScore = 0;
-
     var liveStones = copy(stones);
 
     for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
         if (liveStones[i][j] === 3) {
-            prisonerScore -= 1;
             liveStones[i][j] = 0;
         }
         if (liveStones[i][j] === 4) {
-            prisonerScore += 1;
             liveStones[i][j] = 0;
         }
     }
@@ -496,27 +490,24 @@ var scoreOfBoard = function (boardSize, stones) {
     returns an integer
     */
 
-    var prisonerScore = 0;
-
     var liveStones = copy(stones);
 
     for (var i=0; i<boardSize; i++) for (var j=0; j<boardSize; j++) {
         if (liveStones[i][j] === 3) {
-            prisonerScore -= 1;
             liveStones[i][j] = 0;
         }
         if (liveStones[i][j] === 4) {
-            prisonerScore += 1;
             liveStones[i][j] = 0;
         }
     }
 
     for (var k=0; k<2*boardSize; k++) liveStones = withExpandedBorder(boardSize, liveStones);
 
+    // here "territory" refers to area scoring territory (so stones + "japanese territory")
     var numBlackTerritory = numBlackStones(liveStones);
     var numWhiteTerritory = numWhiteStones(liveStones);
 
-    return prisonerScore + numBlackTerritory - numWhiteTerritory;
+    return numBlackTerritory - numWhiteTerritory;
 
 }
 
@@ -599,7 +590,6 @@ var withNewPiece = function (gameState, color, x, y) {
 
         if (numWhiteStonesKilled > 0) {
             if (isNodejs()) console.log('killed', numWhiteStonesKilled, 'white stones');
-            gameState.numWhitePrisoners += numWhiteStonesKilled;
         }
     } else if (color === 'white') {
         assert(newNumWhiteStones === oldNumWhiteStones + 1);
@@ -608,7 +598,6 @@ var withNewPiece = function (gameState, color, x, y) {
 
         if (numBlackStonesKilled > 0) {
             if (isNodejs()) console.log('killed', numBlackStonesKilled, 'black stones');
-            gameState.numBlackPrisoners += numBlackStonesKilled;
         }
     }
 
