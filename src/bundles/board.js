@@ -246,7 +246,7 @@ var App = React.createClass({
                     }} />
             </div>
             <div className="col-md-6">
-                <pre>{JSON.stringify(this.state.gameStatus) + JSON.stringify(this.state.mostRecentGameState ? this.state.mostRecentGameState.prisonerScore : '??')}</pre>
+                <pre>{JSON.stringify(this.state.gameStatus) + JSON.stringify(this.state.mostRecentGameState ? this.state.mostRecentGameState.numWhitePrisoners + '/' + this.state.mostRecentGameState.numBlackPrisoners : '??')}</pre>
                 <Board
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}
@@ -403,14 +403,15 @@ var Board = React.createClass({
 
         }
 
-        var estimatedScore = estimatedScoreOfBoard(gameBoardSize, selectedStones);
+        var estimatedSquareOwnership = estimatedSquareOwnershipOfBoard(gameBoardSize, selectedStones);
 
+        // propagate estimatedSquareOwnership to selectedStones
         for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
             if (selectedStones[i][j] === 0) {
-                if (estimatedScore[i][j] === 1) {
+                if (estimatedSquareOwnership[i][j] === 1) {
                     selectedStones[i][j] = 7;
                 }
-                if (estimatedScore[i][j] === 2) {
+                if (estimatedSquareOwnership[i][j] === 2) {
                     selectedStones[i][j] = 8;
                 }
             }

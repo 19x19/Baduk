@@ -12,7 +12,7 @@ var prettyReprOfStones = go.prettyReprOfStones;
 var sum = go.sum;
 var numBlackStones = go.numBlackStones;
 var numWhiteStones = go.numWhiteStones;
-var estimatedScoreOfBoard = go.estimatedScoreOfBoard;
+var estimatedSquareOwnershipOfBoard = go.estimatedSquareOwnershipOfBoard;
 var withExpandedBorder = go.withExpandedBorder;
 
 console.log(sum([]) === 0);
@@ -61,7 +61,7 @@ console.log(bs4);
 var bs5 = withExpandedBorder(9, bs4);
 console.log(bs5);
 
-console.log(estimatedScoreOfBoard(9, bs1));
+console.log(estimatedSquareOwnershipOfBoard(9, bs1));
 
 
 var gs1 = {

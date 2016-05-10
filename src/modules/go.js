@@ -330,7 +330,8 @@ var initialGameState = function (options) {
         'turn': 'black',
         'size': board_size,
         'moves': [],
-        'prisonerScore': 0,
+        'numBlackPrisoners': 0,
+        'numWhitePrisoners': 0,
     };
 };
 
@@ -459,7 +460,7 @@ var withExpandedBorder = function (boardSize, stones) {
 
 }
 
-var estimatedScoreOfBoard = function (boardSize, stones) {
+var estimatedSquareOwnershipOfBoard = function (boardSize, stones) {
 
     /*
     returns an array of
@@ -598,7 +599,7 @@ var withNewPiece = function (gameState, color, x, y) {
 
         if (numWhiteStonesKilled > 0) {
             if (isNodejs()) console.log('killed', numWhiteStonesKilled, 'white stones');
-            gameState.prisonerScore += numWhiteStonesKilled;
+            gameState.numWhitePrisoners += numWhiteStonesKilled;
         }
     } else if (color === 'white') {
         assert(newNumWhiteStones === oldNumWhiteStones + 1);
@@ -607,7 +608,7 @@ var withNewPiece = function (gameState, color, x, y) {
 
         if (numBlackStonesKilled > 0) {
             if (isNodejs()) console.log('killed', numBlackStonesKilled, 'black stones');
-            gameState.prisonerScore -= numBlackStonesKilled;
+            gameState.numBlackPrisoners += numBlackStonesKilled;
         }
     }
 
@@ -769,7 +770,7 @@ if (isNodejs()) {
     exports.sum = sum;
     exports.numBlackStones = numBlackStones;
     exports.numWhiteStones = numWhiteStones;
-    exports.estimatedScoreOfBoard = estimatedScoreOfBoard;
+    exports.estimatedSquareOwnershipOfBoard = estimatedSquareOwnershipOfBoard;
     exports.withExpandedBorder = withExpandedBorder;
 
 }
@@ -778,7 +779,7 @@ if (isBrowser()) {
     window.isLegalMove = isLegalMove;
     window.boardStateHistoryOf = boardStateHistoryOf;
     window.initialGameState = initialGameState;
-    window.estimatedScoreOfBoard = estimatedScoreOfBoard;
+    window.estimatedSquareOwnershipOfBoard = estimatedSquareOwnershipOfBoard;
 }
 
 })();
