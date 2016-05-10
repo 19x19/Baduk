@@ -1,6 +1,7 @@
 // NPM libraries
 const xss = require('node-xss').clean;
 const emoji = require('node-emoji');
+const fs = require('fs');
 
 // Baduk libraries
 const games = require('./games.js');
@@ -8,8 +9,17 @@ const go = require('./go.js');
 
 // Sets up a logger for all socket stuff
 const winston = require('winston');
+var logFileAvailable = false;
+try {
+    fs.readFileSync('/var/log/baduk.log');
+    logFileAvailable = true;
+} catch (e) {
+    logFileAvailable = false;
+}
+
+
 const logger = new (winston.Logger)({
-  transports: [
+  transports: logFileAvailable ? [
     new (winston.transports.Console)({
         level: 'info',
     }),
@@ -17,6 +27,10 @@ const logger = new (winston.Logger)({
         filename: '/var/log/baduk.log',
         level: 'verbose',
     })
+  ] : [
+    new (winston.transports.Console)({
+        lever: 'verbose',
+    }),
   ]
 });
 
