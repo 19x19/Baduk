@@ -313,7 +313,35 @@ var ButtonArea = React.createClass({
             console.log('unknown gameStatus ', this.props.gameStatus);
         }
     }
-})
+});
+
+var isNonEmptyStoneColor = function (i) {
+    return i === 1 || i === 2 || i === 3 || i === 4 || i === 7 || i === 8;
+}
+var isGhostStoneColor = function (i) {
+    return i === 3 || i === 4;
+}
+var isEstimateColor = function (i) {
+    return i === 7 || i === 8;
+}
+
+var itemizedStonesOf = function (gameBoardSize, stones, selectedMove) {
+    var ret = [];
+    for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
+        if (isNonEmptyStoneColor(stones[i][j])) {
+            ret.push({
+                x: i,
+                y: j,
+                color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white', 7: 'black', 8: 'white' }[stones[i][j]],
+                isGhost: isGhostStoneColor(stones[i][j]),
+                isSelectedMove: selectedMove && selectedMove.row === i && selectedMove.col === j,
+                isEstimate: isEstimateColor(stones[i][j]),
+            });
+        }
+    }
+    return ret;
+}
+
 
 var Board = React.createClass({
     // props:
@@ -335,44 +363,13 @@ var Board = React.createClass({
     },
     getDisplayedStones: function () {
         if (this.props.gameStatus === 'resolving_dead_groups' && this.props.deadGroupResolutionState) {
-            var displayedStones = [];
-            var gameBoardSize = this.props.mostRecentGameState.size;
-
-            var stones = this.props.deadGroupResolutionState.stones;
-
-            var isNonEmptyStoneColor = function (i) {
-                return i === 1 || i === 2 || i === 3 || i === 4 || i === 7 || i === 8;
-            }
-            var isGhostStoneColor = function (i) {
-                return i === 3 || i === 4;
-            }
-
-            for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
-                if (isNonEmptyStoneColor(stones[i][j])) {
-                    displayedStones.push({
-                        x: i,
-                        y: j,
-                        color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white' }[stones[i][j]],
-                        isGhost: isGhostStoneColor(stones[i][j]),
-                        isSelectedMove: false
-                    });
-                }
-            }
-            return displayedStones;
+            return itemizedStonesOf(this.props.mostRecentGameState.size, this.props.deadGroupResolutionState.stones);
         } else {
             return this.getSelectedDisplayedStones();
         }
     },
     getSelectedDisplayedStones: function () {
-        var isNonEmptyStoneColor = function (i) {
-            return i === 1 || i === 2 || i === 3 || i === 4 || i === 7 || i === 8;
-        }
-        var isGhostStoneColor = function (i) {
-            return i === 3 || i === 4;
-        }
-        var isEstimateColor = function (i) {
-            return i === 7 || i === 8;
-        }
+
 
         if (this.props.mostRecentGameState.moves.length === this.props.selectedMoveIdx + 1) {
             // fast path optimization, not strictly necessary
@@ -384,16 +381,7 @@ var Board = React.createClass({
 
         var selectedMove = this.props.mostRecentGameState.moves[this.props.selectedMoveIdx];
 
-        var stones = [];
         var gameBoardSize = this.props.mostRecentGameState.size;
-
-        var isNonEmptyStoneColor = function (i) {
-            return i === 1 || i === 2 || i === 3 || i === 4 || i === 7 || i === 8;
-        }
-
-        var isGhostStoneColor = function (i) {
-            return i === 3 || i === 4;
-        }
 
         if ((this.props.gameStatus === 'playing' || this.props.gameStatus === null) &&
             this.props.hoverPiece &&
@@ -417,21 +405,8 @@ var Board = React.createClass({
             }
         }
 
-        var displayedStones = [];
+        return itemizedStonesOf(gameBoardSize, selectedStones, selectedMove);
 
-        for (var i=0; i<gameBoardSize; i++) for (var j=0; j<gameBoardSize; j++) {
-            if (isNonEmptyStoneColor(selectedStones[i][j])) {
-                displayedStones.push({
-                    x: i,
-                    y: j,
-                    color: { 1: 'black', 2: 'white', 3: 'black', 4: 'white', 7: 'black', 8: 'white' }[selectedStones[i][j]],
-                    isGhost: isGhostStoneColor(selectedStones[i][j]),
-                    isSelectedMove: selectedMove && selectedMove.row === i && selectedMove.col === j,
-                    isEstimate: isEstimateColor(selectedStones[i][j]),
-                });
-            }
-        }
-        return displayedStones;
     },
     render: function () {
 
