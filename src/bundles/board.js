@@ -358,7 +358,7 @@ var Board = React.createClass({
         };
     },
     getDisplayedStones: function () {
-        if (this.props.gameStatus === 'resolving_dead_groups' && this.props.deadGroupResolutionState) {
+        if ((this.props.gameStatus === 'resolving_dead_groups' || this.props.gameStatus === 'game_over') && this.props.deadGroupResolutionState) {
             return {
                 gameBoardSize: this.props.mostRecentGameState.size,
                 stones: this.props.deadGroupResolutionState.stones,
@@ -406,8 +406,6 @@ var Board = React.createClass({
         var estimatedSquareOwnership = estimatedSquareOwnershipOfBoard(displayedStones.gameBoardSize, displayedStones.stones);
 
         var itemizedSquareOwnership = itemizedStonesOf(displayedStones.gameBoardSize, estimatedSquareOwnership);
-
-        console.log(itemizedSquareOwnership);
 
         var boardSizePixels = this.props.boardSize;
         var borderSize = this.props.borderSize;

@@ -39,10 +39,33 @@ var applyMove = function (roomId, action) {
     }
 
     if (action['action'] === 'retract_pass') {
-        console.log('retract_pass');
         if (currentGameStatus(roomId) === 'resolving_dead_groups') {
+
+            var player_color = action.player_color;
+
+            console.log(player_color, 'retracts pass');
+            console.log(statesOfRoom[roomId].gameState);
+
+            var gameState = statesOfRoom[roomId].gameState;
+            var lastMove = gameState.moves.slice(-1)[0]
+
+            console.log(lastMove);
+
+            assert(lastMove.action === 'pass');
+
+            var numMovesToRevert = 0;
+            if (lastMove.player_color === player_color) {
+                numMovesToRevert = 1;
+                console.log('revert 1 move');
+            } else {
+                numMovesToRevert = 2;
+                console.log('revert 2 moves');
+            }
+
+            statesOfRoom[roomId].gameState.moves = statesOfRoom[roomId].gameState.moves.slice(0, -numMovesToRevert);
             statesOfRoom[roomId].gameStatus = 'playing';
-            // todo: revert one or two previous passes
+            statesOfRoom[roomId].gameState.turn = player_color;
+
             return true;
         } else {
             if (isNodejs()) console.log('illegal move: cannot retract_pass unless status is resolving_dead_groups');
