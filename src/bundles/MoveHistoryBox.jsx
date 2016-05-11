@@ -12,7 +12,8 @@ window.MoveHistoryBox = React.createClass({
             <h5>Move History</h5>
             <div ref="scroll" style={{
                 maxHeight: '25em',
-                overflow: 'scroll'
+                overflowX: 'show',
+                overflowY: 'scroll',
             }}>{pairsOf(this.props.moves).map(function (pair, i) {
 
                 var moveEntries = pair.map(function (obj) {
@@ -25,13 +26,13 @@ window.MoveHistoryBox = React.createClass({
                 });
 
                 if (pair.length === 2) {
-                    return <div key={i} style={{margin: 0, padding: 0}}>
+                    return <div key={i} style={{margin: 0, padding: 0, display: 'flex'}}>
                         <div style={{display: 'inline-block', paddingLeft: 10, paddingRight: 10, backgroundColor: 'lightgrey', width: '3em', textAlign: 'right'}}>{i+1}</div>
                         {moveEntries[0]}
                         {moveEntries[1]}
                     </div>
                 } else {
-                    return <div key={i} style={{margin: 0, padding: 0}}>
+                    return <div key={i} style={{margin: 0, padding: 0, display: 'flex'}}>
                         <div style={{display: 'inline-block', paddingLeft: 10, paddingRight: 10, backgroundColor: 'lightgrey', width: '3em', textAlign: 'right'}}>{i+1}</div>
                         {moveEntries[0]}
                     </div>

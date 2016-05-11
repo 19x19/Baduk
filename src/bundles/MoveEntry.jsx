@@ -3,8 +3,7 @@ window.MoveEntry = React.createClass({
 		return <div className="moveEntry"
 			style={{
 				fontWeight: this.props.isSelected ? 'bold' : 'lighter',
-				width: '40%',
-				display: 'inline-block',
+				flexGrow: 1,
 				paddingLeft: 5,
 			}}
 			onClick={this.props.onClick}
