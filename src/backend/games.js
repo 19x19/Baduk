@@ -134,6 +134,7 @@ exports.remove_user = remove_user;
 exports.players_in_room = players_in_room;
 exports.cleanse = cleanse;
 exports.registerGameRoom = registerGameRoom;
+exports.sockets_in_room = sockets_in_room;
 
 exports.current_games = current_games;
 exports.current_users = current_users;

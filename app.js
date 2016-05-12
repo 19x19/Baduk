@@ -35,6 +35,7 @@ const bodyParser = require('body-parser');
 // Baduk modules
 const games = require('./src/backend/games.js');
 const sockets = require('./src/backend/sockets.js');
+const go = require('./src/modules/go.js');
 
 // Export public, bower_components and src as static directories
 app.use(express.static('public'));
@@ -125,6 +126,26 @@ app.get('/go/:id', function (req, res) {
     } else {
         res.redirect('/');
     }
+});
+
+app.get('/lobby', function (req, res) {
+    res.sendFile(__dirname + '/src/views/lobby.html');
+});
+
+app.get('/lobby.json', function (req, res) {
+
+    var ret = {};
+
+    Object.keys(games.current_games).forEach(function (roomId) {
+        ret[roomId] = {
+            'numPlayers': games.sockets_in_room(roomId).length,
+            'gameStatus': go.getLobby()[roomId].gameStatus,
+            'gameState': go.getLobby()[roomId].gameState,
+        }
+    });
+
+    res.json(ret);
+    // console.log(games.current_games);
 });
 
 // 404 page will just redirect to homepage

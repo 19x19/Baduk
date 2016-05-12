@@ -15,9 +15,14 @@ var statesOfRoom = {};
 
 // public API
 
+var getLobby = function () {
+    return statesOfRoom;
+}
+
 var registerGameRoom = function (roomId, options) {
     statesOfRoom[roomId] = {};
     statesOfRoom[roomId].gameState = initialGameState(options);
+    statesOfRoom[roomId].gameStatus = 'playing';
 }
 
 var applyMove = function (roomId, action) {
@@ -766,6 +771,7 @@ if (isNodejs()) {
     exports.currentGameStatus = currentGameStatus;
     exports.currentDeadGroupResolutionState = currentDeadGroupResolutionState;
     exports.registerGameRoom = registerGameRoom;
+    exports.getLobby = getLobby;
 
     // exported for testing
 
