@@ -74,16 +74,17 @@ var LobbyApp = React.createClass({
     }
 });
 
-fetch('/lobby.json').then(function (res) {
-    return res.json();
-}).then(function (res) {
-    console.log(res);
-    
-    ReactDOM.render(
-      <LobbyApp lobbyData={res} />, document.getElementById('reactLobbyAppContainer')
-    );
+setInterval(() => {
+    fetch('/lobby.json').then(function (res) {
+        return res.json();
+    }).then(function (res) {
+        ReactDOM.render(
+          <LobbyApp lobbyData={res} />, document.getElementById('reactLobbyAppContainer')
+        );
 
-});
+    });
+}, 1000);
+
 
 </script>
 
