@@ -11,11 +11,26 @@ $(window).resize(function () {
     });
 });
 
+$('#gameOverOKBtn').click(() => {
+    $('#gameOver').modal('hide');
+});
+
 socket.on('new_game_state', function (gameState) {
 
     if (gameState === false) {
         console.log('WARN: gameState is false, this should never happen. Please contact @zodiac');
         return;
+    }
+
+    if (gameState.result) {
+        console.log(gameState.result);
+        var winner = gameState.result.winner;
+        winner = winner[0].toUpperCase() + winner.slice(1);
+        if (gameState.result.advantage === 'resign') {
+            $('#winMessage').text(winner + " wins by resignation");
+        } else {
+            $('#winMessage').text(winner + " wins by " + gameState.result.advantage + " points");
+        }
     }
 
     // Play the sound for a new piece
@@ -48,6 +63,9 @@ socket.on('move_is_illegal', function (msg) {
 });
 
 socket.on('new_game_status', function (msg) {
+    if (msg === 'game_over') {
+        $('#gameOver').modal('show');
+    }
     window.appElement.setState({
         gameStatus: msg,
     });

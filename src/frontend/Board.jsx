@@ -25,9 +25,7 @@ window.Board = React.createClass({
                 y={this.props.borderSize} />
             {this.props.itemizedStones.map((stone, i) => {
                 var posOfStone = this.posOf(stone.x, stone.y);
-                console.log(posOfStone);
                 var stoneSize = this.props.gridSize / this.props.gameBoardSize;
-                console.log(stoneSize);
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image
                         key={stone.color + "-" + stone.x + "-" + stone.y}

@@ -45,7 +45,6 @@
     <!-- User Wait Pop Up-->
     <div class="modal fade" id="userWait" role="dialog" data-backdrop="static">
         <div class="modal-dialog" style="margin-top: 120px">
-            <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Waiting for another player to join...</h4>
@@ -53,6 +52,21 @@
                 </div>
                 <div class="modal-body">
                     <button id="roomLink" data-toggle="popover" data-placement="right" class="btn">Copy Room Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Pop Up-->
+    <div class="modal" id="gameOver" role="dialog" data-backdrop="static">
+        <div class="modal-dialog" style="margin-top: 120px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Game Over!</h4>
+                    <span id="winMessage"></span>
+                </div>
+                <div class="modal-body">
+                    <button id="gameOverOKBtn" class="btn">OK</button>
                 </div>
             </div>
         </div>
@@ -77,5 +91,6 @@
     <script type="text/babel" src="/src/frontend/Board.jsx"></script>
     <script type="text/babel" src="/src/frontend/board.js"></script>
     <script src="/src/frontend/chat.js"></script>
+
 </body>
 </html>
