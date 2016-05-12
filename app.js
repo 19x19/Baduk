@@ -33,8 +33,8 @@ const ddos = new Ddos({'silentStart' : true});
 const bodyParser = require('body-parser');
 
 // Baduk modules
-const games = require('./src/modules/games.js');
-const sockets = require('./src/modules/sockets.js');
+const games = require('./src/backend/games.js');
+const sockets = require('./src/backend/sockets.js');
 
 // Export public, bower_components and src as static directories
 app.use(express.static('public'));

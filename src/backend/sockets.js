@@ -5,7 +5,7 @@ const fs = require('fs');
 
 // Baduk libraries
 const games = require('./games.js');
-const go = require('./go.js');
+const go = require('../modules/go.js');
 
 // Sets up a logger for all socket stuff
 const winston = require('winston');

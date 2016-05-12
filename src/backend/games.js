@@ -5,7 +5,7 @@ var moniker = require('moniker');
 var schedule = require('node-schedule');
 var cryptohat = require('cryptohat');
 
-var go = require('./go.js');
+var go = require('../modules/go.js');
 
 var current_games = {};
 var current_users = {};

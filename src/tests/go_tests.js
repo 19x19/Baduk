@@ -1,4 +1,4 @@
-var go = require('./go');
+var go = require('../modules/go');
 var isInBounds = go.isInBounds;
 var libertiesOf = go.libertiesOf;
 var withoutDeadGroups = go.withoutDeadGroups;
