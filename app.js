@@ -101,7 +101,7 @@ app.get('/hash', function(req, res) {
 
 // No robots around here y'all
 app.get('/robots.txt', function(req, res) {
-    res.sendFile(__dirname + '/src/views/robots.txt');
+    res.sendFile(__dirname + '/public/robots.txt');
 });
 
 app.post('/go', function (req, res) {
