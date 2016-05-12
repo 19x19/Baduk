@@ -1,12 +1,11 @@
+/*
+    Javascript module for games.
+*/
 var moniker = require('moniker');
 var schedule = require('node-schedule');
 var cryptohat = require('cryptohat');
 
 var go = require('./go.js');
-
-/*
-    Javascript module for games.
-*/
 
 var current_games = {};
 var current_users = {};

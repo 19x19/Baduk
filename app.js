@@ -36,10 +36,11 @@ const bodyParser = require('body-parser');
 const games = require('./src/modules/games.js');
 const sockets = require('./src/modules/sockets.js');
 
-// What to use, what not to use, that is the question
+// Export public, bower_components and src as static directories
 app.use(express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 app.use('/src', express.static('src'));
+
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(ddos.express);
 app.use(session);
