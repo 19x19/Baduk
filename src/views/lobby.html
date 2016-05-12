@@ -29,6 +29,9 @@
         <div id="reactLobbyAppContainer"></div>
     </div>
 
+    <script src="/src/frontend/helpers.js"></script>
+    <script type="text/babel" src="/src/frontend/Board.jsx"></script>
+
 </head>
 
 <body>
@@ -38,11 +41,34 @@ var LobbyApp = React.createClass({
         var roomIds = Object.keys(this.props.lobbyData);
         return <div>
             <h1>Lobby</h1>
+            <h3>{roomIds.length} games in progress</h3>
             {roomIds.map((roomId) => {
+                var gameState = this.props.lobbyData[roomId].gameState;
                 console.log(this.props.lobbyData[roomId]);
-                return <div key={roomId}>
-                    <a href={"/go/" + roomId}>{"Room with " + this.props.lobbyData[roomId].numPlayers + " players"}</a>
-                </div>
+
+                // var displayedStones = this.getDisplayedStones();
+                var itemizedStones = itemizedStonesOf(gameState.size, gameState.stones);
+                // var estimatedSquareOwnership = estimatedSquareOwnershipOfBoard(displayedStones.gameBoardSize, displayedStones.stones);
+                // var itemizedSquareOwnership = itemizedStonesOf(displayedStones.gameBoardSize, estimatedSquareOwnership);
+
+                // // this.props.boardSize is actually boardSizePixels
+
+                return <a key={roomId} style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: 350,
+                }} href={"/go/" + roomId}>
+                    <Board
+                        boardSizePixels={300}
+                        borderSize={5}
+                        onClick={() => {}}
+                        gameBoardSize={gameState.size}
+                        gridSize={300 - 2*5}
+                        itemizedStones={itemizedStones}
+                        itemizedSquareOwnership={[]} />
+                    <div style={{color: 'black'}}>{this.props.lobbyData[roomId].numPlayers + " players"}</div>
+                </a>
             })}
         </div>
     }
