@@ -338,6 +338,65 @@ var itemizedStonesOf = function (gameBoardSize, stones, selectedMove) {
     return ret;
 }
 
+var Board = React.createClass({
+    posOf: function (row, col) {
+        var stoneSize = this.props.gridSize / (this.props.gameBoardSize - 1);
+        return {
+            x: this.props.borderSize + (row * stoneSize),
+            y: this.props.borderSize + (col * stoneSize),
+        };
+    },
+    render: function () {
+        var self = this;
+        return <svg
+            height={this.props.boardSizePixels}
+            width={this.props.boardSizePixels}
+            onClick={this.props.onClick}
+        >
+            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={this.props.boardSizePixels} height={this.props.boardSizePixels} />
+            <image xlinkHref={{
+                9: "/img/go_board_9.png",
+                13: "/img/go_board_13.png",
+                19: "/img/go_board_19.png",
+            }[this.props.gameBoardSize] }
+                width={this.props.gridSize}
+                height={this.props.gridSize}
+                x={this.props.borderSize}
+                y={this.props.borderSize} />
+            {this.props.itemizedStones.map((stone, i) => {
+                var posOfStone = this.posOf(stone.x, stone.y);
+                console.log(posOfStone);
+                var stoneSize = this.props.gridSize / this.props.gameBoardSize;
+                console.log(stoneSize);
+                if (stone.color === 'white' || stone.color === 'black') {
+                    return <image
+                        key={stone.color + "-" + stone.x + "-" + stone.y}
+                        xlinkHref={"/img/" + stone.color + "_circle" + (stone.isSelectedMove ? "_recent" : "" ) + ".png"}
+                        x={posOfStone.x - (stoneSize / 2)}
+                        y={posOfStone.y - (stoneSize / 2)}
+                        width={stoneSize}
+                        height={stoneSize}
+                        opacity={stone.isGhost ? 0.5 : 1} />
+                }
+            })}
+            {this.props.itemizedSquareOwnership.map((stone, i) => {
+                var posOfStone = this.posOf(stone.x, stone.y);
+                var stoneSize = 15
+                if (stone.color === 'white' || stone.color === 'black') {
+                    return <image
+                        key={stone.color + "-" + stone.x + "-" + stone.y}
+                        xlinkHref={"/img/" + stone.color + "_circle" + (stone.isSelectedMove ? "_recent" : "" ) + ".png"}
+                        x={posOfStone.x - (stoneSize / 2)}
+                        y={posOfStone.y - (stoneSize / 2)}
+                        width={stoneSize}
+                        height={stoneSize}
+                        opacity={stone.isGhost ? 0.5 : 1} />
+                }
+            })}
+        </svg>
+    }
+})
+
 var BoardContainer = React.createClass({
     // props:
     // mostRecentGameState
@@ -348,14 +407,7 @@ var BoardContainer = React.createClass({
     // handleClick
     // gridSize
     // playerColor
-    // todo: reduce
-    posOf: function (row, col) {
-        var stoneSize = this.props.gridSize / (this.props.mostRecentGameState.size - 1);
-        return {
-            x: this.props.borderSize + (row * stoneSize),
-            y: this.props.borderSize + (col * stoneSize),
-        };
-    },
+    // todo: reduce these props
     getDisplayedStones: function () {
         if ((this.props.gameStatus === 'resolving_dead_groups' || this.props.gameStatus === 'game_over') && this.props.deadGroupResolutionState) {
             return {
@@ -400,63 +452,20 @@ var BoardContainer = React.createClass({
     render: function () {
 
         var displayedStones = this.getDisplayedStones();
-
         var itemizedStones = itemizedStonesOf(displayedStones.gameBoardSize, displayedStones.stones, displayedStones.selectedMove);
         var estimatedSquareOwnership = estimatedSquareOwnershipOfBoard(displayedStones.gameBoardSize, displayedStones.stones);
-
         var itemizedSquareOwnership = itemizedStonesOf(displayedStones.gameBoardSize, estimatedSquareOwnership);
 
-        var boardSizePixels = this.props.boardSize;
-        var borderSize = this.props.borderSize;
-        var gridSize = boardSizePixels - 2*borderSize;
-        var gameBoardSize = this.props.mostRecentGameState.size;
+        // this.props.boardSize is actually boardSizePixels
 
-        var self = this;
-
-        return <svg
-            height={boardSizePixels}
-            width={boardSizePixels}
+        return <Board
+            boardSizePixels={this.props.boardSize}
+            borderSize={this.props.borderSize}
             onClick={this.props.handleClick}
-        >
-            <image xlinkHref="/img/wood-texture.jpg" preserveAspectRatio="none" x="0" y="0" width={boardSizePixels} height={boardSizePixels} />
-            <image xlinkHref={{
-                9: "/img/go_board_9.png",
-                13: "/img/go_board_13.png",
-                19: "/img/go_board_19.png",
-            }[gameBoardSize] }
-                width={gridSize}
-                height={gridSize}
-                x={borderSize}
-                y={borderSize} />
-            {itemizedStones.map(function (stone, i) {
-                var posOfStone = self.posOf(stone.x, stone.y);
-                var stoneSize = gridSize / gameBoardSize;
-                if (stone.color === 'white' || stone.color === 'black') {
-                    return <image
-                        key={stone.color + "-" + stone.x + "-" + stone.y}
-                        xlinkHref={"/img/" + stone.color + "_circle" + (stone.isSelectedMove ? "_recent" : "" ) + ".png"}
-                        x={posOfStone.x - (stoneSize / 2)}
-                        y={posOfStone.y - (stoneSize / 2)}
-                        width={stoneSize}
-                        height={stoneSize}
-                        opacity={stone.isGhost ? 0.5 : 1} />
-                }
-            })}
-            {itemizedSquareOwnership.map(function (stone, i) {
-                var posOfStone = self.posOf(stone.x, stone.y);
-                var stoneSize = 15
-                if (stone.color === 'white' || stone.color === 'black') {
-                    return <image
-                        key={stone.color + "-" + stone.x + "-" + stone.y}
-                        xlinkHref={"/img/" + stone.color + "_circle" + (stone.isSelectedMove ? "_recent" : "" ) + ".png"}
-                        x={posOfStone.x - (stoneSize / 2)}
-                        y={posOfStone.y - (stoneSize / 2)}
-                        width={stoneSize}
-                        height={stoneSize}
-                        opacity={stone.isGhost ? 0.5 : 1} />
-                }
-            })}
-        </svg>
+            gameBoardSize={this.props.mostRecentGameState.size}
+            gridSize={this.props.boardSize - 2*this.props.borderSize}
+            itemizedStones={itemizedStones}
+            itemizedSquareOwnership={itemizedSquareOwnership} />
     }
 });
 
