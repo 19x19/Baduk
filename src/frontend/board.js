@@ -247,7 +247,7 @@ var App = React.createClass({
             </div>
             <div className="col-md-6">
                 <pre>{JSON.stringify(this.state.gameStatus)}</pre>
-                <Board
+                <BoardContainer
                     ref="gameBoard"
                     mostRecentGameState={this.state.mostRecentGameState}
                     selectedMoveIdx={this.state.selectedMoveIdx}
@@ -338,8 +338,7 @@ var itemizedStonesOf = function (gameBoardSize, stones, selectedMove) {
     return ret;
 }
 
-
-var Board = React.createClass({
+var BoardContainer = React.createClass({
     // props:
     // mostRecentGameState
     // selectedMoveIdx
