@@ -10,7 +10,6 @@ window.Board = React.createClass({
         return this.props.boardSizePixels - 2*this.props.borderSize;
     },
     render: function () {
-        var self = this;
         return <svg
             height={this.props.boardSizePixels}
             width={this.props.boardSizePixels}

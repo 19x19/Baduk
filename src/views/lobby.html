@@ -46,12 +46,9 @@ var LobbyApp = React.createClass({
                 var gameState = this.props.lobbyData[roomId].gameState;
                 console.log(this.props.lobbyData[roomId]);
 
-                // var displayedStones = this.getDisplayedStones();
                 var itemizedStones = itemizedStonesOf(gameState.size, gameState.stones);
-                // var estimatedSquareOwnership = estimatedSquareOwnershipOfBoard(displayedStones.gameBoardSize, displayedStones.stones);
-                // var itemizedSquareOwnership = itemizedStonesOf(displayedStones.gameBoardSize, estimatedSquareOwnership);
 
-                // // this.props.boardSize is actually boardSizePixels
+                // this.props.boardSize is actually boardSizePixels
 
                 return <a key={roomId} style={{
                     display: 'flex',
