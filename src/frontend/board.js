@@ -399,7 +399,6 @@ var BoardContainer = React.createClass({
             borderSize={this.props.borderSize}
             onClick={this.props.handleClick}
             gameBoardSize={this.props.mostRecentGameState.size}
-            gridSize={this.props.boardSize - 2*this.props.borderSize}
             itemizedStones={itemizedStones}
             itemizedSquareOwnership={itemizedSquareOwnership} />
     }

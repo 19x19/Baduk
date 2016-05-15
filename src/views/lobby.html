@@ -61,10 +61,9 @@ var LobbyApp = React.createClass({
                 }} href={"/go/" + roomId}>
                     <Board
                         boardSizePixels={300}
-                        borderSize={5}
+                        borderSize={15}
                         onClick={() => {}}
                         gameBoardSize={gameState.size}
-                        gridSize={300 - 2*5}
                         itemizedStones={itemizedStones}
                         itemizedSquareOwnership={[]} />
                     <div style={{color: 'black'}}>{this.props.lobbyData[roomId].numPlayers + " players"}</div>

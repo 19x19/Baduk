@@ -1,10 +1,13 @@
 window.Board = React.createClass({
     posOf: function (row, col) {
-        var stoneSize = this.props.gridSize / (this.props.gameBoardSize - 1);
+        var stoneSize = this.gridSize() / (this.props.gameBoardSize - 1);
         return {
             x: this.props.borderSize + (row * stoneSize),
             y: this.props.borderSize + (col * stoneSize),
         };
+    },
+    gridSize: function () {
+        return this.props.boardSizePixels - 2*this.props.borderSize;
     },
     render: function () {
         var self = this;
@@ -19,13 +22,13 @@ window.Board = React.createClass({
                 13: "/img/go_board_13.png",
                 19: "/img/go_board_19.png",
             }[this.props.gameBoardSize] }
-                width={this.props.gridSize}
-                height={this.props.gridSize}
+                width={this.gridSize()}
+                height={this.gridSize()}
                 x={this.props.borderSize}
                 y={this.props.borderSize} />
             {this.props.itemizedStones.map((stone, i) => {
                 var posOfStone = this.posOf(stone.x, stone.y);
-                var stoneSize = this.props.gridSize / this.props.gameBoardSize;
+                var stoneSize = this.gridSize() / this.props.gameBoardSize;
                 if (stone.color === 'white' || stone.color === 'black') {
                     return <image
                         key={stone.color + "-" + stone.x + "-" + stone.y}
