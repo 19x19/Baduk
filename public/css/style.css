@@ -114,6 +114,17 @@ section.header .main-header p{
     color: #fff;
     text-transform: uppercase;
 }
+section.header img{
+    max-width: 50px;
+    height: 50px;
+    align-self: center;
+    margin-top: 10px;
+}
+section.header .header-logo-container{
+  display: inline-flex;
+  align-content: center;
+  flex-direction: row;
+}
 section.header .main-header button i{
     margin-right: 10px;
 }
@@ -306,4 +317,22 @@ section.header .main-header button:hover{
 .modal-body {
     overflow: hidden;
 }
+.header-container{
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.header-container h1,
+.header-container img{
+  display: inline-block;
+}
+.header-container img{
+  max-height: 40px;
+  margin-top: 10px;
+}
+@media(max-width: 405px){
+  section.header .header-logo-container{
+    flex-direction: column;
+  }
 
+}

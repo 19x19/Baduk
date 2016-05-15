@@ -9,6 +9,7 @@
     <meta name="author" content="">
 
     <title>Baduk</title>
+    <link rel="icon" href="img/favicon.png" type="image/x-icon" />
 
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -73,7 +74,8 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn" id="startGame">Start</button>
+                    <button class="btn btn-secondary" id="quit">Cancel</button>
+                    <button class="btn btn-primary" id="startGame">Start</button>
                 </div>
             </div>
         </div>
@@ -82,7 +84,10 @@
     <!-- Head content -->
     <section class="header">
         <div class="container main-header text-center">
-            <h1 class="">Baduk</h1>
+            <div class="header-logo-container">
+                <img class="img-responsive" src="img/logo.png">
+                <h1 class="">Baduk</h1>
+            </div>
             <p>The easiest Go platform you've ever used</p>
             <button class="btn btn-primary" id="playGame_top"><i class="icon-control-play icons"></i> Play Go</button>
         </div>
@@ -157,6 +162,10 @@ Baduk is not for profit. We don't have ads and we don't collect your information
                 location.href = url;
             },
         });
+    });
+
+    $("#quit").on("click", function() {
+        $("#createGame").modal('hide');
     });
     </script>
 
